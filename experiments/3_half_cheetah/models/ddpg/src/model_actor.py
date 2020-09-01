@@ -7,7 +7,7 @@ class Model(torch.nn.Module):
     def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
 
-        self.device = "cpu" #torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = "cpu"
         
          
         self.layers = [ 

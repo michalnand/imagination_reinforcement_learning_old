@@ -1,4 +1,4 @@
-import common.decay
+import libs_common.decay
 
 class Config(): 
 

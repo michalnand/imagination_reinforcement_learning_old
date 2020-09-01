@@ -84,7 +84,7 @@ class EpisodicLifeEnv(gym.Wrapper):
         obs, reward, done, info = self.env.step(action)
         self.was_real_done = done
         
-        lives = self.env.unwrapped.ale.lives()
+        lives = 3 #self.env.unwrapped.ale.lives()
         if lives < self.lives and lives > 0:
             done    = True
             reward  = -1.0
@@ -99,8 +99,8 @@ class EpisodicLifeEnv(gym.Wrapper):
             obs = self.env.reset(**kwargs)
         else:
             obs, _, _, _ = self.env.step(0)
-        self.lives = self.env.unwrapped.ale.lives()
-        self.inital_lives = self.env.unwrapped.ale.lives()
+        self.lives = 3 #self.env.unwrapped.ale.lives()
+        self.inital_lives = 3 #self.env.unwrapped.ale.lives()
         return obs
 
 
