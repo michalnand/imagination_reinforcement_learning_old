@@ -1,25 +1,25 @@
-import sys
-sys.path.insert(0, '..')
 import gym
 import pybulletgym
 import numpy
 import time
 
+import sys
+sys.path.insert(0, '../..')
 
-import agents
+import libs_agents
+from libs_common.Training import *
 
 
 import models.ddpg.src.model_critic     as ModelCritic
 import models.ddpg.src.model_actor      as ModelActor
 import models.ddpg.src.config           as Config
-from common.Training import *
 
 path = "models/ddpg/"
 
 env = gym.make("HalfCheetahPyBulletEnv-v0")
 #env.render()
 
-agent = agents.AgentDDPG(env, ModelCritic, ModelActor, Config)
+agent = libs_agents.AgentDDPG(env, ModelCritic, ModelActor, Config)
 
 max_iterations = 10*(10**6)
 trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
