@@ -40,17 +40,21 @@ class Model(torch.nn.Module):
  
 
         self.layers_features = [ 
-                        nn.Conv2d(input_channels, 32, kernel_size=3, stride=2, padding=1),
+                        nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1),
                         nn.ReLU(), 
+                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
-                        nn.Conv2d(32, 32, kernel_size=3, stride=2, padding=1),
+                        nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
                         nn.ReLU(),
+                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
  
-                        nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),
+                        nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
                         nn.ReLU(),
+                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
             
-                        nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1),
+                        nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
                         nn.ReLU(),
+                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
                         
                         Flatten(),
                         NoiseLayer(fc_inputs_count, 0.001)
@@ -58,15 +62,15 @@ class Model(torch.nn.Module):
 
 
         self.layers_value = [
-                            nn.Linear(fc_inputs_count, 256),
+                            nn.Linear(fc_inputs_count, 128),
                             nn.ReLU(),                      
-                            nn.Linear(256, 1) 
+                            nn.Linear(128, 1) 
                         ]
- 
+
         self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 256),
+                                nn.Linear(fc_inputs_count, 128),
                                 nn.ReLU(),                      
-                                nn.Linear(256, outputs_count)
+                                nn.Linear(128, outputs_count)
                             ]
 
   
