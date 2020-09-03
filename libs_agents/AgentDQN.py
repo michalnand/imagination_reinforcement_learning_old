@@ -2,6 +2,8 @@ import numpy
 import torch
 from .ExperienceBuffer import *
 
+import cv2
+
 
 class AgentDQN():
     def __init__(self, env, Model, Config):
@@ -46,7 +48,7 @@ class AgentDQN():
     def disable_training(self):
         self.enabled_training = False
     
-    def main(self):
+    def main(self, show_activity = False):
         if self.enabled_training:
             self.exploration.process()
             epsilon = self.exploration.get()
@@ -81,10 +83,24 @@ class AgentDQN():
         else:
             self.state = state_new.copy()
 
+        if show_activity:
+            self._show_activity(self.state)
+
         self.iterations+= 1
 
         return self.reward, done
     
+    def _show_activity(self, state):
+        activity_map    = self.model.get_activity_map(state)
+        activity_map    = numpy.stack((activity_map,)*3, axis=-1)*[0, 0, 1]
+
+        state_map    = numpy.stack((state[0],)*3, axis=-1)
+        image        = state_map + activity_map
+
+        image = cv2.resize(image, (400, 400), interpolation = cv2.INTER_AREA)
+        cv2.imshow('state activity', image)
+        cv2.waitKey(1)
+        
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model.device)
         

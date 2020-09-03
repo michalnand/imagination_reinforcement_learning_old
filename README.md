@@ -34,6 +34,11 @@ imagination RL experiments
 * DDPG + imagination with meta-actor : imagined sttes entropty maximization exploration
 
 
+# 4 atari pacman
+
+![](doc/images/pacman.gif)
+
+
 # dependences
 cmake python3 pip3 swig
 numpy numpy matplotlib torch pillow opencv-python 

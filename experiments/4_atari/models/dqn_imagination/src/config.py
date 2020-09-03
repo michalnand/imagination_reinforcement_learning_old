@@ -18,7 +18,7 @@ class Config():
 
         self.imagination_rollouts           = 4
         self.imagination_steps              = 4
-        self.imagination_beta               = 1.0
+        self.imagination_beta               = 0.1
         self.imagination_learning_rate      = 0.0002 
 
 
