@@ -4,7 +4,7 @@ import torch.nn as nn
 
 
 class Model(torch.nn.Module):
-    def __init__(self, input_shape, outputs_count, hidden_count = 256):
+    def __init__(self, input_shape, outputs_count, hidden_count = 400):
         super(Model, self).__init__()
 
         self.device = "cpu"
