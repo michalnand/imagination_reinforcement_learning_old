@@ -76,6 +76,21 @@ class CuriosityModule:
 
         return curiosity, reward_prediction
 
+    def eval_state(self, state, action):
+        state_t         = torch.tensor(state, dtype=torch.float32).detach().to(self.model.device).unsqueeze(0)
+
+        if self.continuous_actions:
+            action_t = action.clone()
+        else:
+            action_t = torch.zeros((1, self.actions_count))
+            action_t[0, action] = 1.0
+        
+        action_t = action_t.to(self.model.device)
+
+        state_next_prediction_t, _ = self.model.forward(state_t, action_t)
+
+        return state_next_prediction_t.squeeze(0).detach().to("cpu").numpy()
+
     def get_state(self, batch_size):
         state_t, _, _, _, _ = self.buffer.sample(batch_size, self.model.device)
         return state_t

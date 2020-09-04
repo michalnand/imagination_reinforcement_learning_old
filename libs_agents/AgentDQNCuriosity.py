@@ -4,6 +4,8 @@ from .ExperienceBuffer import *
 
 from .CuriosityModule import *
 
+import cv2
+
 
 class AgentDQNCuriosity():
     def __init__(self, env, ModelDQN, ModelCuriosity, Config):
@@ -53,7 +55,7 @@ class AgentDQNCuriosity():
     def disable_training(self):
         self.enabled_training = False
     
-    def main(self):
+    def main(self, show_activity = False):
         if self.enabled_training:
             self.exploration.process()
             epsilon = self.exploration.get()
@@ -86,6 +88,9 @@ class AgentDQNCuriosity():
             
         if done:
             self.env.reset()
+
+        if show_activity:
+            self._show_activity(self.state, self.action)
 
 
         self.iterations+= 1
@@ -139,5 +144,34 @@ class AgentDQNCuriosity():
         self.curiosity_module.save(save_path) 
 
     def load(self, save_path):
-        self.model.load(save_path)
+        self.model_dqn.load(save_path)
         self.curiosity_module.load(save_path)     
+
+
+    def _show_activity(self, state, action):
+        size            = 400
+        state_now       = state[0]
+        state_next      = self.curiosity_module.eval_state(state, action)[0]
+
+
+        space   = numpy.zeros((state.shape[1], 4)) 
+        
+        dif     =  (state_now - state_next)**2
+        dif     =  (dif - dif.min())/(dif.max() - dif.min())
+        image   =  numpy.hstack((state_now, space, state_next, space, dif))
+
+        image = cv2.resize(image, (3*size, size), interpolation = cv2.INTER_AREA)
+
+
+        font                   = cv2.FONT_HERSHEY_SIMPLEX
+
+
+        cv2.putText(image,'state', (10 + 0*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+        cv2.putText(image,'prediction', (10 + 1*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+        cv2.putText(image,'error', (10 + 2*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+
+        cv2.imshow('curiosity activity', image)
+        cv2.waitKey(1)
