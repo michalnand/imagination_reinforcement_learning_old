@@ -1,0 +1,11 @@
+cd 4_atari
+./training_batch
+cd ..
+
+cd 5_super_mario
+./training_batch
+cd ..
+
+cd 6_2048
+./training_batch
+cd ..

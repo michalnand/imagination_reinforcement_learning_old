@@ -36,8 +36,13 @@ imagination RL experiments
 
 # 4 atari pacman
 
+
+last conv. layer attention visualisation
 ![](doc/images/pacman.gif)
 
+
+pacman with curiosity - forward model for state prediction used
+![](doc/images/pacman_curiosity.gif)
 
 # dependences
 cmake python3 pip3 swig

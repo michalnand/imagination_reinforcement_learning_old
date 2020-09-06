@@ -103,8 +103,7 @@ class AgentDQNCuriosity():
         #compute curiosity
         curiosity_t, _  = self.curiosity_module.eval(state_t, state_next_t, action_t)
         curiosity_t  = torch.clamp(self.curiosity_beta*curiosity_t, 0.0, 1.0)   
-
-
+        
         #q values, state now, state next
         q_predicted      = self.model_dqn.forward(state_t)
         q_predicted_next = self.model_dqn_target.forward(state_next_t)

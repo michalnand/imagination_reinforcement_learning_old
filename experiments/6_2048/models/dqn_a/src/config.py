@@ -15,6 +15,6 @@ class Config():
 
         self.exploration = libs_common.decay.Exponential(0.99999988, 1.0, 0.01, 0.01)
 
-        self.experience_replay_size = 16384
+        self.experience_replay_size = 32768
  
 
