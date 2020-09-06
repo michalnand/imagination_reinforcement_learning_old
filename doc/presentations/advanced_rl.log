@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  6 SEP 2020 10:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  6 SEP 2020 13:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1695,6 +1695,40 @@ Overfull \hbox (37.18227pt too wide) in paragraph at lines 303--303
 [19
 
  <../images/curiosity_conv.png>]
+<../diagrams/imagination.png, id=292, 2690.05pt x 1431.3475pt>
+File: ../diagrams/imagination.png Graphic file (type png)
+<use ../diagrams/imagination.png>
+Package pdftex.def Info: ../diagrams/imagination.png  used on input line 307.
+(pdftex.def)             Requested size: 322.79207pt x 171.75429pt.
+ [20
+
+ <../diagrams/imagination.png>]
+<../diagrams/imaginationmodeldetail.png, id=303, 1670.24pt x 1102.1175pt>
+File: ../diagrams/imaginationmodeldetail.png Graphic file (type png)
+<use ../diagrams/imaginationmodeldetail.png>
+Package pdftex.def Info: ../diagrams/imaginationmodeldetail.png  used on input 
+line 311.
+(pdftex.def)             Requested size: 334.04208pt x 220.41959pt.
+ [21
+
+ <../diagrams/imaginationmodeldetail.png>]
+<../diagrams/imaginationentropy.png, id=314, 3005.2275pt x 1668.2325pt>
+File: ../diagrams/imaginationentropy.png Graphic file (type png)
+<use ../diagrams/imaginationentropy.png>
+Package pdftex.def Info: ../diagrams/imaginationentropy.png  used on input line
+ 325.
+(pdftex.def)             Requested size: 240.42311pt x 133.46132pt.
+ [22
+
+ <../diagrams/imaginationentropy.png>]
+File: ../diagrams/imaginationmodeldetail.png Graphic file (type png)
+<use ../diagrams/imaginationmodeldetail.png>
+Package pdftex.def Info: ../diagrams/imaginationmodeldetail.png  used on input 
+line 331.
+(pdftex.def)             Requested size: 167.03378pt x 110.2182pt.
+[23
+
+]
 \tf@nav=\write6
 \openout6 = `advanced_rl.nav'.
 
@@ -1711,19 +1745,23 @@ Package movie15 Warning: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 (movie15)                @@ superseded by `media9'.           @@
 (movie15)                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 308.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 308.
-(./advanced_rl.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 308.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 308.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 335.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 335.
+(./advanced_rl.aux
+
+Package pdfbase Warning: Rerun to get internal references right!
+
+)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 335.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 335.
 Package rerunfilecheck Info: File `advanced_rl.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 35314 strings out of 492616
- 668545 string characters out of 6129482
+ 35343 strings out of 492616
+ 669185 string characters out of 6129482
  883721 words of memory out of 5000000
- 38562 multiletter control sequences out of 15000+600000
+ 38580 multiletter control sequences out of 15000+600000
  584232 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,15n,70p,802b,781s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1742,10 +1780,10 @@ nts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type
 lm/lmsso8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy10.
 pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/l
 ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on advanced_rl.pdf (19 pages, 3809379 bytes).
+Output written on advanced_rl.pdf (23 pages, 4151663 bytes).
 PDF statistics:
- 348 PDF objects out of 1000 (max. 8388607)
- 227 compressed objects within 3 object streams
- 39 named destinations out of 1000 (max. 500000)
- 415 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 391 PDF objects out of 1000 (max. 8388607)
+ 256 compressed objects within 3 object streams
+ 47 named destinations out of 1000 (max. 500000)
+ 454 words of extra memory for PDF output out of 10000 (max. 10000000)
 

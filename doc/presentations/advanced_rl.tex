@@ -303,10 +303,33 @@
 \end{frame}
 
 \begin{frame}{\bf imagination in RL}
-
   {\centering \includegraphics[scale=0.12]{../diagrams/imagination.png}}
-
 \end{frame}
+
+\begin{frame}{\bf imagination in RL - model detail with meta-actor}
+  {\centering \includegraphics[scale=0.2]{../diagrams/imaginationmodeldetail.png}}
+\end{frame}
+
+\begin{frame}{\bf imagination in RL - model detail with meta-actor}
+  {\centering \includegraphics[scale=0.08]{../diagrams/imaginationentropy.png}}
+
+  \begin{align*}
+    \mathcal{L}_{entropy}(\phi) &= -\frac{1}{2} ln(2\pi e \sigma(.;\phi)^2)
+  \end{align*}
+
+
+  note : maximum entropy defined as
+    \begin{align*}
+      H(x) = \int_{-\infty}^{\infty} x ln(x)dx
+    \end{align*}
+\end{frame}
+
+
+
+\begin{frame}{\bf imagination in RL - model detail with meta-actor}
+  {\centering \includegraphics[scale=0.1]{../diagrams/imaginationmodeldetail.png}}
+\end{frame}
+
 
 
 \end{document}
