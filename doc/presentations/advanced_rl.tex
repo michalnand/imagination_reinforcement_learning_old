@@ -166,15 +166,18 @@
 
 
 \begin{frame}{\bf from DQN to DDPG}
+
   {\centering \includegraphics[scale=0.2]{../diagrams/dqn.png}}
 \end{frame}
 
 \begin{frame}{\bf from DQN to DDPG}
-  {\centering \includegraphics[scale=0.15]{../diagrams/dqndetail.png}}
+
+  {\centering \includegraphics[scale=0.14]{../diagrams/dqndetail.png}}
 \end{frame}
 
 \begin{frame}{\bf from DQN to DDPG}
-  {\centering \includegraphics[scale=0.15]{../diagrams/dqndetail.png}}
+
+  {\centering \includegraphics[scale=0.14]{../diagrams/dqndetail.png}}
 
     \begin{align*}
       \mathcal{L(\theta)} = \left( R + \gamma \max \limits_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta)  \right)^2
@@ -182,14 +185,17 @@
 \end{frame}
 
 \begin{frame}{\bf from DQN to DDPG}
+
   {\centering \includegraphics[scale=0.2]{../diagrams/ddpg.png}}
 \end{frame}
 
 \begin{frame}{\bf from DQN to DDPG}
+
   {\centering \includegraphics[scale=0.16]{../diagrams/ddpgdetail.png}}
 \end{frame}
 
 \begin{frame}{\bf from DQN to DDPG}
+
   {\centering \includegraphics[scale=0.16]{../diagrams/ddpgdetail.png}}
 
     critic loss:
@@ -202,6 +208,29 @@
       \mathcal{L}_a(\phi) = -Q(s, a; \theta, \phi)
     \end{align*}
 \end{frame}
+
+
+
+\begin{frame}{\bf reparametrization trick}
+
+   \begin{columns}
+
+    \begin{column}{0.5\textwidth}
+      non-diferentiable \\
+      \includegraphics[scale=0.12]{../diagrams/reparametrizationtrick0.png}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      diferentiable \\
+      \includegraphics[scale=0.12]{../diagrams/reparametrizationtrick1.png}
+    \end{column}
+
+  \end{columns}
+
+\end{frame}
+
+
+
 
 \begin{frame}{\bf wise Wizard's DDPG spell chart}
   \begin{itemize}
@@ -219,10 +248,12 @@
 
 
 \begin{frame}{\bf DDPG critic}
+
   {\centering \includegraphics[scale=0.4]{../images/ddpg_critic.png}}
 \end{frame}
 
 \begin{frame}{\bf DDPG actor}
+
   {\centering \includegraphics[scale=0.4]{../images/ddpg_actor.png}}
 \end{frame}
 
@@ -251,7 +282,7 @@
 \end{frame}
 
 \begin{frame}{\bf model based RL}
-  \centering
+
   {\centering \includegraphics[scale=0.22]{../images/samples.png}}
 
   \begin{itemize}
@@ -259,6 +290,14 @@
     \item world models
     \item imagination
   \end{itemize}
+
+\end{frame}
+
+\begin{frame}{\bf curiosity in RL}
+
+  {\centering \includegraphics[scale=0.2]{../images/paper_curiosity_0.png}}
+
+  {\centering \includegraphics[scale=0.3]{../images/paper_curiosity_1.png}}
 
 \end{frame}
 
@@ -303,14 +342,26 @@
 \end{frame}
 
 \begin{frame}{\bf imagination in RL}
+
+  {\centering \includegraphics[scale=0.2]{../images/paper_imagination_0.png}}
+
+  {\centering \includegraphics[scale=0.3]{../images/paper_imagination_1.png}}
+
+\end{frame}
+
+
+\begin{frame}{\bf imagination in RL}
+
   {\centering \includegraphics[scale=0.12]{../diagrams/imagination.png}}
 \end{frame}
 
 \begin{frame}{\bf imagination in RL - model detail with meta-actor}
-  {\centering \includegraphics[scale=0.2]{../diagrams/imaginationmodeldetail.png}}
+
+  {\centering \includegraphics[scale=0.18]{../diagrams/imaginationmodeldetail.png}}
 \end{frame}
 
 \begin{frame}{\bf imagination in RL - model detail with meta-actor}
+
   {\centering \includegraphics[scale=0.08]{../diagrams/imaginationentropy.png}}
 
   \begin{align*}
@@ -327,7 +378,15 @@
 
 
 \begin{frame}{\bf imagination in RL - model detail with meta-actor}
+
   {\centering \includegraphics[scale=0.1]{../diagrams/imaginationmodeldetail.png}}
+
+  
+    \begin{align*}
+      \mathcal{L}_c(\theta) &= \left( R + \gamma Q(s', a'; \theta^-, \phi^- ) - Q(s, a; \theta, \phi )  \right)^2 \\
+      \mathcal{L}_a(\phi) &= -Q(s, a; \theta, \phi) - \beta H(\{s^{im}_0 .. s^{im}_k\}) \\
+      \mathcal{L}_m(\kappa) &= \left( s' - EM(s, a; \kappa)  \right)^2 \\    
+    \end{align*}
 \end{frame}
 
 
