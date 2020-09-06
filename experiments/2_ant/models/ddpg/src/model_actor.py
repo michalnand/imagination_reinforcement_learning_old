@@ -6,17 +6,15 @@ import torch.nn as nn
 class Model(torch.nn.Module):
     def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
-
         self.device = "cpu"
         
-         
         self.layers = [ 
-                                    nn.Linear(input_shape[0], hidden_count),
-                                    nn.ReLU(),           
-                                    nn.Linear(hidden_count, hidden_count//2),
-                                    nn.ReLU(),    
-                                    nn.Linear(hidden_count//2, outputs_count),
-                                    nn.Tanh()
+                        nn.Linear(input_shape[0], hidden_count),
+                        nn.ReLU(),           
+                        nn.Linear(hidden_count, hidden_count//2),
+                        nn.ReLU(),    
+                        nn.Linear(hidden_count//2, outputs_count),
+                        nn.Tanh()
         ]
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
@@ -28,7 +26,6 @@ class Model(torch.nn.Module):
 
         print(self.model)
        
-
     def forward(self, state):
         return self.model(state)
 

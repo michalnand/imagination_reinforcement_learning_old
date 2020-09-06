@@ -217,6 +217,16 @@
   \end{itemize}
 \end{frame}
 
+
+\begin{frame}{\bf DDPG critic}
+  {\centering \includegraphics[scale=0.4]{../images/ddpg_critic.png}}
+\end{frame}
+
+\begin{frame}{\bf DDPG actor}
+  {\centering \includegraphics[scale=0.4]{../images/ddpg_actor.png}}
+\end{frame}
+
+
 \begin{frame}{\bf wise Wizard's magic staff}
 
   \begin{columns}
@@ -240,16 +250,55 @@
 
 \end{frame}
 
+\begin{frame}{\bf model based RL}
+  \centering
+  {\centering \includegraphics[scale=0.22]{../images/samples.png}}
+
+  \begin{itemize}
+    \item curiosity
+    \item world models
+    \item imagination
+  \end{itemize}
+
+\end{frame}
+
 
 \begin{frame}{\bf curiosity in RL}
 
-    \begin{align*}
-      Q'(s, a) = R + \beta C(s, s', a) + \gamma \max \limits_{a'} Q(s', a')
-    \end{align*}
+  {\centering \includegraphics[scale=0.12]{../diagrams/dqncuriosity.png}}
 
-  {\centering \includegraphics[scale=0.1]{../diagrams/dqncuriosity.png}}
+  \begin{align*}
+      Q'(s, a; \theta) &= R + \beta C(s, s', a; \phi) + \gamma \max \limits_{a'} Q(s', a'; \theta^-) \\
+      \mathcal{L}_{em}(\phi) &= \left( s' - EM(s, a; \phi)  \right)^2 \\
+      C(s, s', a) &= \Vert s' - EM(s, a; \phi) \Vert ^2_2
+  \end{align*}
+
+\end{frame}
+
+\begin{frame}{\bf environment model - vector input}
+
+  {\centering \includegraphics[scale=0.22]{../diagrams/fccuriositydetail.png}}
+
+\end{frame}
+
+\begin{frame}{\bf environment model - vector input}
+
+  {\centering \includegraphics[scale=0.15]{../diagrams/fccuriositydetail.png}}
+  {\centering \includegraphics[scale=0.5]{../images/curiosity_fc.png}}
+
+\end{frame}
 
 
+\begin{frame}{\bf environment model - visual input}
+
+  {\centering \includegraphics[scale=0.12]{../diagrams/convcuriositydetail.png}}
+
+\end{frame}
+
+\begin{frame}{\bf environment model - visual input}
+
+  {\centering \includegraphics[scale=0.12]{../diagrams/convcuriositydetail.png}}
+  {\centering \includegraphics[scale=0.3]{../images/curiosity_conv.png}}
 
 \end{frame}
 
