@@ -5,10 +5,32 @@ class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
+class ResidualBlock(torch.nn.Module):
+    def __init__(self, channels):
+        super(ResidualBlock, self).__init__()
+
+        self.layers = []
+        
+        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
+        self.layers.append(nn.BatchNorm2d(channels))
+        self.layers.append(nn.ReLU())
+        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
+        self.layers.append(nn.BatchNorm2d(channels))
+        
+        torch.nn.init.xavier_uniform_(self.layers[0].weight)
+        torch.nn.init.xavier_uniform_(self.layers[3].weight)
+
+        self.model = nn.Sequential(*self.layers)
+        self.activation = nn.ReLU()
+
+    def forward(self, x):
+        y = self.model(x) 
+        return self.activation(y + x)
+
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count = 64):
+    def __init__(self, input_shape, outputs_count, kernels_count = 32):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -22,59 +44,47 @@ class Model(torch.nn.Module):
 
         input_kernel_size = 4
 
-        fc_input_height = input_shape[1]//(input_kernel_size*2*2)
-        fc_input_width  = input_shape[2]//(input_kernel_size*2*2)
+        fc_input_height = input_shape[1]//(input_kernel_size)
+        fc_input_width  = input_shape[2]//(input_kernel_size)
 
-        self.conv0 = nn.Sequential( 
+
+        self.conv = nn.Sequential(
                                     nn.Conv2d(input_channels + outputs_count, kernels_count, kernel_size=input_kernel_size, stride=input_kernel_size, padding=1),
                                     nn.ReLU(),
-                                    nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=1, padding=1),
-                                    nn.ReLU(),
+                                    ResidualBlock(kernels_count),
+                                    ResidualBlock(kernels_count),
+                                    ResidualBlock(kernels_count)
         )
 
-        self.conv1 = nn.Sequential(
-                                    nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=1, padding=1),
+        self.deconv = nn.Sequential(
+                                    nn.Conv2d(kernels_count, kernels_count, kernel_size=1, stride=1, padding=0),
                                     nn.ReLU(),
-        )
-
-        self.deconv0 = nn.Sequential(
-                                        nn.ConvTranspose2d(kernels_count, 1, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0),
+                                    nn.ConvTranspose2d(kernels_count, 1, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0),
         )
 
         self.reward = nn.Sequential(
-                                            nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=2, padding=1),
-                                            nn.ReLU(),
-
-                                            nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=2, padding=1),
-                                            nn.ReLU(),
-
-                                            Flatten(),
-                                            nn.Linear(fc_input_height*fc_input_width*kernels_count, 64),
-                                            nn.ReLU(),
-                                            nn.Linear(64, 1)
+                                        nn.Conv2d(kernels_count, 16, kernel_size=1, stride=1, padding=0),
+                                        nn.ReLU(),
+                                        Flatten(),
+                                        nn.Linear(fc_input_height*fc_input_width*16, 1)
         ) 
 
-        self.conv0.to(self.device)
-        self.conv1.to(self.device) 
-        self.deconv0.to(self.device) 
+        self.conv.to(self.device) 
+        self.deconv.to(self.device) 
         self.reward.to(self.device) 
 
-        print(self.conv0)
-        print(self.conv1)
-        print(self.deconv0)  
+        print(self.conv)
+        print(self.deconv)  
         print(self.reward)                      
 
     def forward(self, state, action):
         action_ = action.unsqueeze(1).unsqueeze(1).transpose(3, 1).repeat((1, 1, self.input_shape[1], self.input_shape[2])).to(self.device)
 
         model_input      = torch.cat([state, action_], dim = 1)
-        conv0_output     = self.conv0(model_input)
-        conv1_output     = self.conv1(conv0_output)
+        conv_output      = self.conv(model_input)
 
-        tmp = conv0_output + conv1_output
-
-        frame_prediction       = self.deconv0(tmp) 
-        reward_prediction      = self.reward(tmp)
+        frame_prediction       = self.deconv(conv_output) 
+        reward_prediction      = self.reward(conv_output)
 
         frames_count            = state.shape[1]
         state_tmp               = torch.narrow(state, 1, 0, frames_count-1)
@@ -86,23 +96,20 @@ class Model(torch.nn.Module):
     def save(self, path):
         print("saving ", path)
 
-        torch.save(self.conv0.state_dict(), path + "trained/model_env_conv0.pt")
-        torch.save(self.conv1.state_dict(), path + "trained/model_env_conv1.pt")
-        torch.save(self.deconv0.state_dict(), path + "trained/model_env_deconv0.pt")
+        torch.save(self.conv.state_dict(), path + "trained/model_env_conv.pt")
+        torch.save(self.deconv.state_dict(), path + "trained/model_env_deconv.pt")
         torch.save(self.reward.state_dict(), path + "trained/model_env_reward.pt")
 
 
     def load(self, path):
         print("loading ", path, " device = ", self.device) 
 
-        self.conv0.load_state_dict(torch.load(path + "trained/model_env_conv0.pt", map_location = self.device))
-        self.conv1.load_state_dict(torch.load(path + "trained/model_env_conv1.pt", map_location = self.device))
-        self.deconv0.load_state_dict(torch.load(path + "trained/model_env_deconv0.pt", map_location = self.device))
+        self.conv.load_state_dict(torch.load(path + "trained/model_env_conv.pt", map_location = self.device))
+        self.deconv.load_state_dict(torch.load(path + "trained/model_env_deconv.pt", map_location = self.device))
         self.reward.load_state_dict(torch.load(path + "trained/model_env_reward.pt", map_location = self.device))
 
-        self.conv0.eval() 
-        self.conv1.eval() 
-        self.deconv0.eval() 
+        self.conv.eval() 
+        self.deconv.eval() 
         self.reward.eval() 
 
 
@@ -128,3 +135,5 @@ if __name__ == "__main__":
 
     print(y.shape)
     print(r.shape)
+
+    model.save("./")

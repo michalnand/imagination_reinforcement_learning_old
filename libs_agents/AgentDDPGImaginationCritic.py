@@ -5,7 +5,7 @@ from .ExperienceBufferContinuous import *
 from .ImaginationModule import *
 
 
-class AgentDDPGImagination():
+class AgentDDPGImaginationCritic():
     def __init__(self, env, ModelCritic, ModelActor, ModelImagination, Config):
         self.env = env
 
@@ -18,10 +18,12 @@ class AgentDDPGImagination():
 
         self.exploration    = config.exploration
 
+       
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.shape[0]
 
         self.experience_replay = ExperienceBufferContinuous(config.experience_replay_size)
+
 
         self.model_actor    = ModelActor.Model(self.state_shape, self.actions_count)
         self.model_actor_target    = ModelActor.Model(self.state_shape, self.actions_count)
@@ -29,20 +31,19 @@ class AgentDDPGImagination():
         self.model_critic   = ModelCritic.Model(self.state_shape, self.actions_count)
         self.model_critic_target   = ModelCritic.Model(self.state_shape, self.actions_count)
 
+        
         for target_param, param in zip(self.model_actor_target.parameters(), self.model_actor.parameters()):
             target_param.data.copy_(param.data)
 
         for target_param, param in zip(self.model_critic_target.parameters(), self.model_critic.parameters()):
             target_param.data.copy_(param.data)
 
-        self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate, weight_decay=0.001*config.critic_learning_rate)
-        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate, weight_decay=0.001*config.critic_learning_rate)
+        self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate)
+        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
 
-
-        self.imagination_beta       = config.imagination_beta
         self.imagination_rollouts   = config.imagination_rollouts
         self.imagination_steps      = config.imagination_steps
-        self.imagination_module     = ImaginationModule(ModelImagination, self.state_shape, self.actions_count, config.imagination_learning_rate, config.imagination_buffer_size, True)
+        self.imagination_module     = ImaginationModule(ModelImagination, self.state_shape, self.actions_count, config.imagination_learning_rate, self.experience_replay, True)
 
         self.state    = env.reset()
 
@@ -58,70 +59,80 @@ class AgentDDPGImagination():
     
 
     def main(self):
-        
         if self.enabled_training:
             self.exploration.process()
 
         state_t     = torch.from_numpy(self.state).to(self.model_actor.device).unsqueeze(0).float()
 
-        rewards, actions = self.sample_imagination(self.state)
-
-        action_best_idx = numpy.argmax(rewards)
-
-        action_t = actions[action_best_idx][0]
-
-        action = action_t.squeeze(0).detach().to("cpu").numpy()
+        _, actions_b, values_b  = self._process_imagination(state_t)
+        action                  = self._sample_imagination(actions_b, values_b)
         
         state_new, self.reward, done, self.info = self.env.step(action)
 
         if self.enabled_training:
-            self.imagination_module.add(self.state, action, self.reward, done)
-            self.experience_replay.add(self.state, action, self.reward + self.imagination_beta*rewards[action_best_idx], done)
+            self.experience_replay.add(self.state, action, self.reward, done)
 
-        if self.enabled_training and self.iterations%self.update_frequency == 0:
+        if self.enabled_training and (self.iterations > self.experience_replay.size) and self.iterations%self.update_frequency == 0:
+            self.train_model()
             self.imagination_module.train()
-        
-        if self.enabled_training and (self.iterations > self.experience_replay.size):
-            if self.iterations%self.update_frequency == 0:
-                self.train_model()
-
-        self.state = state_new
-            
+                   
         if done:
-            self.env.reset()
+            self.state = self.env.reset()
+        else:
+            self.state = state_new
 
         self.iterations+= 1
 
         return self.reward, done
 
-    def sample_imagination(self, state_initial):
+    def _process_imagination(self, state_initial):
+        states_b    = torch.zeros((self.imagination_steps, self.imagination_rollouts, ) + self.state_shape).to(self.model_actor.device)
+        actions_b   = torch.zeros((self.imagination_steps, self.imagination_rollouts, self.actions_count)).to(self.model_actor.device)
+        values_b    = torch.zeros((self.imagination_steps, self.imagination_rollouts, 1)).to(self.model_actor.device)
+
+        states_t    = state_initial.repeat(self.imagination_rollouts, 1).clone().detach()
+
+        for n in range(self.imagination_steps):                       
+            actions_t = self._sample_action(states_t)
+
+            states_next_t, _  = self.imagination_module.eval(states_t, actions_t)
+            value_t           = self.model_critic(states_t, actions_t)
+           
+            states_t = states_next_t.clone()
+
+            states_b[n]     = states_t.clone()
+            actions_b[n]    = actions_t.clone()
+            values_b[n]     = value_t.clone()
+
         
-        actions = []
-        rewards = []
-        for m in range(self.imagination_rollouts):
-            state_t     = torch.from_numpy(state_initial).to(self.model_actor.device).unsqueeze(0).float()
+        values_b = values_b.squeeze(2)
 
-            reward_sum = 0.0
-            actions_rollout = []
-            for n in range(self.imagination_steps):           
-                action_t = self._sample_action(state_t)
-                actions_rollout.append(action_t.clone())
+        print(values_b)
 
-                state_next_t, reward = self.imagination_module.eval(state_t, action_t)
-                reward      =  reward.squeeze(0).detach().to("cpu").numpy()
+        return states_b, actions_b, values_b
 
-                state_t = state_next_t.detach().clone()
-                reward_sum+= reward
+    def _sample_imagination(self, actions_b, values_b):
+        values_mean  = torch.mean(values_b, dim = 1)
+        best_idx     = torch.argmax(values_mean)
 
-            actions.append(actions_rollout)
-
-            rewards.append(reward_sum/self.imagination_steps)
-
-
-        return rewards, actions
-
-            
+        return actions_b[0][best_idx].detach().to("cpu").numpy()
+           
+    def _sample_action(self, state_t):
         
+        if self.enabled_training:
+            epsilon = self.exploration.get()
+        else:
+            epsilon = self.exploration.get_testing()
+       
+        action_t    = self.model_actor(state_t)
+
+        noise       = torch.randn(state_t.shape[0], self.actions_count).to(self.model_actor.device)
+        action_t    = action_t + epsilon*noise
+        action_t    = torch.clamp(action_t, -1.0, 1.0)
+    
+
+        return action_t
+
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device)
         
@@ -172,18 +183,4 @@ class AgentDDPGImagination():
         self.imagination_module.load(save_path)     
 
 
-    def _sample_action(self, state_t):
-        
-        if self.enabled_training:
-            epsilon = self.exploration.get()
-        else:
-            epsilon = self.exploration.get_testing()
-       
-        action_t    = self.model_actor(state_t)
-
-        noise  = torch.randn(state_t.shape[0], self.actions_count).to(self.model_actor.device)
-        action_t = action_t + epsilon*noise
-        action_t = torch.clamp(action_t, -1.0, 1.0)
-    
-
-        return action_t
+   
