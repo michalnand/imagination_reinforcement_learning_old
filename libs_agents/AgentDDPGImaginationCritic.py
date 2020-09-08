@@ -107,8 +107,6 @@ class AgentDDPGImaginationCritic():
         
         values_b = values_b.squeeze(2)
 
-        print(values_b)
-
         return states_b, actions_b, values_b
 
     def _sample_imagination(self, actions_b, values_b):
