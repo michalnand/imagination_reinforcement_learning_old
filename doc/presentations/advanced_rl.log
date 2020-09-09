@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  6 SEP 2020 13:59
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  9 SEP 2020 08:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1526,281 +1526,326 @@ Package pdftex.def Info: ../images/sac_minitaur.jpg  used on input line 137.
  [2
 
  <../images/ant.png> <../images/sac_car.jpg> <../images/lunar_lander.png> <../i
-mages/sac_minitaur.jpg>] [3
+mages/sac_minitaur.jpg>]
+<../images/motoko_uprising.jpg, id=46, 4175.6pt x 2348.775pt>
+File: ../images/motoko_uprising.jpg Graphic file (type jpg)
+<use ../images/motoko_uprising.jpg>
+Package pdftex.def Info: ../images/motoko_uprising.jpg  used on input line 155.
 
-]
-<../diagrams/dqn.png, id=78, 1507.6325pt x 710.655pt>
-File: ../diagrams/dqn.png Graphic file (type png)
-<use ../diagrams/dqn.png>
-Package pdftex.def Info: ../diagrams/dqn.png  used on input line 171.
-(pdftex.def)             Requested size: 301.52116pt x 142.12848pt.
- [4
+(pdftex.def)             Requested size: 166.99556pt x 93.935pt.
 
- <../diagrams/dqn.png>]
-<../diagrams/dqndetail.png, id=89, 2340.745pt x 710.655pt>
-File: ../diagrams/dqndetail.png Graphic file (type png)
-<use ../diagrams/dqndetail.png>
-Package pdftex.def Info: ../diagrams/dqndetail.png  used on input line 176.
-(pdftex.def)             Requested size: 327.70207pt x 99.49101pt.
-
-Overfull \hbox (20.4122pt too wide) in paragraph at lines 176--176
+Overfull \hbox (13.35063pt too wide) in paragraph at lines 155--155
 [][]  
  []
 
-[5
+<../images/robot_model.png, id=47, 778.91pt x 598.235pt>
+File: ../images/robot_model.png Graphic file (type png)
+<use ../images/robot_model.png>
+Package pdftex.def Info: ../images/robot_model.png  used on input line 155.
+(pdftex.def)             Requested size: 155.77924pt x 119.64487pt.
 
- <../diagrams/dqndetail.png>]
+Overfull \hbox (2.13431pt too wide) in paragraph at lines 155--155
+[][]  
+ []
+
+[3
+
+ <../images/motoko_uprising.jpg> <../images/robot_model.png>] [4
+
+]
+<../diagrams/dqn.png, id=98, 1507.6325pt x 710.655pt>
+File: ../diagrams/dqn.png Graphic file (type png)
+<use ../diagrams/dqn.png>
+Package pdftex.def Info: ../diagrams/dqn.png  used on input line 197.
+(pdftex.def)             Requested size: 301.52116pt x 142.12848pt.
+ [5
+
+ <../diagrams/dqn.png>]
+<../diagrams/dqndetail.png, id=109, 2340.745pt x 710.655pt>
 File: ../diagrams/dqndetail.png Graphic file (type png)
 <use ../diagrams/dqndetail.png>
-Package pdftex.def Info: ../diagrams/dqndetail.png  used on input line 185.
+Package pdftex.def Info: ../diagrams/dqndetail.png  used on input line 202.
 (pdftex.def)             Requested size: 327.70207pt x 99.49101pt.
 
-Overfull \hbox (20.4122pt too wide) in paragraph at lines 185--185
+Overfull \hbox (20.4122pt too wide) in paragraph at lines 202--202
 [][]  
  []
 
 [6
 
-]
-<../diagrams/ddpg.png, id=117, 1507.6325pt x 867.24pt>
-File: ../diagrams/ddpg.png Graphic file (type png)
-<use ../diagrams/ddpg.png>
-Package pdftex.def Info: ../diagrams/ddpg.png  used on input line 190.
-(pdftex.def)             Requested size: 301.52116pt x 173.44493pt.
- [7
+ <../diagrams/dqndetail.png>]
+File: ../diagrams/dqndetail.png Graphic file (type png)
+<use ../diagrams/dqndetail.png>
+Package pdftex.def Info: ../diagrams/dqndetail.png  used on input line 211.
+(pdftex.def)             Requested size: 327.70207pt x 99.49101pt.
 
- <../diagrams/ddpg.png>]
-<../diagrams/ddpgdetail.png, id=129, 2005.4925pt x 939.51pt>
-File: ../diagrams/ddpgdetail.png Graphic file (type png)
-<use ../diagrams/ddpgdetail.png>
-Package pdftex.def Info: ../diagrams/ddpgdetail.png  used on input line 195.
-(pdftex.def)             Requested size: 320.88536pt x 150.32466pt.
-
-Overfull \hbox (13.59549pt too wide) in paragraph at lines 195--195
+Overfull \hbox (20.4122pt too wide) in paragraph at lines 211--211
 [][]  
  []
 
-[8
+[7
 
- <../diagrams/ddpgdetail.png>]
+]
+<../diagrams/ddpg.png, id=138, 1507.6325pt x 867.24pt>
+File: ../diagrams/ddpg.png Graphic file (type png)
+<use ../diagrams/ddpg.png>
+Package pdftex.def Info: ../diagrams/ddpg.png  used on input line 216.
+(pdftex.def)             Requested size: 301.52116pt x 173.44493pt.
+ [8
+
+ <../diagrams/ddpg.png>]
+<../diagrams/ddpgdetail.png, id=149, 2005.4925pt x 939.51pt>
 File: ../diagrams/ddpgdetail.png Graphic file (type png)
 <use ../diagrams/ddpgdetail.png>
-Package pdftex.def Info: ../diagrams/ddpgdetail.png  used on input line 210.
+Package pdftex.def Info: ../diagrams/ddpgdetail.png  used on input line 221.
 (pdftex.def)             Requested size: 320.88536pt x 150.32466pt.
 
-Overfull \hbox (13.59549pt too wide) in paragraph at lines 210--210
+Overfull \hbox (13.59549pt too wide) in paragraph at lines 221--221
 [][]  
  []
 
 [9
 
-]
-<../diagrams/reparametrizationtrick0.png, id=149, 1445.4pt x 869.2475pt>
-File: ../diagrams/reparametrizationtrick0.png Graphic file (type png)
-<use ../diagrams/reparametrizationtrick0.png>
-Package pdftex.def Info: ../diagrams/reparametrizationtrick0.png  used on input
- line 230.
-(pdftex.def)             Requested size: 173.4405pt x 104.30519pt.
+ <../diagrams/ddpgdetail.png>]
+File: ../diagrams/ddpgdetail.png Graphic file (type png)
+<use ../diagrams/ddpgdetail.png>
+Package pdftex.def Info: ../diagrams/ddpgdetail.png  used on input line 236.
+(pdftex.def)             Requested size: 320.88536pt x 150.32466pt.
 
-Overfull \hbox (19.79558pt too wide) in paragraph at lines 230--230
-[][]  
- []
-
-<../diagrams/reparametrizationtrick1.png, id=150, 1353.055pt x 1025.8325pt>
-File: ../diagrams/reparametrizationtrick1.png Graphic file (type png)
-<use ../diagrams/reparametrizationtrick1.png>
-Package pdftex.def Info: ../diagrams/reparametrizationtrick1.png  used on input
- line 230.
-(pdftex.def)             Requested size: 162.35959pt x 123.09459pt.
-
-Overfull \hbox (8.71466pt too wide) in paragraph at lines 230--230
+Overfull \hbox (13.59549pt too wide) in paragraph at lines 236--236
 [][]  
  []
 
 [10
 
- <../diagrams/reparametrizationtrick0.png> <../diagrams/reparametrizationtrick1
-.png>] [11
-
 ]
-<../images/ddpg_critic.png, id=189, 690.58pt x 581.17125pt>
-File: ../images/ddpg_critic.png Graphic file (type png)
-<use ../images/ddpg_critic.png>
-Package pdftex.def Info: ../images/ddpg_critic.png  used on input line 253.
-(pdftex.def)             Requested size: 276.2271pt x 232.46437pt.
- [12
+<../diagrams/reparametrizationtrick0.png, id=169, 1445.4pt x 869.2475pt>
+File: ../diagrams/reparametrizationtrick0.png Graphic file (type png)
+<use ../diagrams/reparametrizationtrick0.png>
+Package pdftex.def Info: ../diagrams/reparametrizationtrick0.png  used on input
+ line 260.
+(pdftex.def)             Requested size: 158.99449pt x 95.61751pt.
 
- <../images/ddpg_critic.png>]
-<../images/ddpg_actor.png, id=201, 609.27625pt x 550.055pt>
-File: ../images/ddpg_actor.png Graphic file (type png)
-<use ../images/ddpg_actor.png>
-Package pdftex.def Info: ../images/ddpg_actor.png  used on input line 258.
-(pdftex.def)             Requested size: 243.70618pt x 220.0181pt.
- [13
-
- <../images/ddpg_actor.png>]
-<../images/computer.jpg, id=223, 1606.0pt x 1606.0pt>
-File: ../images/computer.jpg Graphic file (type jpg)
-<use ../images/computer.jpg>
-Package pdftex.def Info: ../images/computer.jpg  used on input line 282.
-(pdftex.def)             Requested size: 160.6094pt x 160.6094pt.
-
-Overfull \hbox (6.96448pt too wide) in paragraph at lines 282--282
+Overfull \hbox (5.34956pt too wide) in paragraph at lines 260--260
 [][]  
  []
 
-[14
+<../diagrams/reparametrizationtrick1.png, id=170, 1353.055pt x 1025.8325pt>
+File: ../diagrams/reparametrizationtrick1.png Graphic file (type png)
+<use ../diagrams/reparametrizationtrick1.png>
+Package pdftex.def Info: ../diagrams/reparametrizationtrick1.png  used on input
+ line 260.
+(pdftex.def)             Requested size: 148.8365pt x 112.84192pt.
+[11
+
+ <../diagrams/reparametrizationtrick0.png> <../diagrams/reparametrizationtrick1
+.png>] [12
+
+]
+<../images/ddpg_critic.png, id=210, 690.58pt x 581.17125pt>
+File: ../images/ddpg_critic.png Graphic file (type png)
+<use ../images/ddpg_critic.png>
+Package pdftex.def Info: ../images/ddpg_critic.png  used on input line 283.
+(pdftex.def)             Requested size: 276.2271pt x 232.46437pt.
+ [13
+
+ <../images/ddpg_critic.png>]
+<../images/ddpg_actor.png, id=222, 609.27625pt x 550.055pt>
+File: ../images/ddpg_actor.png Graphic file (type png)
+<use ../images/ddpg_actor.png>
+Package pdftex.def Info: ../images/ddpg_actor.png  used on input line 288.
+(pdftex.def)             Requested size: 243.70618pt x 220.0181pt.
+ [14
+
+ <../images/ddpg_actor.png>]
+<../images/computer.jpg, id=243, 1606.0pt x 1606.0pt>
+File: ../images/computer.jpg Graphic file (type jpg)
+<use ../images/computer.jpg>
+Package pdftex.def Info: ../images/computer.jpg  used on input line 312.
+(pdftex.def)             Requested size: 160.6094pt x 160.6094pt.
+
+Overfull \hbox (6.96448pt too wide) in paragraph at lines 312--312
+[][]  
+ []
+
+[15
 
  <../images/computer.jpg>]
-<../images/samples.png, id=233, 1391.1975pt x 234.8775pt>
+<../images/samples.png, id=253, 1391.1975pt x 234.8775pt>
 File: ../images/samples.png Graphic file (type png)
 <use ../images/samples.png>
-Package pdftex.def Info: ../images/samples.png  used on input line 294.
+Package pdftex.def Info: ../images/samples.png  used on input line 324.
 (pdftex.def)             Requested size: 306.06439pt x 51.6732pt.
- [15
-
- <../images/samples.png (PNG copy)>]
-<../images/paper_curiosity_0.png, id=249, 921.4425pt x 188.705pt>
-File: ../images/paper_curiosity_0.png Graphic file (type png)
-<use ../images/paper_curiosity_0.png>
-Package pdftex.def Info: ../images/paper_curiosity_0.png  used on input line 30
-2.
-(pdftex.def)             Requested size: 184.28523pt x 37.74033pt.
-<../images/paper_curiosity_1.png, id=250, 442.65375pt x 218.8175pt>
-File: ../images/paper_curiosity_1.png Graphic file (type png)
-<use ../images/paper_curiosity_1.png>
-Package pdftex.def Info: ../images/paper_curiosity_1.png  used on input line 30
-2.
-(pdftex.def)             Requested size: 132.79713pt x 65.64575pt.
  [16
 
+ <../images/samples.png (PNG copy)>]
+<../images/paper_curiosity_0.png, id=269, 921.4425pt x 188.705pt>
+File: ../images/paper_curiosity_0.png Graphic file (type png)
+<use ../images/paper_curiosity_0.png>
+Package pdftex.def Info: ../images/paper_curiosity_0.png  used on input line 34
+6.
+(pdftex.def)             Requested size: 184.28523pt x 37.74033pt.
+<../images/paper_curiosity_1.png, id=276, 442.65375pt x 218.8175pt>
+File: ../images/paper_curiosity_1.png Graphic file (type png)
+<use ../images/paper_curiosity_1.png>
+Package pdftex.def Info: ../images/paper_curiosity_1.png  used on input line 34
+6.
+(pdftex.def)             Requested size: 177.05835pt x 87.52544pt.
+
+Overfull \hbox (23.41342pt too wide) in paragraph at lines 346--346
+[][]  
+ []
+
+[17
+
  <../images/paper_curiosity_0.png> <../images/paper_curiosity_1.png>]
-<../diagrams/dqncuriosity.png, id=262, 2013.5225pt x 1158.3275pt>
+<../diagrams/dqncuriosity.png, id=288, 2013.5225pt x 1158.3275pt>
 File: ../diagrams/dqncuriosity.png Graphic file (type png)
 <use ../diagrams/dqncuriosity.png>
-Package pdftex.def Info: ../diagrams/dqncuriosity.png  used on input line 315.
+Package pdftex.def Info: ../diagrams/dqncuriosity.png  used on input line 359.
 (pdftex.def)             Requested size: 241.61227pt x 138.9933pt.
- [17
+
+[18
 
  <../diagrams/dqncuriosity.png>]
-<../diagrams/fccuriositydetail.png, id=273, 1463.4675pt x 560.0925pt>
+<../diagrams/fccuriositydetail.png, id=299, 1463.4675pt x 560.0925pt>
 File: ../diagrams/fccuriositydetail.png Graphic file (type png)
 <use ../diagrams/fccuriositydetail.png>
 Package pdftex.def Info: ../diagrams/fccuriositydetail.png  used on input line 
-321.
+365.
 (pdftex.def)             Requested size: 321.96385pt x 123.22072pt.
 
-Overfull \hbox (14.67398pt too wide) in paragraph at lines 321--321
+Overfull \hbox (14.67398pt too wide) in paragraph at lines 365--365
 [][]  
  []
 
-[18
+[19
 
  <../diagrams/fccuriositydetail.png>]
 File: ../diagrams/fccuriositydetail.png Graphic file (type png)
 <use ../diagrams/fccuriositydetail.png>
 Package pdftex.def Info: ../diagrams/fccuriositydetail.png  used on input line 
-328.
+372.
 (pdftex.def)             Requested size: 219.51065pt x 84.01024pt.
-<../images/curiosity_fc.png, id=284, 587.19376pt x 192.72pt>
+<../images/curiosity_fc.png, id=311, 587.19376pt x 192.72pt>
 File: ../images/curiosity_fc.png Graphic file (type png)
 <use ../images/curiosity_fc.png>
-Package pdftex.def Info: ../images/curiosity_fc.png  used on input line 328.
+Package pdftex.def Info: ../images/curiosity_fc.png  used on input line 372.
 (pdftex.def)             Requested size: 293.59616pt x 96.35976pt.
- [19
+ [20
 
  <../images/curiosity_fc.png>]
-<../diagrams/convcuriositydetail.png, id=296, 2870.725pt x 780.9175pt>
+<../diagrams/convcuriositydetail.png, id=322, 2870.725pt x 780.9175pt>
 File: ../diagrams/convcuriositydetail.png Graphic file (type png)
 <use ../diagrams/convcuriositydetail.png>
 Package pdftex.def Info: ../diagrams/convcuriositydetail.png  used on input lin
-e 335.
+e 379.
 (pdftex.def)             Requested size: 344.47214pt x 93.70605pt.
 
-Overfull \hbox (37.18227pt too wide) in paragraph at lines 335--335
+Overfull \hbox (37.18227pt too wide) in paragraph at lines 379--379
 [][]  
  []
 
-[20
+[21
 
  <../diagrams/convcuriositydetail.png>]
 File: ../diagrams/convcuriositydetail.png Graphic file (type png)
 <use ../diagrams/convcuriositydetail.png>
 Package pdftex.def Info: ../diagrams/convcuriositydetail.png  used on input lin
-e 342.
+e 386.
 (pdftex.def)             Requested size: 344.47214pt x 93.70605pt.
-<../images/curiosity_conv.png, id=307, 1015.795pt x 392.46625pt>
+<../images/curiosity_conv.png, id=333, 1015.795pt x 392.46625pt>
 File: ../images/curiosity_conv.png Graphic file (type png)
 <use ../images/curiosity_conv.png>
-Package pdftex.def Info: ../images/curiosity_conv.png  used on input line 342.
+Package pdftex.def Info: ../images/curiosity_conv.png  used on input line 386.
 (pdftex.def)             Requested size: 304.74084pt x 117.74077pt.
 
-Overfull \hbox (37.18227pt too wide) in paragraph at lines 342--342
+Overfull \hbox (37.18227pt too wide) in paragraph at lines 386--386
 [][] 
  []
 
-[21
+[22
 
  <../images/curiosity_conv.png>]
-<../images/paper_imagination_0.png, id=318, 758.835pt x 307.1475pt>
+<../images/paper_imagination_0.png, id=344, 758.835pt x 307.1475pt>
 File: ../images/paper_imagination_0.png Graphic file (type png)
 <use ../images/paper_imagination_0.png>
 Package pdftex.def Info: ../images/paper_imagination_0.png  used on input line 
-350.
+409.
 (pdftex.def)             Requested size: 151.76431pt x 61.4284pt.
-<../images/paper_imagination_1.png, id=319, 736.7525pt x 320.19624pt>
+<../images/paper_imagination_1.png, id=349, 736.7525pt x 320.19624pt>
 File: ../images/paper_imagination_1.png Graphic file (type png)
 <use ../images/paper_imagination_1.png>
 Package pdftex.def Info: ../images/paper_imagination_1.png  used on input line 
-350.
-(pdftex.def)             Requested size: 221.02745pt x 96.0596pt.
- [22
+409.
+(pdftex.def)             Requested size: 184.18767pt x 80.04886pt.
 
- <../images/paper_imagination_0.png> <../images/paper_imagination_1.png>]
-<../diagrams/imagination.png, id=331, 2690.05pt x 1431.3475pt>
-File: ../diagrams/imagination.png Graphic file (type png)
-<use ../diagrams/imagination.png>
-Package pdftex.def Info: ../diagrams/imagination.png  used on input line 356.
-(pdftex.def)             Requested size: 322.79207pt x 171.75429pt.
-
-Overfull \hbox (15.5022pt too wide) in paragraph at lines 356--356
+Overfull \hbox (30.54274pt too wide) in paragraph at lines 409--409
 [][]  
  []
 
 [23
 
- <../diagrams/imagination.png>]
-<../diagrams/imaginationmodeldetail.png, id=342, 1794.705pt x 1037.8775pt>
-File: ../diagrams/imaginationmodeldetail.png Graphic file (type png)
-<use ../diagrams/imaginationmodeldetail.png>
-Package pdftex.def Info: ../diagrams/imaginationmodeldetail.png  used on input 
-line 361.
-(pdftex.def)             Requested size: 323.03296pt x 186.80989pt.
+ <../images/paper_imagination_0.png> <../images/paper_imagination_1.png>]
+<../diagrams/imagination.png, id=362, 2690.05pt x 1431.3475pt>
+File: ../diagrams/imagination.png Graphic file (type png)
+<use ../diagrams/imagination.png>
+Package pdftex.def Info: ../diagrams/imagination.png  used on input line 415.
+(pdftex.def)             Requested size: 322.79207pt x 171.75429pt.
 
-Overfull \hbox (15.74309pt too wide) in paragraph at lines 361--361
+Overfull \hbox (15.5022pt too wide) in paragraph at lines 415--415
 [][]  
  []
 
 [24
 
+ <../diagrams/imagination.png>]
+<../diagrams/imaginationmodeldetail.png, id=373, 1794.705pt x 1037.8775pt>
+File: ../diagrams/imaginationmodeldetail.png Graphic file (type png)
+<use ../diagrams/imaginationmodeldetail.png>
+Package pdftex.def Info: ../diagrams/imaginationmodeldetail.png  used on input 
+line 420.
+(pdftex.def)             Requested size: 323.03296pt x 186.80989pt.
+
+Overfull \hbox (15.74309pt too wide) in paragraph at lines 420--420
+[][]  
+ []
+
+[25
+
  <../diagrams/imaginationmodeldetail.png>]
-<../diagrams/imaginationentropy.png, id=353, 3005.2275pt x 1668.2325pt>
+<../diagrams/imaginationentropy.png, id=385, 3005.2275pt x 1668.2325pt>
 File: ../diagrams/imaginationentropy.png Graphic file (type png)
 <use ../diagrams/imaginationentropy.png>
 Package pdftex.def Info: ../diagrams/imaginationentropy.png  used on input line
- 376.
+ 435.
 (pdftex.def)             Requested size: 240.42311pt x 133.46132pt.
- [25
+ [26
 
  <../diagrams/imaginationentropy.png>]
 File: ../diagrams/imaginationmodeldetail.png Graphic file (type png)
 <use ../diagrams/imaginationmodeldetail.png>
 Package pdftex.def Info: ../diagrams/imaginationmodeldetail.png  used on input 
-line 390.
+line 449.
 (pdftex.def)             Requested size: 179.481pt x 103.79382pt.
- [26
+ [27
+
+] [28
 
 ]
+<../images/me.jpg, id=426, 1606.0pt x 1606.0pt>
+File: ../images/me.jpg Graphic file (type jpg)
+<use ../images/me.jpg>
+Package pdftex.def Info: ../images/me.jpg  used on input line 475.
+(pdftex.def)             Requested size: 160.6094pt x 160.6094pt.
+LaTeX Font Info:    Try loading font information for T1+lmtt on input line 475.
+
+ (/usr/local/texlive/2019/texmf-dist/tex/latex/lm/t1lmtt.fd
+File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+[29
+
+ <../images/me.jpg>]
 \tf@nav=\write6
 \openout6 = `advanced_rl.nav'.
 
@@ -1817,24 +1862,24 @@ Package movie15 Warning: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 (movie15)                @@ superseded by `media9'.           @@
 (movie15)                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 394.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 394.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 478.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 478.
 (./advanced_rl.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 394.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 394.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 478.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 478.
 Package rerunfilecheck Info: File `advanced_rl.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 35380 strings out of 492616
- 670227 string characters out of 6129482
- 883721 words of memory out of 5000000
- 38606 multiletter control sequences out of 15000+600000
- 581455 words of font info for 56 fonts, out of 8000000 for 9000
+ 35445 strings out of 492616
+ 671334 string characters out of 6129482
+ 884720 words of memory out of 5000000
+ 38658 multiletter control sequences out of 15000+600000
+ 581774 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 56i,15n,70p,802b,781s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/lo
-cal/texlive/2019/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/texlive/20
+ 56i,15n,70p,802b,786s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
+texlive/2019/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/local/texlive/20
 19/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/local/texlive/2019/texmf-d
 ist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2019/texmf-dist/fonts/
 enc/dvips/lm/lm-rm.enc}</usr/local/texlive/2019/texmf-dist/fonts/type1/public/l
@@ -1847,11 +1892,12 @@ nts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type
 1/public/lm/lmsso10.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/
 lm/lmsso8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy10.
 pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/l
-ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb>
-Output written on advanced_rl.pdf (26 pages, 4649908 bytes).
+ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texliv
+e/2019/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
+Output written on advanced_rl.pdf (29 pages, 5609272 bytes).
 PDF statistics:
- 432 PDF objects out of 1000 (max. 8388607)
- 279 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 502 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 502 PDF objects out of 1000 (max. 8388607)
+ 322 compressed objects within 4 object streams
+ 59 named destinations out of 1000 (max. 500000)
+ 625 words of extra memory for PDF output out of 10000 (max. 10000000)
 
