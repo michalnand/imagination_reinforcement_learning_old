@@ -10,13 +10,13 @@ import libs_agents
 from libs_common.Training import *
 
 
-import models.ddpg_imagination_meta_actor.src.model_critic     as ModelCritic
-import models.ddpg_imagination_meta_actor.src.model_meta_actor      as ModelMetaActor
-import models.ddpg_imagination_meta_actor.src.model_env        as ModelEnv
-import models.ddpg_imagination_meta_actor.src.config           as Config
+import models.ddpg_imagination_meta_actor_critic.src.model_critic     as ModelCritic
+import models.ddpg_imagination_meta_actor_critic.src.model_actor      as ModelActor
+import models.ddpg_imagination_meta_actor_critic.src.model_env        as ModelEnv
+import models.ddpg_imagination_meta_actor_critic.src.config           as Config
 
 
-path = "models/ddpg_imagination_meta_actor/"
+path = "models/ddpg_imagination_meta_actor_critic/"
 
 class Wrapper(gym.ObservationWrapper):
     def __init__(self, env):
@@ -30,7 +30,7 @@ class Wrapper(gym.ObservationWrapper):
 env = gym.make("LineFollower-v0", gui = False)
 env = Wrapper(env)
 
-agent = libs_agents.AgentDDPGImaginationMetaActor(env, ModelCritic, ModelMetaActor, ModelEnv, Config)
+agent = libs_agents.AgentDDPGImaginationMetaActorCritic(env, ModelCritic, ModelActor, ModelEnv, Config)
 
 max_iterations = (10**5)
 trainig = TrainingIterations(env, agent, max_iterations, path, 1000)

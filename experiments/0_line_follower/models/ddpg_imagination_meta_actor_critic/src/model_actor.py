@@ -60,17 +60,17 @@ class Model(torch.nn.Module):
 
     def save(self, path):
         print("saving to ", path)
-        torch.save(self.model_features.state_dict(), path + "trained/model_meta_actor_features.pt")
-        torch.save(self.model_mu.state_dict(), path + "trained/model_meta_actor_mu.pt")
-        torch.save(self.model_var.state_dict(), path + "trained/model_meta_actor_var.pt")
+        torch.save(self.model_features.state_dict(), path + "trained/model_actor_features.pt")
+        torch.save(self.model_mu.state_dict(), path + "trained/model_actor_mu.pt")
+        torch.save(self.model_var.state_dict(), path + "trained/model_actor_var.pt")
 
     def load(self, path):       
         print("loading from ", path)
-        self.model_features.load_state_dict(torch.load(path + "trained/model_meta_actor_features.pt", map_location = self.device))
+        self.model_features.load_state_dict(torch.load(path + "trained/model_actor_features.pt", map_location = self.device))
         self.model_features.eval()  
-        self.model_mu.load_state_dict(torch.load(path + "trained/model_meta_actor_mu.pt", map_location = self.device))
+        self.model_mu.load_state_dict(torch.load(path + "trained/model_actor_mu.pt", map_location = self.device))
         self.model_mu.eval()  
-        self.model_var.load_state_dict(torch.load(path + "trained/model_meta_actor_var.pt", map_location = self.device))
+        self.model_var.load_state_dict(torch.load(path + "trained/model_actor_var.pt", map_location = self.device))
         self.model_var.eval()  
         
     

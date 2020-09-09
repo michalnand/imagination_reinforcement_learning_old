@@ -42,7 +42,7 @@ class AgentDDPGImaginationMetaActor():
             target_param.data.copy_(param.data)
 
         self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate)
-        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate, weight_decay=0.0001)
+        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
 
 
         self.imagination_beta       = config.imagination_beta

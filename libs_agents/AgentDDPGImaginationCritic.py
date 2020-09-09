@@ -107,13 +107,18 @@ class AgentDDPGImaginationCritic():
         
         values_b = values_b.squeeze(2)
 
+
         return states_b, actions_b, values_b
 
     def _sample_imagination(self, actions_b, values_b):
-        values_mean  = torch.mean(values_b, dim = 1)
-        best_idx     = torch.argmax(values_mean)
 
-        return actions_b[0][best_idx].detach().to("cpu").numpy()
+        values_sum   = torch.sum(values_b, dim = 0).detach().to("cpu").numpy()
+
+        probs        = numpy.exp(values_sum - numpy.max(values_sum))
+        probs        = probs/numpy.sum(probs)
+        selected     = numpy.random.choice(range(len(probs)), p = probs)
+
+        return actions_b[0][selected].detach().to("cpu").numpy()
            
     def _sample_action(self, state_t):
         
