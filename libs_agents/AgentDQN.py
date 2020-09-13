@@ -90,12 +90,14 @@ class AgentDQN():
 
         return self.reward, done
     
-    def _show_activity(self, state):
+    def _show_activity(self, state, alpha = 0.6):
         activity_map    = self.model.get_activity_map(state)
         activity_map    = numpy.stack((activity_map,)*3, axis=-1)*[0, 0, 1]
 
         state_map    = numpy.stack((state[0],)*3, axis=-1)
-        image        = state_map + activity_map
+        image        = alpha*state_map + (1.0 - alpha)*activity_map
+
+        image        = (image - image.min())/(image.max() - image.min())
 
         image = cv2.resize(image, (400, 400), interpolation = cv2.INTER_AREA)
         cv2.imshow('state activity', image)

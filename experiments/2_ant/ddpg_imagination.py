@@ -19,11 +19,12 @@ path = "models/ddpg_imagination/"
 env = gym.make("AntPyBulletEnv-v0")
 env.render()
 
-agent = libs_agents.AgentDDPGImagination(env, ModelCritic, ModelActor, ModelEnv, Config)
+agent = libs_agents.AgentDDPGImaginationCritic(env, ModelCritic, ModelActor, ModelEnv, Config)
 
 max_iterations = 4*(10**6)
 #trainig = TrainingIterations(env, agent, max_iterations, path, 1000)
 #trainig.run() 
+
 
 agent.load(path)
 agent.disable_training()

@@ -112,7 +112,6 @@ class Model(torch.nn.Module):
         self.deconv.eval() 
         self.reward.eval() 
 
-
   
 if __name__ == "__main__":
     batch_size = 8
