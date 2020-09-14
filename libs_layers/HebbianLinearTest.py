@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-import LinearHebbianLayer as Hebbian
+import HebbianLinear as Hebbian
 import torchvision
 
 class Flatten(nn.Module):
@@ -11,18 +11,27 @@ class Model(torch.nn.Module):
     def __init__(self, input_features, output_features):
         super(Model, self).__init__()
 
-        self.model = nn.Sequential( Flatten(),
-                                    Hebbian.HebbianLinearLayer(input_features, 256, True), 
-                                    nn.ReLU(),   
-                                    Hebbian.HebbianLinearLayer(256, 64, True),
-                                    nn.ReLU(),
-                                    Hebbian.HebbianLinearLayer(64, output_features, True)
-        )
+        self.layers = [
+                        Flatten(),
+                        Hebbian.HebbianLinear(input_features, 256),
+                        nn.ReLU(),
+                        Hebbian.HebbianLinear(256, 64),
+                        nn.ReLU(),
+                        Hebbian.HebbianLinear(64, output_features)
+        ]
+
+        self.model = nn.Sequential(*self.layers)
+
 
         print(self.model)
 
     def forward(self, x):
         return self.model.forward(x)
+
+    def reset(self):
+        for i in range(len(self.layers)):
+            if hasattr(self.layers[i], "reset"):
+                self.layers[i].reset()
 
 
 
@@ -82,5 +91,6 @@ if __name__ == "__main__":
             
             print(epoch, batch_idx, loss, round(accuraccy_filtered, 2))
 
+        model.reset()
 
     print("program done")
