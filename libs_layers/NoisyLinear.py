@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy
 
 class NoisyLinear(nn.Linear):
-    def __init__(self, in_features, out_features, sigma = 0.1, bias=True):
+    def __init__(self, in_features, out_features, sigma = 0.1, bias=True, device = "cpu"):
         super(NoisyLinear, self).__init__(in_features, out_features, bias=bias)
 
         self.in_features    = in_features
@@ -11,7 +11,7 @@ class NoisyLinear(nn.Linear):
         self.sigma          = sigma
 
 
-        self.weight_noise = nn.Parameter(torch.Tensor(out_features, in_features))
+        self.weight_noise = nn.Parameter(torch.Tensor(out_features, in_features)).to(device)
         if bias:
             self.bias_noise = nn.Parameter(torch.Tensor(out_features))
         else:
@@ -27,8 +27,8 @@ class NoisyLinear(nn.Linear):
     def forward(self, x):
         y       = x.mm(self.weight.t()) + self.bias
 
-        noise_x =  self.sigma*torch.randn(x.shape)
-        noise_b =  self.sigma*torch.randn(y.shape)
+        noise_x =  self.sigma*torch.randn(x.shape).to(x.device)
+        noise_b =  self.sigma*torch.randn(y.shape).to(x.device)
 
         y_noise = noise_x.mm(self.weight_noise.t()) + self.bias_noise*noise_b
         y_noise = y_noise.to(x.device)
@@ -38,10 +38,10 @@ class NoisyLinear(nn.Linear):
     def to(self, device):
         super(NoisyLinear, self).__init__(device)
 
-        self.weight_noise.to(self.device)
+        self.weight_noise = self.weight_noise.to(self.device)
 
         if self.bias_noise is not None:
-            self.bias_noise.to(self.device)
+            self.bias_noise = self.bias_noise.to(self.device)
 
         print("TO ", self.device)
 
