@@ -23,7 +23,7 @@ set output 'training_score_total.png'
 plot '../models/ddpg/result/result.log' using 1:4 title 'DDPG'  with lines lc 'blue' lw 3, \
      '../models/ddpg_imagination/result/result.log' using 1:4 title 'DDPG : imagination' with lines lc 'green' lw 3, \
      '../models/ddpg_imagination_meta_actor/result/result.log' using 1:4 title 'DDPG : imagination meta actor' with lines lc 'red' lw 3, \
-     '../models/pdqn/result/result.log' using 1:4 title 'PDQN' with lines lc 'orange' lw 3
+     '../models/ddpg_noisy/result/result.log' using 1:4 title 'DDPG noisy' with lines lc 'orange' lw 3
 
 
 
@@ -34,7 +34,7 @@ set output 'training_score_per_iterations.png'
 plot '../models/ddpg/result/result.log' using 1:($4/$1) title 'DDPG'  with lines lc 'blue' lw 3, \
      '../models/ddpg_imagination/result/result.log' using 1:($4/$1) title 'DDPG : imagination' with lines lc 'green' lw 3, \
      '../models/ddpg_imagination_meta_actor/result/result.log' using 1:($4/$1) title 'DDPG : imagination meta actor' with lines lc 'red' lw 3, \
-     '../models/pdqn/result/result.log' using 1:($4/$1) title 'PDQN' with lines lc 'orange' lw 3
+     '../models/ddpg_noisy/result/result.log' using 1:($4/$1) title 'DDPG noisy' with lines lc 'orange' lw 3
 
 
 set xlabel "episodes" 
@@ -44,4 +44,4 @@ set output 'training_score_per_episode.png'
 plot '../models/ddpg/result/result.log' using 2:5 title 'DDPG'  with lines lc 'blue' lw 3, \
      '../models/ddpg_imagination/result/result.log' using 2:5 title 'DDPG : imagination' with lines lc 'green' lw 3, \
      '../models/ddpg_imagination_meta_actor/result/result.log' using 2:5 title 'DDPG : imagination meta actor' with lines lc 'red' lw 3, \
-     '../models/pdqn/result/result.log' using 2:5 title 'PDQN' with lines lc 'orange' lw 3
+     '../models/ddpg_noisy/result/result.log' using 2:5 title 'DDPG noisy' with lines lc 'orange' lw 3
