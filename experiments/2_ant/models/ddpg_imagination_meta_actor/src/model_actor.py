@@ -7,18 +7,17 @@ sys.path.insert(0, '../../..')
 import libs_layers
 
 class Model(torch.nn.Module):
-    def __init__(self, input_shape, outputs_count, hidden_count = 64):
+    def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
-
         self.device = "cpu"
         
         self.layers = [ 
-                                    nn.Linear(input_shape[0], hidden_count),
-                                    nn.ReLU(),           
-                                    nn.Linear(hidden_count, hidden_count),
-                                    nn.ReLU(),    
-                                    libs_layers.NoisyLinear(hidden_count, outputs_count),
-                                    nn.Tanh()
+                        nn.Linear(input_shape[0], hidden_count),
+                        nn.ReLU(),           
+                        nn.Linear(hidden_count, hidden_count//2),
+                        nn.ReLU(),    
+                        libs_layers.NoisyLinear(hidden_count//2, outputs_count),
+                        nn.Tanh() 
         ]
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
@@ -33,7 +32,6 @@ class Model(torch.nn.Module):
     def forward(self, state):
         return self.model(state)
 
-     
     def save(self, path):
         print("saving to ", path)
         torch.save(self.model.state_dict(), path + "trained/model_actor.pt")

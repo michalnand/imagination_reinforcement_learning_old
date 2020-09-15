@@ -13,7 +13,7 @@ class Config():
 
         self.exploration   = libs_common.decay.Linear(1000000, 1.0, 0.3, 0.3)
 
-        self.experience_replay_size = 16384
+        self.experience_replay_size = 256 #16384
 
         self.imagination_beta             = 0.1
         self.entropy_beta                 = 0.1
