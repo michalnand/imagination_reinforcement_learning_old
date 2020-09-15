@@ -53,7 +53,7 @@ class Model(torch.nn.Module):
         fc_input_width  = self.input_shape[2]    
 
         kernels_count   = [input_channels, 32, 32, 64, 64]
-        residual_count  = [2, 2, 2, 2]
+        residual_count  = [1, 1, 1, 1]
 
         ratio           = 2**(len(kernels_count) - 1)
         fc_inputs_count = kernels_count[-1]*((fc_input_width)//ratio)*((fc_input_height)//ratio)
