@@ -19,7 +19,7 @@ class AgentDQNCuriosity():
 
         self.exploration    = config.exploration
         self.gamma          = config.gamma
-        self.tau            = tau
+        self.tau            = config.tau
 
         self.curiosity_beta = config.curiosity_beta
         self.update_frequency = config.update_frequency

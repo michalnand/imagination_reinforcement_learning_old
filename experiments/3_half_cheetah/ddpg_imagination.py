@@ -22,7 +22,7 @@ env = gym.make("HalfCheetahPyBulletEnv-v0")
 
 agent = libs_agents.AgentDDPGImagination(env, ModelCritic, ModelActor, ModelEnv, Config)
 
-max_iterations = 10*(10**6)
+max_iterations = 6*(10**6)
 trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
 trainig.run()
 
