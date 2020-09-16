@@ -118,12 +118,15 @@ class AgentDDPGImagination():
 
         return states_b, actions_b, rewards_b
 
-    def _sample_imagination(self, actions_b, rewards_b):
-        rewards_mean    = torch.mean(rewards_b, dim = 1)
-        best_idx        = torch.argmax(rewards_mean)
+    def _sample_imagination(self, actions_b, values_b):
+        values_sum   = torch.sum(values_b, dim = 0).detach().to("cpu").numpy()
 
-        return actions_b[0][best_idx].detach().to("cpu").numpy(), rewards_mean[best_idx].detach().to("cpu").numpy()
-           
+        probs        = numpy.exp(values_sum - numpy.max(values_sum))
+        probs        = probs/numpy.sum(probs)
+        selected     = numpy.random.choice(range(len(probs)), p = probs)
+
+        return actions_b[0][selected].detach().to("cpu").numpy(), values_sum[selected]
+   
         
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device)

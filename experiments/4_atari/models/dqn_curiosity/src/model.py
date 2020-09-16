@@ -58,24 +58,26 @@ class Model(torch.nn.Module):
         self.layers_features = []
 
         for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=2, padding=1))
+            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=1, padding=1))
             self.layers_features.append(nn.ReLU()) 
 
             for j in range(residual_count[i]):
                 self.layers_features.append(ResidualBlock(kernels_count[i+1]))
 
+            self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+
         self.layers_features.append(Flatten())
 
         self.layers_value = [
-                            nn.Linear(fc_inputs_count, 256),
+                            nn.Linear(fc_inputs_count, 128),
                             nn.ReLU(),                      
-                            nn.Linear(256, 1) 
+                            nn.Linear(128, 1) 
         ] 
 
         self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 256),
+                                nn.Linear(fc_inputs_count, 128),
                                 nn.ReLU(),                      
-                                nn.Linear(256, outputs_count)
+                                nn.Linear(128, outputs_count)
         ] 
 
   

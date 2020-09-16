@@ -59,14 +59,14 @@ class Model(torch.nn.Module):
         self.deconv = nn.Sequential(
                                     nn.Conv2d(kernels_count, kernels_count, kernel_size=1, stride=1, padding=0),
                                     nn.ReLU(),
-                                    nn.ConvTranspose2d(kernels_count, 1, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0),
+                                    nn.ConvTranspose2d(kernels_count, input_channels, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0),
         )
 
         self.reward = nn.Sequential(
-                                        nn.Conv2d(kernels_count, 16, kernel_size=1, stride=1, padding=0),
+                                        nn.Conv2d(kernels_count, kernels_count, kernel_size=1, stride=1, padding=0),
                                         nn.ReLU(),
                                         Flatten(),
-                                        nn.Linear(fc_input_height*fc_input_width*16, 1)
+                                        nn.Linear(fc_input_height*fc_input_width*kernels_count, 1)
         ) 
 
         self.conv.to(self.device) 
@@ -83,14 +83,16 @@ class Model(torch.nn.Module):
         model_input      = torch.cat([state, action_], dim = 1)
         conv_output      = self.conv(model_input)
 
-        frame_prediction       = self.deconv(conv_output) 
+        observation_prediction = self.deconv(conv_output) 
         reward_prediction      = self.reward(conv_output)
 
+        '''
         frames_count            = state.shape[1]
         state_tmp               = torch.narrow(state, 1, 0, frames_count-1)
         frame_prediction        = frame_prediction + torch.narrow(state, 1, 0, 1)
         observation_prediction  = torch.cat([frame_prediction, state_tmp], dim = 1)
-  
+        '''
+
         return observation_prediction, reward_prediction
 
     def save(self, path):

@@ -42,6 +42,7 @@ class AgentDDPGImaginationMetaActor():
         self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
 
         self.entropy_beta           = config.entropy_beta
+        self.imagination_beta       = config.imagination_beta
         self.imagination_rollouts   = config.imagination_rollouts
         self.imagination_steps      = config.imagination_steps
         self.imagination_module     = ImaginationModule(ModelImagination, self.state_shape, self.actions_count, config.imagination_learning_rate, self.experience_replay, True)
@@ -67,12 +68,12 @@ class AgentDDPGImaginationMetaActor():
         state_t     = torch.from_numpy(self.state).to(self.model_actor.device).unsqueeze(0).float()
 
         _, actions_b, rewards_b = self._process_imagination(state_t)
-        action                  = self._sample_imagination(actions_b, rewards_b)
+        action, im_reward       = self._sample_imagination(actions_b, rewards_b)
 
         state_new, self.reward, done, self.info = self.env.step(action)
 
         if self.enabled_training:
-            self.experience_replay.add(self.state, action, self.reward, done)
+            self.experience_replay.add(self.state, action, self.reward + self.imagination_beta*im_reward, done)
 
         if self.enabled_training and (self.iterations > self.experience_replay.size) and self.iterations%self.update_frequency == 0:
             self.imagination_module.train()
@@ -112,16 +113,17 @@ class AgentDDPGImaginationMetaActor():
 
         return states_b, actions_b, values_b
 
-    def _sample_imagination(self, actions_b, values_b):
 
+    def _sample_imagination(self, actions_b, values_b):
         values_sum   = torch.sum(values_b, dim = 0).detach().to("cpu").numpy()
 
         probs        = numpy.exp(values_sum - numpy.max(values_sum))
         probs        = probs/numpy.sum(probs)
         selected     = numpy.random.choice(range(len(probs)), p = probs)
 
-        return actions_b[0][selected].detach().to("cpu").numpy()
-    
+        return actions_b[0][selected].detach().to("cpu").numpy(), values_sum[selected]
+
+
     def _sample_action(self, state_t):
         if self.enabled_training:
             epsilon = self.exploration.get()
