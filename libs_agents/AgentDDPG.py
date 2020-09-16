@@ -34,7 +34,7 @@ class AgentDDPG():
             target_param.data.copy_(param.data)
 
         self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate)
-        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate, weight_decay=config.critic_learning_rate*0.01)
+        self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
 
         self.state          = env.reset()
 

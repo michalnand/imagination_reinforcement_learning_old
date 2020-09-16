@@ -1,7 +1,7 @@
-cd 4_atari
+cd 2_ant
 ./training_batch
 cd ..
 
-cd 6_2048
+cd 3_half_cheetah
 ./training_batch
 cd ..

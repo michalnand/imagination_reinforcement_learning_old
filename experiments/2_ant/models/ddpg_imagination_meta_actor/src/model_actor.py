@@ -16,7 +16,7 @@ class Model(torch.nn.Module):
                         nn.ReLU(),           
                         nn.Linear(hidden_count, hidden_count//2),
                         nn.ReLU(),    
-                        libs_layers.NoisyLinear(hidden_count//2, outputs_count),
+                        nn.Linear(hidden_count//2, outputs_count),
                         nn.Tanh() 
         ]
 

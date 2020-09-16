@@ -15,8 +15,8 @@ class AgentDQNImagination():
 
         self.exploration    = config.exploration
         self.gamma          = config.gamma
+        self.tau            = config.tau
         self.update_frequency = config.update_frequency
-        self.update_target_frequency = config.update_target_frequency
 
         if hasattr(config, 'bellman_steps'):
             self.bellman_steps = config.bellman_steps
@@ -34,7 +34,7 @@ class AgentDQNImagination():
 
         self.model_dqn          = ModelDQN.Model(self.state_shape, self.actions_count)
         self.model_dqn_target   = ModelDQN.Model(self.state_shape, self.actions_count)
-        self.optimizer_dqn      = torch.optim.Adam(self.model_dqn.parameters(), lr= config.learning_rate, weight_decay=config.learning_rate*0.0001)
+        self.optimizer_dqn      = torch.optim.Adam(self.model_dqn.parameters(), lr= config.learning_rate)
 
         for target_param, param in zip(self.model_dqn_target.parameters(), self.model_dqn.parameters()):
             target_param.data.copy_(param.data)
@@ -79,10 +79,14 @@ class AgentDQNImagination():
             self.train_model()
             
             if self.iterations%self.update_target_frequency == 0:
-                # update target network
+                #soft update target network
+                for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
+                    target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
+
+                '''
                 for target_param, param in zip(self.model_dqn_target.parameters(), self.model_dqn.parameters()):
                     target_param.data.copy_(param.data)
-     
+                '''
         
         self.state = state_new
             
