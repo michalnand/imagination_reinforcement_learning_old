@@ -79,7 +79,7 @@ class AgentDQNImagination():
             self.train_model()
             
             #soft update target network
-            for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
+            for target_param, param in zip(self.model_dqn_target.parameters(), self.model_dqn.parameters()):
                 target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
         
         self.state = state_new
