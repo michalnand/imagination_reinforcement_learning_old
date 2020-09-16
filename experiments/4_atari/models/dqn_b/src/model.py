@@ -53,7 +53,7 @@ class Model(torch.nn.Module):
         fc_input_width  = self.input_shape[2]    
 
         kernels_count   = [input_channels, 32, 32, 64, 64]
-        residual_count  = [1, 1, 1, 1]
+        residual_count  = [0, 0, 0, 0]
 
         ratio           = 2**(len(kernels_count) - 1)
         fc_inputs_count = kernels_count[-1]*((fc_input_width)//ratio)*((fc_input_height)//ratio)
@@ -70,15 +70,15 @@ class Model(torch.nn.Module):
         self.layers_features.append(Flatten())
 
         self.layers_value = [
-                            libs_layers.NoisyLinear(fc_inputs_count, 128),
+                            nn.Linear(fc_inputs_count, 256),
                             nn.ReLU(),                      
-                            libs_layers.NoisyLinear(128, 1) 
+                            libs_layers.NoisyLinear(256, 1) 
         ]
 
         self.layers_advantage = [
-                                libs_layers.NoisyLinear(fc_inputs_count, 128),
+                                nn.Linear(fc_inputs_count, 256),
                                 nn.ReLU(),                      
-                                libs_layers.NoisyLinear(128, outputs_count)
+                                libs_layers.NoisyLinear(256, outputs_count)
         ] 
 
   

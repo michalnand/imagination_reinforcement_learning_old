@@ -98,8 +98,8 @@ class AgentDDPGImaginationMetaActor():
         for n in range(self.imagination_steps):                       
             actions_t = self._sample_action(states_t.detach())
 
-            states_next_t, _  = self.imagination_module.eval(states_t.detach(), actions_t)
-            value_t           = self.model_critic(states_t.detach(), actions_t)
+            states_next_t, value_t  = self.imagination_module.eval(states_t.detach(), actions_t)
+            #value_t           = self.model_critic(states_t.detach(), actions_t)
            
             states_t = states_next_t.clone()
 
