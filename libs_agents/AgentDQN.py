@@ -72,14 +72,9 @@ class AgentDQN():
             if self.iterations%self.update_frequency == 0:
                 self.train_model()
             
-            if self.iterations%self.update_target_frequency == 0:
-                #soft update target network
-                for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
-                    target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
-                '''
-                for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
-                    target_param.data.copy_(param.data)
-                '''
+            #soft update target network
+            for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
+                target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
 
         if done:
             self.state = self.env.reset()

@@ -79,15 +79,11 @@ class AgentDQNCuriosity():
             self.train_model()
             self.curiosity_module.train()
             
-            if self.iterations%self.update_target_frequency == 0:
-                #soft update target network
-                for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
-                    target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
+            #soft update target network
+            for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
+                target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
 
-                '''
-                for target_param, param in zip(self.model_dqn_target.parameters(), self.model_dqn.parameters()):
-                    target_param.data.copy_(param.data)
-                '''
+      
         
         self.state = state_new
             
