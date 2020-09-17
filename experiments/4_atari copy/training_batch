@@ -1,4 +1,0 @@
-#python3 dqn.py
-#python3 dqn_imagination.py
-python3 dqn.py
-python3 dqn_curiosity.py

@@ -17,13 +17,11 @@ class ResidualBlock(torch.nn.Module):
         self.layers = []
         
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=2, stride=1, padding=0))
-        self.layers.append(nn.BatchNorm2d(channels))
         self.layers.append(nn.ReLU())
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=2, stride=1, padding=1))
-        self.layers.append(nn.BatchNorm2d(channels))
         
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
-        torch.nn.init.xavier_uniform_(self.layers[3].weight)
+        torch.nn.init.xavier_uniform_(self.layers[2].weight)
 
         self.model = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
@@ -51,9 +49,10 @@ class Model(torch.nn.Module):
         for n in range(n_blocks):
             self.layers.append(ResidualBlock(features_count))
 
-        self.layers.append(Flatten())
-
-        self.layers.append(libs_layers.NoisyLinear(features_count*4*4, outputs_count))
+        self.layers.append(nn.Conv2d(features_count, 8, kernel_size=1, stride=1, padding=0))
+        self.layers.append(nn.ReLU())
+        self.layers.append(Flatten()) 
+        self.layers.append(libs_layers.NoisyLinear(8*4*4, outputs_count))
 
         for i in range(len(self.layers)):
             if hasattr(self.layers[i], "weight"):

@@ -13,8 +13,7 @@ from libs_common.Game2048Wrapper import *
 import models.dqn.src.model            as Model
 import models.dqn.src.config           as Config
 
-
-path = "models/dqn/"
+path = "models/dqn/" 
 
 env = gym.make("2048-v0")
 env = Game2048Wrapper(env, 4)
@@ -28,7 +27,6 @@ trainig.run()
 
 '''
 agent.load(path)
-
 agent.disable_training()
 agent.iterations = 0
 while True:
