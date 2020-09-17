@@ -12,7 +12,7 @@ class Model(torch.nn.Module):
         self.device = "cpu"
         
         self.layers = [ 
-                        nn.Linear(input_shape[0], hidden_count),
+                        libs_layers.NoisyLinear(input_shape[0], hidden_count),
                         nn.ReLU(),           
                         nn.Linear(hidden_count, hidden_count//2),
                         nn.ReLU(),    
