@@ -1,15 +1,24 @@
+import gym
+import numpy
+import time
+
 import sys
 sys.path.insert(0, '../..')
 
 import libs_agents
-import numpy
-import time
+from libs_common.Training import *
+
+
+import models.ddpg_imagination.src.model_critic     as ModelCritic
+import models.ddpg_imagination.src.model_actor      as ModelActor
+import models.ddpg_imagination.src.model_env        as ModelEnv
+import models.ddpg_imagination.src.config           as Config
 
 from pybullet_envs.bullet import minitaur_gym_env
 from pybullet_envs.bullet import minitaur_env_randomizer
 
 randomizer = (minitaur_env_randomizer.MinitaurEnvRandomizer())
-env = minitaur_gym_env.MinitaurBulletEnv(   render=True,
+env = minitaur_gym_env.MinitaurBulletEnv(   render=False,  #render=True
                                             leg_model_enabled=False,
                                             motor_velocity_limit=numpy.inf,
                                             pd_control_enabled=True,
@@ -18,35 +27,19 @@ env = minitaur_gym_env.MinitaurBulletEnv(   render=True,
                                             env_randomizer=randomizer,
                                             hard_reset=False)
 
-observation = env.reset()
+path = "models/ddpg_imagination/"
 
-state_shape    = env.observation_space.shape
-actions_count  = env.action_space.shape[0]
+agent = libs_agents.AgentDDPGImagination(env, ModelCritic, ModelActor, ModelEnv, Config)
 
-print("state_shape      = ", state_shape)
-print("actions_count    = ", actions_count)
+max_iterations = 10*(10**6)
+trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
+trainig.run()
 
-print("state = \n", observation)
-
-
-agent = libs_agents.AgentRandomContinuous(env)
-
-k = 0.1
-fps = 0
+'''
+agent.load(path)
+agent.disable_training()
 while True:
-    time_start      = time.time()
-    reward, done    = agent.main()
-    time_stop       = time.time()
+    reward, done = agent.main()
     env.render()
-
-    fps = (1.0-k)*fps + k*1.0/(time_stop - time_start)
-
-
-    if reward != 0:
-        print("reward = ", reward)
-    
-    if done:
-        print("FPS = ", round(fps, 1))
-        print("DONE \n\n")
-    
     time.sleep(0.01)
+'''
