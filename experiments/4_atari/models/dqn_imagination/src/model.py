@@ -35,7 +35,7 @@ class ResidualBlock(torch.nn.Module):
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [1, 1, 1, 1]):
+    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [0, 0, 0, 0]):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,7 +55,7 @@ class Model(torch.nn.Module):
         self.layers_features = []
 
         for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=1, stride=1, padding=0))
+            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=1, padding=1))
             self.layers_features.append(nn.ReLU()) 
 
             for j in range(residual_count[i]):
@@ -68,7 +68,7 @@ class Model(torch.nn.Module):
         self.layers_value = [
                             nn.Linear(fc_inputs_count, 128),
                             nn.ReLU(),                       
-                            nn.Linear(128, 1) 
+                            nn.Linear(128, 1)  
         ] 
 
         self.layers_advantage = [

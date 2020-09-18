@@ -138,6 +138,8 @@ class AgentDDPGImaginationMetaActor():
     
         return action_t
 
+
+    '''
     def _imagination_exploration_entropy_loss(self, initial_states_b):
         batch_size = initial_states_b.shape[0]
 
@@ -157,7 +159,22 @@ class AgentDDPGImaginationMetaActor():
         
         exploration_entropy_loss = entropy_t.mean()        
         return exploration_entropy_loss
+    '''
+
+    def _imagination_exploration_entropy_loss(self, initial_state):
+        states_b, _, _  = self._process_imagination(initial_state)
+
+        #take ending states in each rollout
+        ending_states_b = states_b[:][self.imagination_steps - 1]
+
+        #compute variance
+        variance        = torch.var(ending_states_b)
         
+        #compute entropy, considering states distribution is gaussian
+        exploration_entropy_loss    = 0.5*torch.log(2.0*numpy.pi*numpy.e*variance)
+        
+        return exploration_entropy_loss
+
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device)
         
@@ -184,7 +201,7 @@ class AgentDDPGImaginationMetaActor():
         actor_loss      = actor_loss.mean()
 
         #maximize exploration entropy loss
-        entropy_loss = -self.entropy_beta*self._imagination_exploration_entropy_loss(state_t)
+        entropy_loss = -self.entropy_beta*self._imagination_exploration_entropy_loss(state_t[0])
         actor_loss+=  entropy_loss
         
         #print("entropy_loss = ", entropy_loss)
