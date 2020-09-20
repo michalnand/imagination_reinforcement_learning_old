@@ -5,11 +5,12 @@ import libs_agents
 import numpy
 import time
 
+import gym
 from pybullet_envs.bullet import minitaur_gym_env
 from pybullet_envs.bullet import minitaur_env_randomizer
 
 randomizer = (minitaur_env_randomizer.MinitaurEnvRandomizer())
-env = minitaur_gym_env.MinitaurBulletEnv(   render=False,
+env = minitaur_gym_env.MinitaurBulletEnv(   render=True,
                                             leg_model_enabled=False,
                                             motor_velocity_limit=numpy.inf,
                                             pd_control_enabled=True,
@@ -17,6 +18,16 @@ env = minitaur_gym_env.MinitaurBulletEnv(   render=False,
                                             motor_overheat_protection=True,
                                             env_randomizer=randomizer,
                                             hard_reset=False)
+
+class Wrapper(gym.Wrapper):
+    def __init__(self, env):
+        gym.Wrapper.__init__(self, env)
+
+    def step(self, action):
+        action_ = numpy.pi*(action + 0.5)
+        return self.env.step(action_)
+
+env = Wrapper(env)
 
 observation = env.reset()
 
@@ -29,24 +40,22 @@ print("actions_count    = ", actions_count)
 print("state = \n", observation)
 
 
-agent = libs_agents.AgentRandomContinuous(env)
 
-k = 0.1
-fps = 0
+x = 0.0
+
+phase = numpy.zeros(8)
+
+for i in range(8):
+    phase[i] = numpy.pi*i/8.0
+
 while True:
-    time_start      = time.time()
-    reward, done    = agent.main()
-    time_stop       = time.time()
-    env.render()
 
-    fps = (1.0-k)*fps + k*1.0/(time_stop - time_start)
+    x+= 0.04
+    action = 0.1*numpy.sin(x + phase)
 
+    _, _, done, _ = env.step(action)
 
-    if reward != 0:
-        print("reward = ", reward)
-    
     if done:
-        print("FPS = ", round(fps, 1))
-        print("DONE \n\n")
-    
+        env.reset()
+
     time.sleep(0.01)

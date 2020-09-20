@@ -27,6 +27,17 @@ env = minitaur_gym_env.MinitaurBulletEnv(   render=False,  #render=True
                                             env_randomizer=randomizer,
                                             hard_reset=False)
 
+class Wrapper(gym.Wrapper):
+    def __init__(self, env):
+        gym.Wrapper.__init__(self, env)
+
+    def step(self, action):
+        action_ = numpy.pi*(action + 0.5)
+        return self.env.step(action_)
+
+env = Wrapper(env)
+
+
 path = "models/ddpg_imagination_meta_actor/"
 
 agent = libs_agents.AgentDDPGImaginationMetaActor(env, ModelCritic, ModelMetaActor, ModelEnv, Config)
