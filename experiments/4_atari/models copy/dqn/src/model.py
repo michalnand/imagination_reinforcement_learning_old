@@ -1,6 +1,11 @@
 import torch
 import torch.nn as nn
 
+import sys
+sys.path.insert(0, '../../..')
+
+import libs_layers
+
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
@@ -72,7 +77,7 @@ class Model(torch.nn.Module):
         ] 
 
         self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 128),
+                                libs_layers.NoisyLinear(fc_inputs_count, 128),
                                 nn.ReLU(),                      
                                 nn.Linear(128, outputs_count)
         ] 

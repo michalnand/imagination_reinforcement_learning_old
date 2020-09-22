@@ -21,8 +21,9 @@ class AgentDQNCuriosity():
         self.gamma          = config.gamma
         self.tau            = config.tau
 
-        self.curiosity_beta = config.curiosity_beta
-        self.update_frequency = config.update_frequency
+        self.curiosity_alpha    = config.curiosity_alpha
+        self.curiosity_beta     = config.curiosity_beta
+        self.update_frequency   = config.update_frequency
 
         if hasattr(config, 'bellman_steps'):
             self.bellman_steps = config.bellman_steps
@@ -46,6 +47,7 @@ class AgentDQNCuriosity():
             target_param.data.copy_(param.data)
 
         self.curiosity_module = CuriosityModule(ModelCuriosity, self.state_shape, self.actions_count, config.curiosity_learning_rate, self.experience_replay, False)
+        self.curiosity        = 0.0
 
         self.state    = env.reset()
         self.enable_training()
@@ -72,8 +74,25 @@ class AgentDQNCuriosity():
 
         state_new, self.reward, done, self.info = self.env.step(self.action)
 
+        #compute curiosity
+        #next state to tenzor
+        state_next_t    = torch.from_numpy(state_new).to(self.model_dqn.device).unsqueeze(0).float()
+        
+        #action as one-hot encoding tensor
+        action_t = torch.zeros((1, self.actions_count)).to(self.model_dqn.device)
+        action_t[0][self.action] = 1.0
+        
+        #curiosity forward
+        curiosity_t, _  = self.curiosity_module.eval(state_t, state_next_t, action_t)
+
+        #tanh squeeze, to numpy
+        curiosity_t     = torch.tahn(self.curiosity_beta*curiosity_t).squeeze().detach().to("cpu").numpy()
+
+        #curiosity filter
+        self.curiosity = (1.0 - self.curiosity_alpha)*self.curiosity + self.curiosity_alpha*curiosity_t
+
         if self.enabled_training:
-            self.experience_replay.add(self.state, self.action, self.reward, done)
+            self.experience_replay.add(self.state, self.action, self.reward + self.curiosity, done)
        
         if self.enabled_training and (self.iterations > self.experience_replay.size) and self.iterations%self.update_frequency == 0:
             self.train_model()
@@ -89,6 +108,7 @@ class AgentDQNCuriosity():
             
         if done:
             self.env.reset()
+            self.curiosity = 0.0
 
         if show_activity:
             self._show_activity(self.state, self.action)
@@ -101,10 +121,6 @@ class AgentDQNCuriosity():
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_dqn.device)            
 
-        #compute curiosity
-        curiosity_t, _  = self.curiosity_module.eval(state_t, state_next_t, action_t)
-        curiosity_t  = torch.clamp(self.curiosity_beta*curiosity_t, 0.0, 1.0)   
-        
         #q values, state now, state next
         q_predicted      = self.model_dqn.forward(state_t)
         q_predicted_next = self.model_dqn_target.forward(state_next_t)
@@ -121,7 +137,7 @@ class AgentDQNCuriosity():
                 reward_sum+= reward_t[j][i]*(gamma_**j)
 
             action_idx    = action_t[i]
-            q_target[i][action_idx]   = curiosity_t[i] + reward_sum + gamma_*torch.max(q_predicted_next[i])
+            q_target[i][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[i])
 
         #train DQN model
         loss = ((q_target.detach() - q_predicted)**2).mean() 

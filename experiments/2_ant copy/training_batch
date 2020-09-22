@@ -1,3 +1,0 @@
-python3 ddpg.py
-python3 ddpg_imagination.py
-python3 ddpg_imagination_meta_actor.py

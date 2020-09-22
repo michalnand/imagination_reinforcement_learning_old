@@ -14,9 +14,9 @@ class Config():
         self.exploration   = libs_common.decay.Linear(1000000, 1.0, 0.3, 0.3)
 
         self.experience_replay_size = 100000
-
+        
         self.imagination_beta             = 0.01
         self.imagination_rollouts         = 4
-        self.imagination_steps            = 4
+        self.imagination_steps            = 8
         self.imagination_learning_rate    = 0.001
  

@@ -31,112 +31,116 @@ class ResidualBlock(torch.nn.Module):
         return self.activation(y + x)
 
 
-
-
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [1, 1, 1, 1]):
+    def __init__(self, input_shape, outputs_count, kernels_count = 32, residual_count = 3):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.input_shape    = input_shape
+        self.input_shape    = input_shape 
         self.outputs_count  = outputs_count
         
         input_channels  = self.input_shape[0]
-        fc_input_height = self.input_shape[1]
-        fc_input_width  = self.input_shape[2]    
+        input_height    = self.input_shape[1]
+        input_width     = self.input_shape[2]   
 
-        kernels_count   = [input_channels] + kernels_count
+        input_kernel_size = 4 
 
-        ratio           = 2**(len(kernels_count) - 1)
-        fc_inputs_count = kernels_count[-1]*((fc_input_width)//ratio)*((fc_input_height)//ratio)
+        fc_input_height = input_shape[1]//(input_kernel_size)
+        fc_input_width  = input_shape[2]//(input_kernel_size)
 
-        self.layers_features = []
 
-        for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=1, stride=1, padding=0))
-            self.layers_features.append(nn.ReLU()) 
+        self.conv_layers = []
+        self.conv_layers.append(nn.Conv2d(input_channels + outputs_count, kernels_count, kernel_size=input_kernel_size, stride=input_kernel_size, padding=1))
+        self.conv_layers.append(nn.ReLU())
 
-            for j in range(residual_count[i]):
-                self.layers_features.append(ResidualBlock(kernels_count[i+1]))
+        for i in range(residual_count):
+            self.conv_layers.append(ResidualBlock(kernels_count))
 
-            self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+        self.conv = nn.Sequential(*self.conv_layers)
+      
+        self.deconv = nn.Sequential(
+                                        nn.Conv2d(kernels_count, kernels_count, kernel_size=1, stride=1, padding=0),
+                                        nn.ReLU(),
+                                        nn.ConvTranspose2d(kernels_count, 4, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0)
+        )
 
-        self.layers_features.append(Flatten())
+        self.reward = nn.Sequential(
+                                        nn.Conv2d(kernels_count, 8, kernel_size=1, stride=1, padding=0),
+                                        nn.ReLU(),
 
-        self.layers_value = [
-                            nn.Linear(fc_inputs_count, 128),
-                            nn.ReLU(),                       
-                            nn.Linear(128, 1) 
-        ] 
+                                        Flatten(),
+                                        nn.Linear(fc_input_height*fc_input_width*8, 1)
+        ) 
 
-        self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 128),
-                                nn.ReLU(),                      
-                                nn.Linear(128, outputs_count)
-        ] 
+        self.conv.to(self.device)
+        self.deconv.to(self.device) 
+        self.reward.to(self.device) 
 
-  
-        for i in range(len(self.layers_features)):
-            if hasattr(self.layers_features[i], "weight"):
-                torch.nn.init.xavier_uniform_(self.layers_features[i].weight)
+        print(self.conv)
+        print(self.deconv)  
+        print(self.reward)                      
 
-        self.model_features = nn.Sequential(*self.layers_features)
-        self.model_features.to(self.device)
+    def forward(self, state, action):
+        action_ = action.unsqueeze(1).unsqueeze(1).transpose(3, 1).repeat((1, 1, self.input_shape[1], self.input_shape[2])).to(self.device)
 
-        self.model_value = nn.Sequential(*self.layers_value)
-        self.model_value.to(self.device)
+        model_input      = torch.cat([state, action_], dim = 1)
+        conv_output     = self.conv(model_input)
+        
+        d_observation_prediction    = self.deconv(conv_output) 
+        reward_prediction           = self.reward(conv_output)
 
-        self.model_advantage = nn.Sequential(*self.layers_advantage)
-        self.model_advantage.to(self.device)
-
-        print(self.model_features)
-        print(self.model_value)
-        print(self.model_advantage)
-
-    def forward(self, state):
-        features    = self.model_features(state)
-
-        value       = self.model_value(features)
-        advantage   = self.model_advantage(features)
-
-        result = value + advantage - advantage.mean()
-        return result
+        observation_prediction = state.detach() + d_observation_prediction
+        '''
+        frames_count            = state.shape[1]
+        state_tmp               = torch.narrow(state, 1, 0, frames_count-1)
+        frame_prediction        = frame_prediction + torch.narrow(state, 1, 0, 1)
+        observation_prediction  = torch.cat([frame_prediction, state_tmp], dim = 1)
+        '''
+        
+        return observation_prediction, reward_prediction
 
     def save(self, path):
         print("saving ", path)
 
-        torch.save(self.model_features.state_dict(), path + "trained/model_features.pt")
-        torch.save(self.model_value.state_dict(), path + "trained/model_value.pt")
-        torch.save(self.model_advantage.state_dict(), path + "trained/model_advantage.pt")
+        torch.save(self.conv.state_dict(), path + "trained/model_env_conv.pt")
+        torch.save(self.deconv.state_dict(), path + "trained/model_env_deconv.pt")
+        torch.save(self.reward.state_dict(), path + "trained/model_env_reward.pt")
+
 
     def load(self, path):
-        print("loading ", path) 
+        print("loading ", path, " device = ", self.device) 
 
-        self.model_features.load_state_dict(torch.load(path + "trained/model_features.pt", map_location = self.device))
-        self.model_value.load_state_dict(torch.load(path + "trained/model_value.pt", map_location = self.device))
-        self.model_advantage.load_state_dict(torch.load(path + "trained/model_advantage.pt", map_location = self.device))
-        
-        self.model_features.eval() 
-        self.model_value.eval() 
-        self.model_advantage.eval() 
+        self.conv.load_state_dict(torch.load(path + "trained/model_env_conv.pt", map_location = self.device))
+        self.deconv.load_state_dict(torch.load(path + "trained/model_env_deconv.pt", map_location = self.device))
+        self.reward.load_state_dict(torch.load(path + "trained/model_env_reward.pt", map_location = self.device))
+
+        self.conv.eval() 
+        self.deconv.eval() 
+        self.reward.eval() 
 
 
-    def get_activity_map(self, state):
- 
-        state_t     = torch.tensor(state, dtype=torch.float32).detach().to(self.device).unsqueeze(0)
-        features    = self.model_features(state_t)
-        features    = features.reshape((1, 64, 6, 6))
+  
+if __name__ == "__main__":
+    batch_size = 8
 
-        upsample = nn.Upsample(size=(self.input_shape[1], self.input_shape[2]), mode='bicubic')
+    channels = 4
+    height   = 96
+    width    = 96
 
-        features = upsample(features).sum(dim = 1)
+    actions_count = 7
 
-        result = features[0].to("cpu").detach().numpy()
 
-        k = 1.0/(result.max() - result.min())
-        q = 1.0 - k*result.max()
-        result = k*result + q
-        
-        return result
+    state   = torch.rand((batch_size, channels, height, width))
+    action  = torch.rand((batch_size, actions_count))
+
+
+    model = Model((channels, height, width), actions_count)
+
+
+    y, r = model.forward(state, action)
+
+    print(y.shape)
+    print(r.shape)
+

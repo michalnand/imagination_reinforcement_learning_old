@@ -1,6 +1,11 @@
 import torch
 import torch.nn as nn
 
+import sys
+sys.path.insert(0, '../../..')
+
+import libs_layers
+
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
@@ -35,7 +40,7 @@ class ResidualBlock(torch.nn.Module):
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [0, 0, 0, 0]):
+    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [1, 1, 1, 1]):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -52,7 +57,7 @@ class Model(torch.nn.Module):
         ratio           = 2**(len(kernels_count) - 1)
         fc_inputs_count = kernels_count[-1]*((fc_input_width)//ratio)*((fc_input_height)//ratio)
 
-        self.layers_features = [] 
+        self.layers_features = []
 
         for i in range(len(kernels_count)-1):
             self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=1, padding=1))
@@ -72,7 +77,7 @@ class Model(torch.nn.Module):
         ] 
 
         self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 128),
+                                libs_layers.NoisyLinear(fc_inputs_count, 128),
                                 nn.ReLU(),                      
                                 nn.Linear(128, outputs_count)
         ] 
