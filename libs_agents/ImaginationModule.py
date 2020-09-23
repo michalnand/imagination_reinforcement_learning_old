@@ -32,7 +32,7 @@ class ImaginationModule:
         state_next_prediction_t, reward_prediction_t = self.model.forward(state_t, action_t)
 
 
-        loss_state  = 10.0*((state_next_t - state_next_prediction_t)**2).mean()
+        loss_state  = ((state_next_t - state_next_prediction_t)**2).mean()
         loss_reward = ((reward_t - reward_prediction_t)**2).mean()
 
         loss = loss_state + loss_reward

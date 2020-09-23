@@ -78,18 +78,14 @@ class AgentDQNCuriosity():
         #next state to tenzor
         state_next_t    = torch.from_numpy(state_new).to(self.model_dqn.device).unsqueeze(0).float()
         
-        #action as one-hot encoding tensor
-        action_t = torch.zeros((1, self.actions_count)).to(self.model_dqn.device)
-        action_t[0][self.action] = 1.0
-        
         #curiosity forward
-        curiosity_t, _  = self.curiosity_module.eval(state_t, state_next_t, action_t)
+        curiosity_t, _  = self.curiosity_module.eval(state_t, state_next_t, self.action)
 
         #tanh squeeze, to numpy
-        curiosity_t     = torch.tahn(self.curiosity_beta*curiosity_t).squeeze().detach().to("cpu").numpy()
+        curiosity     = self.curiosity_beta*numpy.tanh(curiosity_t.squeeze().detach().to("cpu").numpy())
 
         #curiosity filter
-        self.curiosity = (1.0 - self.curiosity_alpha)*self.curiosity + self.curiosity_alpha*curiosity_t
+        self.curiosity = (1.0 - self.curiosity_alpha)*self.curiosity + self.curiosity_alpha*curiosity
 
         if self.enabled_training:
             self.experience_replay.add(self.state, self.action, self.reward + self.curiosity, done)
