@@ -30,13 +30,21 @@ agent.iterations = 0
 while True:
     reward, done = agent.main()
 
-    dg.add(agent.state)
+    state_masked, adjacency_matrix, edge_index = dg.process_state(agent.state)
 
     env.render()
     time.sleep(0.01)
 
-    print(reward)
 
     if done:
-        dg.show_graph()
+        print(adjacency_matrix, "\n\n")
+        print(">>>> ", state_masked.shape)
+        
+        for y in range(26):
+            for x in range(26):
+                print(state_masked[y][x], end=" ")
+            print()
+        print("\n\n\n\n")
+
+        #dg.show_graph()
         env.reset()
