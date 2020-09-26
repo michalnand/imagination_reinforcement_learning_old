@@ -8,7 +8,7 @@ import time
 
 import libs_agents
 
-from libs_common.dynamic_graph import *
+from libs_common.dynamic_state_graph import *
 
 
 
@@ -21,7 +21,7 @@ state = env.reset()
 
 print(state.shape)
 
-dg = DynamicGraph(state.shape[0])
+dg = DynamicGraphState(state.shape[0])
  
 agent = libs_agents.AgentRandomContinuous(env)
 
@@ -38,13 +38,7 @@ while True:
 
     if done:
         print(adjacency_matrix, "\n\n")
-        print(">>>> ", state_masked.shape)
-        
-        for y in range(26):
-            for x in range(26):
-                print(state_masked[y][x], end=" ")
-            print()
-        print("\n\n\n\n")
-
-        #dg.show_graph()
+        print(state_masked, "\n\n\n\n\n")
+      
+        dg.show_graph()
         env.reset()

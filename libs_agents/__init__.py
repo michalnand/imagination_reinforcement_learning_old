@@ -22,6 +22,7 @@ from .AgentPPOContinuous import *
 from .AgentDDPG import *
 from .AgentDDPGCuriosity import *
 from .AgentDDPGImagination import *
+from .AgentDDPGImaginationAdvanced import *
 from .AgentDDPGImaginationMetaActor import *
 from .AgentSDPG import *
 

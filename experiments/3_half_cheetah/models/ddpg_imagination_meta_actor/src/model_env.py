@@ -41,7 +41,7 @@ class Model(torch.nn.Module):
 
         features = self.model_features(x) 
 
-        state_prediction = self.model_state(features) + state.detach()
+        state_prediction = self.model_state(features)
 
         return state_prediction, self.model_reward(features)
 

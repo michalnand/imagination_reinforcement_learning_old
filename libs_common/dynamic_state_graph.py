@@ -2,7 +2,7 @@ import numpy
 import matplotlib.pyplot as plt
 import networkx as nx
 
-class DynamicGraph:
+class DynamicGraphState:
 
     def __init__(self, state_size, alpha = 0.01):
         self.correlation = numpy.zeros((state_size, state_size))
@@ -16,7 +16,6 @@ class DynamicGraph:
         correlation = state_a*state_b
         correlation = correlation**2 + 0.0001
 
-
         self.correlation = (1.0 - self.alpha)*self.correlation + self.alpha*correlation
 
         adjacency_matrix = 1.0/self.correlation
@@ -27,11 +26,10 @@ class DynamicGraph:
         m1 = numpy.concatenate([m0[1], m0[0]])
 
         self.edge_index  = numpy.concatenate([m0, m1], axis=1)
-        self.adjacency_matrix = numpy.sign(nx.adjacency_matrix(self.graph).todense())
+        self.adjacency_matrix = numpy.array(numpy.sign(nx.adjacency_matrix(self.graph).todense()))
         
-        state_ = numpy.repeat(state[numpy.newaxis, :], state.shape[0], 0)
-        #self.state_masked = numpy.multiply(self.adjacency_matrix, state_)
-        self.state_masked = self.adjacency_matrix
+        state_ = numpy.expand_dims(state, 0)
+        self.state_masked = state_*self.adjacency_matrix
 
 
     def process_state(self, state):
@@ -59,7 +57,7 @@ class DynamicGraph:
     
 if __name__ == "__main__":
     state_size = 8
-    dg = DynamicGraph(state_size)
+    dg = DynamicGraphState(state_size)
 
     for i in range(1000):
         state = numpy.random.randn(state_size)
