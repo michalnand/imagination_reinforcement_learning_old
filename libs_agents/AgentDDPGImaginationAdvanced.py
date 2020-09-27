@@ -110,11 +110,8 @@ class AgentDDPGImaginationAdvanced():
                 rewards_b[b][n]    = rewards_t.clone()
 
             
-        if self.imagination_entropy_beta > 0:
-            return states_b, actions_b, rewards_b
-        else:    
-            return states_b.detach(), actions_b.detach(), rewards_b.detach()
-
+        return states_b, actions_b, rewards_b
+        
         
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device)
@@ -132,19 +129,25 @@ class AgentDDPGImaginationAdvanced():
         im_state_t, im_actions_t, im_rewards_t = self._process_imagination(state_t)
 
         value_target    = reward_t + self.gamma*done_t*value_next_t
-        value_predicted = self.model_critic.forward(state_t, action_t, im_state_t, im_actions_t, im_rewards_t)
+        value_predicted = self.model_critic.forward(state_t, action_t, im_state_t.detach(), im_actions_t.detach(), im_rewards_t.detach())
 
+
+        
         critic_loss     = ((value_target - value_predicted)**2)
         critic_loss     = critic_loss.mean()
      
         #update critic
         self.optimizer_critic.zero_grad()
-        critic_loss.backward() 
+        critic_loss.backward()
         self.optimizer_critic.step()
 
         #actor loss
-        actor_loss      = -self.model_critic.forward(state_t, self.model_actor.forward(state_t), im_state_t, im_actions_t, im_rewards_t)
+        actor_loss      = -self.model_critic.forward(state_t, self.model_actor.forward(state_t), im_state_t.detach(), im_actions_t.detach(), im_rewards_t.detach())
         actor_loss      = actor_loss.mean()
+  
+        #add loss of state entropy
+        if self.imagination_entropy_beta > 0.0:
+            actor_loss+= self.imagination_entropy_beta*self._imagination_exploration_entropy_loss(im_state_t)
 
         #update actor
         self.optimizer_actor.zero_grad()       
@@ -186,3 +189,21 @@ class AgentDDPGImaginationAdvanced():
     
 
         return action_t
+
+    #TODO
+    def _imagination_exploration_entropy_loss(self, states_b):
+        
+        batch_size = states_b.shape[0]
+
+        exploration_entropy_loss = torch.zeros(batch_size).to(self.model_critic.device)
+        for b in range(batch_size):
+            #take ending states in each rollout
+            ending_states_b = states_b[b][:][self.imagination_steps - 1]
+
+            #compute variance of ending states in rollouts
+            variance        = torch.var(ending_states_b)
+            
+            #compute entropy, considering states distribution is gaussian
+            exploration_entropy_loss[b]  = 0.5*torch.log(2.0*numpy.pi*numpy.e*variance)
+            
+        return exploration_entropy_loss.mean()
