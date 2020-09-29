@@ -9,12 +9,12 @@ sys.path.insert(0, '../..')
 import libs_agents
 from libs_common.Training import *
 
-import models.ddpg_imagination_advanced.src.model_critic     as ModelCritic
-import models.ddpg_imagination_advanced.src.model_actor      as ModelActor
-import models.ddpg_imagination_advanced.src.model_env        as ModelEnv
-import models.ddpg_imagination_advanced.src.config           as Config
+import models.ddpg_imagination_advanced_meta_actor.src.model_critic     as ModelCritic
+import models.ddpg_imagination_advanced_meta_actor.src.model_actor      as ModelActor
+import models.ddpg_imagination_advanced_meta_actor.src.model_env        as ModelEnv
+import models.ddpg_imagination_advanced_meta_actor.src.config           as Config
 
-path = "models/ddpg_imagination_advanced/"
+path = "models/ddpg_imagination_advanced_meta_actor/"
 
 env = gym.make("AntPyBulletEnv-v0")
 #env.render()

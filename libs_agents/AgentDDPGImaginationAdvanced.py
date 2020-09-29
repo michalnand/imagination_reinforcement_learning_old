@@ -4,6 +4,8 @@ from .ExperienceBufferContinuous import *
 
 from .ImaginationModule import *
 
+from torchviz import make_dot
+
 
 class AgentDDPGImaginationAdvanced():
     def __init__(self, env, ModelCritic, ModelActor, ModelImagination, Config):
