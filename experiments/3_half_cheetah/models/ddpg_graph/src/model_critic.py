@@ -1,42 +1,101 @@
 import torch
 import torch.nn as nn
 
+import sys
+#sys.path.insert(0, '../../..')
+sys.path.insert(0, '../../../../..')
+
+import libs_layers
+
+from torchviz import make_dot
+
+class Flatten(nn.Module):
+    def forward(self, input):
+        return input.view(input.size(0), -1)
+
+
 class Model(torch.nn.Module):
-    def __init__(self, input_shape, outputs_count, hidden_count = 256):
+    def __init__(self, input_shape, outputs_count, hidden_count = 32):
         super(Model, self).__init__()
 
         self.device = "cpu"
 
+        self.dynamic_state_graph = libs_layers.DynamicGraphState(input_shape[0] + outputs_count, 0.001)
 
-        self.layers = [ 
-                        nn.Linear(input_shape[0] + outputs_count, hidden_count),
-                        nn.ReLU(),
-                        nn.Linear(hidden_count, hidden_count//2),
-                        nn.ReLU(),            
-                        nn.Linear(hidden_count//2, 1)           
-        ] 
+        inputs_count    = input_shape[0] + outputs_count
 
-        torch.nn.init.xavier_uniform_(self.layers[0].weight)
-        torch.nn.init.xavier_uniform_(self.layers[2].weight)
-        torch.nn.init.uniform_(self.layers[4].weight, -0.003, 0.003)
+        
+        self.gconv      = libs_layers.GConvSeq([inputs_count, hidden_count, hidden_count])
+        self.flt        = Flatten()
+        self.output     = nn.Linear(inputs_count*hidden_count, 1)
+
+        torch.nn.init.uniform_(self.output.weight, -0.003, 0.003)
  
-        self.model = nn.Sequential(*self.layers) 
-        self.model.to(self.device)
-
-        print(self.model)
-       
 
     def forward(self, state, action):
+
         x = torch.cat([state, action], dim = 1)
-        return self.model(x)
+
+        #train graph estimator        
+        for b in range(state.shape[0]):
+            self.dynamic_state_graph.train(x[b].detach().to("cpu").numpy())
+        
+        edge_index = torch.from_numpy(self.dynamic_state_graph.edge_index)
+        graph_x = self._graph_state_representation(x)
+
+        #graph layers forward
+        x = self.gconv(graph_x, edge_index)
+
+        #output layer forward
+        x = self.flt(x)
+        x = self.output(x)
+
+        return x
+
+    def _graph_state_representation(self, x):
+        batch_size      = x.shape[0]
+        result          = torch.zeros((batch_size,  x.shape[1] , x.shape[1]))
+
+        am = torch.from_numpy(self.dynamic_state_graph.adjacency_matrix).to(self.device)
+        for b in range(batch_size):
+            x_          = torch.unsqueeze(x[b], 0)
+            result[b]   = x_ * am
+
+        return result
 
      
     def save(self, path):
         print("saving to ", path)
-        torch.save(self.model.state_dict(), path + "trained/model_critic.pt")
+        torch.save(self.output.state_dict(), path + "/trained/model_critic_output.pt")
+        self.gconv.save(path + "/trained/model_critic_gconv")
 
     def load(self, path):       
         print("loading from ", path)
-        self.model.load_state_dict(torch.load(path + "trained/model_critic.pt", map_location = self.device))
-        self.model.eval()  
+        self.output.load_state_dict(torch.load(path + "/trained/model_critic_output.pt", map_location = self.device))
+        self.output.eval()  
+        self.gconv.load(path + "/trained/model_critic_gconv")
+
+    
+
+if __name__ == "__main__":
+    state_shape     = (26, )
+    actions_count   = 7
+    batch_size      = 32
+
+    model = Model(state_shape, actions_count)
+
+    action   = torch.randn((batch_size, actions_count))
+    state    = torch.randn((batch_size, ) + state_shape)
+
+    q_values = model.forward(state, action)
+
+    loss = q_values.mean()
+    loss.backward()
+
+    #make_dot(loss).render("model", format="png")
+
+    print(q_values)
+    print("program done")
+
+    
     

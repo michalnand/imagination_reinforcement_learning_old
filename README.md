@@ -46,6 +46,12 @@ pacman with curiosity - forward model for state prediction used
 
 # dependences
 cmake python3 pip3 swig
-numpy numpy matplotlib torch pillow opencv-python 
 
-envs : gym pybullet pybulletgym 'gym[atari]' 'gym[box2d]' gym-super-mario-bros gym_2048
+**basic python libs**
+pip3 install numpy numpy matplotlib torch pillow opencv-python 
+
+**graph neural networks**
+pip3 install torch_geometric torch_sparse torch_scatter
+
+**environments**
+pip3 install  gym pybullet pybulletgym 'gym[atari]' 'gym[box2d]' gym-super-mario-bros gym_2048

@@ -4,14 +4,12 @@ import torch.nn as nn
 import sys
 sys.path.insert(0, '../../..')
 
-import libs_common.dynamic_state_graph
+import libs_common
 
 
 class Model(torch.nn.Module):
     def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
-
-        self.dynamic_state_graph = libs_common.dynamic_state_graph.DynamicGraphState(input_shape[0], 0.001)
 
         self.device = "cpu"
         
@@ -34,11 +32,9 @@ class Model(torch.nn.Module):
 
         print(self.model)
        
-
+ 
     def forward(self, state):
-        state_masked, _, edge_index = self.dynamic_state_graph.process_state(state.detach().to("cpu").numpy())
-
-        print(state_masked)
+        
 
         return self.model(state)
 
