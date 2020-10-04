@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 import sys
-#sys.path.insert(0, '../../..')
-sys.path.insert(0, '../../../../..')
+sys.path.insert(0, '../../..')
+#sys.path.insert(0, '../../../../..')
 
 import libs_layers
 
@@ -15,7 +15,7 @@ class Flatten(nn.Module):
 
 
 class Model(torch.nn.Module):
-    def __init__(self, input_shape, outputs_count, hidden_count = 32):
+    def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
 
         self.device = "cpu"
@@ -24,12 +24,19 @@ class Model(torch.nn.Module):
 
         inputs_count    = input_shape[0] + outputs_count
 
-        
-        self.gconv      = libs_layers.GConvSeq([inputs_count, hidden_count, hidden_count])
-        self.flt        = Flatten()
-        self.output     = nn.Linear(inputs_count*hidden_count, 1)
+         
+        self.gconv      = libs_layers.GConvSeq([inputs_count, hidden_count, hidden_count//2])
 
-        torch.nn.init.uniform_(self.output.weight, -0.003, 0.003)
+        self.output_layers = [
+            nn.AvgPool1d(inputs_count),
+            Flatten(),
+            nn.Linear(hidden_count//2, 1)
+        ]
+        
+        torch.nn.init.uniform_(self.output_layers[2].weight, -0.003, 0.003)
+
+        self.output_model = nn.Sequential(*self.output_layers)
+        self.output_model.to(self.device)
  
 
     def forward(self, state, action):
@@ -46,11 +53,12 @@ class Model(torch.nn.Module):
         #graph layers forward
         x = self.gconv(graph_x, edge_index)
 
+        #channel last to channel first
+        x = x.permute(0, 2, 1)
+        
         #output layer forward
-        x = self.flt(x)
-        x = self.output(x)
-
-        return x
+        return self.output_model(x)
+        
 
     def _graph_state_representation(self, x):
         batch_size      = x.shape[0]
@@ -66,13 +74,13 @@ class Model(torch.nn.Module):
      
     def save(self, path):
         print("saving to ", path)
-        torch.save(self.output.state_dict(), path + "/trained/model_critic_output.pt")
+        torch.save(self.output_model.state_dict(), path + "/trained/model_critic_output.pt")
         self.gconv.save(path + "/trained/model_critic_gconv")
 
     def load(self, path):       
         print("loading from ", path)
-        self.output.load_state_dict(torch.load(path + "/trained/model_critic_output.pt", map_location = self.device))
-        self.output.eval()  
+        self.output_model.load_state_dict(torch.load(path + "/trained/model_critic_output.pt", map_location = self.device))
+        self.output_model.eval()  
         self.gconv.load(path + "/trained/model_critic_gconv")
 
     
@@ -93,6 +101,9 @@ if __name__ == "__main__":
     loss.backward()
 
     #make_dot(loss).render("model", format="png")
+
+    #model.save("./")
+    #model.load("./")
 
     print(q_values)
     print("program done")
