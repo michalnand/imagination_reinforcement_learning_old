@@ -51,7 +51,23 @@ cmake python3 pip3 swig
 pip3 install numpy numpy matplotlib torch pillow opencv-python 
 
 **graph neural networks**
-pip3 install torch_geometric torch_sparse torch_scatter
+when CPU only :
+
+pip3 install networkx torch_geometric torch_sparse torch_scatter
+
+
+for CUDA different packages are reuired :
+- this is for cuda 10.2
+- and pytorch 1.6
+
+
+pip3 install torch-scatter==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+pip3 install torch-sparse==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+pip3 install torch-cluster==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+pip3 install torch-spline-conv==latest+cu102 -f https://pytorch-geometric.com/whl/torch-1.6.0.html
+pip3 install torch-geometric
+
+see https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
 
 **environments**
 pip3 install  gym pybullet pybulletgym 'gym[atari]' 'gym[box2d]' gym-super-mario-bros gym_2048

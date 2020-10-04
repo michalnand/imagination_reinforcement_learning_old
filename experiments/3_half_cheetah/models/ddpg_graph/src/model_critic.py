@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 import sys
-sys.path.insert(0, '../../..')
-#sys.path.insert(0, '../../../../..')
+#sys.path.insert(0, '../../..')
+sys.path.insert(0, '../../../../..')
 
 import libs_layers
 
@@ -25,7 +25,7 @@ class Model(torch.nn.Module):
         inputs_count    = input_shape[0] + outputs_count
 
          
-        self.gconv      = libs_layers.GConvSeq([inputs_count, hidden_count, hidden_count//2])
+        self.gconv      = libs_layers.GConvSeq([inputs_count, hidden_count, hidden_count//2], self.device)
 
         self.output_layers = [
             nn.AvgPool1d(inputs_count),
@@ -47,7 +47,7 @@ class Model(torch.nn.Module):
         for b in range(state.shape[0]):
             self.dynamic_state_graph.train(x[b].detach().to("cpu").numpy())
         
-        edge_index = torch.from_numpy(self.dynamic_state_graph.edge_index)
+        edge_index = torch.from_numpy(self.dynamic_state_graph.edge_index).to(self.device)
         graph_x = self._graph_state_representation(x)
 
         #graph layers forward
@@ -62,7 +62,7 @@ class Model(torch.nn.Module):
 
     def _graph_state_representation(self, x):
         batch_size      = x.shape[0]
-        result          = torch.zeros((batch_size,  x.shape[1] , x.shape[1]))
+        result          = torch.zeros((batch_size,  x.shape[1] , x.shape[1])).to(self.device)
 
         am = torch.from_numpy(self.dynamic_state_graph.adjacency_matrix).to(self.device)
         for b in range(batch_size):

@@ -5,9 +5,13 @@ from torch_geometric.utils import add_self_loops, degree
 class GConv(MessagePassing):
     def __init__(self, in_channels, out_channels, device = "cpu"):
         super(GConv, self).__init__(aggr='add')
+
+        self.device = device
+
         self.linear_layer = torch.nn.Linear(in_channels, out_channels)
         torch.nn.init.xavier_uniform_(self.linear_layer.weight)
-        self.linear_layer.to()
+        
+        self.linear_layer.to(self.device)
 
     def forward(self, x, edge_index):
         # Step 1: Add self-loops

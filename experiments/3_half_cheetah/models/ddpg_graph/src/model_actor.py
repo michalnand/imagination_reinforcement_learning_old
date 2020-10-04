@@ -18,11 +18,11 @@ class Model(torch.nn.Module):
     def __init__(self, input_shape, outputs_count, hidden_count = 256):
         super(Model, self).__init__()
 
-        self.device = "cpu"
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         self.dynamic_state_graph = libs_layers.DynamicGraphState(input_shape[0], 0.001)
 
-        self.gconv      = libs_layers.GConvSeq([input_shape[0], hidden_count, hidden_count//2])
+        self.gconv      = libs_layers.GConvSeq([input_shape[0], hidden_count, hidden_count//2], self.device)
 
         self.output_layers = [
             nn.AvgPool1d(input_shape[0]),
@@ -41,7 +41,7 @@ class Model(torch.nn.Module):
         for b in range(state.shape[0]):
             self.dynamic_state_graph.train(state[b].detach().to("cpu").numpy())
         
-        edge_index = torch.from_numpy(self.dynamic_state_graph.edge_index)
+        edge_index = torch.from_numpy(self.dynamic_state_graph.edge_index).to(self.device)
         graph_x = self._graph_state_representation(state)
 
         #graph layers forward
@@ -56,7 +56,7 @@ class Model(torch.nn.Module):
 
     def _graph_state_representation(self, x):
         batch_size      = x.shape[0]
-        result          = torch.zeros((batch_size,  x.shape[1] , x.shape[1]))
+        result          = torch.zeros((batch_size,  x.shape[1] , x.shape[1])).to(self.device)
 
         am = torch.from_numpy(self.dynamic_state_graph.adjacency_matrix).to(self.device)
         for b in range(batch_size):
