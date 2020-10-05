@@ -42,10 +42,13 @@ class AgentDDPGImaginationEntropy():
         self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate)
         self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
         self.optimizer_env      = torch.optim.Adam(self.model_env.parameters(), lr= config.env_learning_rate)
-
+                
         self.state          = env.reset()
 
         self.iterations     = 0
+        
+        self.entropy_alpha  = 10.0*config.env_learning_rate
+        self.entropy_mean   = 0.0
 
         self.enable_training()
 
@@ -117,14 +120,18 @@ class AgentDDPGImaginationEntropy():
         #compute entropy of imagined states
         entropy_t           = self._compute_entropy(states_imagined_t)
 
-        #critic loss
-        #normalise entropy
-        entropy_t       = self.entropy_beta*torch.tanh(entropy_t).detach()
+        #filtered entropy mean
+        self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
 
+        #normalise entropy reward
+        entropy       = (entropy_t - self.entropy_mean)/(self.entropy_mean + 0.000001)
+        entropy       = torch.tanh(self.entropy_beta*(entropy**2)).detach()
+ 
         #target value, Q-learning
-        value_target    = reward_t + entropy_t + self.gamma*done_t*value_next_t
+        value_target    = reward_t + entropy + self.gamma*done_t*value_next_t
         value_predicted = self.model_critic.forward(state_t, action_t)
 
+        #critic loss
         critic_loss     = ((value_target - value_predicted)**2)
         critic_loss     = critic_loss.mean()
      
