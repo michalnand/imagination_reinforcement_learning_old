@@ -3,8 +3,8 @@ import torch
 from .ExperienceBufferContinuous import *
 
 
-class AgentDDPGEntropy():
-    def __init__(self, env, ModelCritic, ModelActor, ModelEntropy, Config):
+class AgentDDPGImaginationEntropy():
+    def __init__(self, env, ModelCritic, ModelActor, ModelEnv, Config):
         self.env = env
 
         config = Config.Config()
@@ -19,9 +19,9 @@ class AgentDDPGEntropy():
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.shape[0]
 
-        self.entropy_samples        = config.entropy_samples
+        self.imagination_rollouts   = config.imagination_rollouts
         self.entropy_beta           = config.entropy_beta
-        self.entropy_learning_rate  = config.entropy_learning_rate
+        self.env_learning_rate      = config.env_learning_rate
 
         self.experience_replay      = ExperienceBufferContinuous(config.experience_replay_size)
 
@@ -31,7 +31,7 @@ class AgentDDPGEntropy():
         self.model_critic           = ModelCritic.Model(self.state_shape, self.actions_count)
         self.model_critic_target    = ModelCritic.Model(self.state_shape, self.actions_count)
 
-        self.model_entropy          = ModelEntropy.Model(self.state_shape, self.actions_count)
+        self.model_env              = ModelEnv.Model(self.state_shape, self.actions_count)
 
         for target_param, param in zip(self.model_actor_target.parameters(), self.model_actor.parameters()):
             target_param.data.copy_(param.data)
@@ -41,7 +41,7 @@ class AgentDDPGEntropy():
 
         self.optimizer_actor    = torch.optim.Adam(self.model_actor.parameters(), lr= config.actor_learning_rate)
         self.optimizer_critic   = torch.optim.Adam(self.model_critic.parameters(), lr= config.critic_learning_rate)
-        self.optimizer_entropy  = torch.optim.Adam(self.model_entropy.parameters(), lr= config.entropy_learning_rate)
+        self.optimizer_env      = torch.optim.Adam(self.model_env.parameters(), lr= config.env_learning_rate)
 
         self.state          = env.reset()
 
@@ -54,23 +54,23 @@ class AgentDDPGEntropy():
 
     def disable_training(self):
         self.enabled_training = False
+
+
+    
+    
     
     def main(self):
         if self.enabled_training:
             self.exploration.process()
-            epsilon = self.exploration.get()
+            self.epsilon = self.exploration.get()
         else:
-            epsilon = self.exploration.get_testing()
+            self.epsilon = self.exploration.get_testing()
        
         state_t     = torch.from_numpy(self.state).to(self.model_actor.device).unsqueeze(0).float()
 
-        action_t    = self.model_actor(state_t)
-        action      = action_t.squeeze(0).detach().to("cpu").numpy()
+        action_t, action = self._sample_action(state_t, self.epsilon)
 
-        noise  = numpy.random.normal(loc = 0.0, scale = epsilon, size = self.actions_count)
-        action = action + epsilon*noise
-
-        action = numpy.clip(action, -1.0, 1.0)
+        action = action.squeeze()
 
         state_new, self.reward, done, self.info = self.env.step(action)
 
@@ -92,29 +92,36 @@ class AgentDDPGEntropy():
         
         
     def train_model(self):
-        state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device, self.entropy_samples)
+        state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model_critic.device)
         
         reward_t = reward_t.unsqueeze(-1)
         done_t   = (1.0 - done_t).unsqueeze(-1)
 
-        #entropy bonus reward
-        entropy_predicted_t    = self.model_entropy(state_t, state_next_t, action_t)
-        entropy_target_t       = self._compute_entropy(self.experience_replay.sample_next_states(self.entropy_samples, self.model_entropy.device))
+        #environment model state prediction
+        state_predicted_t   = self.model_env(state_t, action_t)
 
         action_next_t       = self.model_actor_target.forward(state_next_t).detach()
         value_next_t        = self.model_critic_target.forward(state_next_t, action_next_t).detach()
+ 
+        #env model loss
+        env_loss = (state_next_t - state_predicted_t)**2
+        env_loss = env_loss.mean()
 
-        #entropy loss
-        entropy_loss = (entropy_target_t - entropy_predicted_t)**2
-        entropy_loss = entropy_loss.mean()
-        
-        #update entropy
-        self.optimizer_entropy.zero_grad()
-        entropy_loss.backward() 
-        self.optimizer_entropy.step()
+        #update env model
+        self.optimizer_env.zero_grad()
+        env_loss.backward() 
+        self.optimizer_env.step()
+
+        #compute imagined states, use state_t as initial state
+        states_imagined_t   = self._process_imagination(state_t, self.epsilon)
+        #compute entropy of imagined states
+        entropy_t           = self._compute_entropy(states_imagined_t)
 
         #critic loss
-        entropy_t       = self.entropy_beta*torch.tanh(entropy_predicted_t).detach()
+        #normalise entropy
+        entropy_t       = self.entropy_beta*torch.tanh(entropy_t).detach()
+
+        #target value, Q-learning
         value_target    = reward_t + entropy_t + self.gamma*done_t*value_next_t
         value_predicted = self.model_critic.forward(state_t, action_t)
 
@@ -146,20 +153,46 @@ class AgentDDPGEntropy():
     def save(self, save_path):
         self.model_critic.save(save_path)
         self.model_actor.save(save_path)
-        self.model_entropy.save(save_path)
+        self.model_env.save(save_path)
 
     def load(self, save_path):
         self.model_critic.load(save_path)
         self.model_actor.load(save_path)
-        self.model_entropy.load(save_path)
+        self.model_env.load(save_path)
 
-    def _compute_entropy(self, states):
-        batch_size  = states.shape[0]
+    def _sample_action(self, state_t, epsilon):
+        action_t    = self.model_actor(state_t)
+        action_t    = action_t + epsilon*torch.randn(action_t.shape).to(self.model_actor.device)
+        action_t    = action_t.clamp(-1.0, 1.0)
 
-        result      = torch.zeros(batch_size).to(self.model_entropy.device)
+        action_np   = action_t.detach().to("cpu").numpy()
+
+        return action_t, action_np
+
+
+    def _process_imagination(self, states_t, epsilon):
+        batch_size  = states_t.shape[0]
+
+        result      = torch.zeros((self.imagination_rollouts, batch_size, ) + self.state_shape ).to(self.model_env.device)
+
+        #imagine rollouts
+        for r in range(self.imagination_rollouts):
+            action_t, _ = self._sample_action(states_t, epsilon)
+            result[r]   = self.model_env(states_t, action_t)
+
+        #swap axis, batch first
+        result = result.transpose(1, 0)
+
+        return result
+
+
+    def _compute_entropy(self, states_t):
+        batch_size  = states_t.shape[0]
+
+        result      = torch.zeros(batch_size).to(self.model_env.device)
 
         for b in range(batch_size):
-            v           = torch.var(states[b], dim = 0)
+            v           = torch.var(states_t[b], dim = 0)
             result[b]   = v.mean()
 
         return result

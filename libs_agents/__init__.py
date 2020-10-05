@@ -24,6 +24,7 @@ from .AgentDDPGEntropy import *
 
 from .AgentDDPGCuriosity import *
 from .AgentDDPGImagination import *
+from .AgentDDPGImaginationEntropy import *
 from .AgentDDPGImaginationAdvanced import *
 from .AgentDDPGImaginationMetaActor import *
 from .AgentSDPG import *
