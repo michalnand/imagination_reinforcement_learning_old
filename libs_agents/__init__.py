@@ -20,6 +20,8 @@ from .AgentPPOContinuous import *
 
 
 from .AgentDDPG import *
+from .AgentDDPGEntropy import *
+
 from .AgentDDPGCuriosity import *
 from .AgentDDPGImagination import *
 from .AgentDDPGImaginationAdvanced import *
