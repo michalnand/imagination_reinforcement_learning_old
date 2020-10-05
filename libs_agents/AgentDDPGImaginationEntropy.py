@@ -117,18 +117,19 @@ class AgentDDPGImaginationEntropy():
 
         #compute imagined states, use state_t as initial state
         states_imagined_t   = self._process_imagination(state_t, self.epsilon)
+        
         #compute entropy of imagined states
-        entropy_t           = self._compute_entropy(states_imagined_t)
+        entropy_t           = self._compute_entropy(states_imagined_t).detach()
 
         #filtered entropy mean
         self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
 
         #normalise entropy reward
         entropy       = (entropy_t - self.entropy_mean)/(self.entropy_mean + 0.000001)
-        entropy       = torch.tanh(self.entropy_beta*(entropy**2)).detach()
- 
+        entropy       = torch.tanh(self.entropy_beta*(entropy**2))
+
         #target value, Q-learning
-        value_target    = reward_t + entropy + self.gamma*done_t*value_next_t
+        value_target    = reward_t + 0 + self.gamma*done_t*value_next_t
         value_predicted = self.model_critic.forward(state_t, action_t)
 
         #critic loss
