@@ -14,7 +14,7 @@ class Model(torch.nn.Module):
                         nn.Linear(hidden_count, hidden_count//2),
                         nn.ReLU(),            
                         nn.Linear(hidden_count//2, input_shape[0])           
-        ] 
+        ]  
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
         torch.nn.init.xavier_uniform_(self.layers[2].weight)
@@ -28,7 +28,7 @@ class Model(torch.nn.Module):
 
     def forward(self, state, action):
         x = torch.cat([state, action], dim = 1)
-        return self.model(x) + state.detach()
+        return self.model(x)
 
      
     def save(self, path):

@@ -57,13 +57,9 @@ class AgentDDPG():
        
         state_t     = torch.from_numpy(self.state).to(self.model_actor.device).unsqueeze(0).float()
 
-        action_t    = self.model_actor(state_t)
-        action      = action_t.squeeze(0).detach().to("cpu").numpy()
-
-        noise  = numpy.random.normal(loc = 0.0, scale = epsilon, size = self.actions_count)
-        action = action + epsilon*noise
-
-        action = numpy.clip(action, -1.0, 1.0)
+        action_t, action = self._sample_action(state_t, epsilon)
+ 
+        action = action.squeeze()
 
         state_new, self.reward, done, self.info = self.env.step(action)
 
@@ -130,3 +126,12 @@ class AgentDDPG():
         self.model_critic.load(save_path)
         self.model_actor.load(save_path)
     
+
+    def _sample_action(self, state_t, epsilon):
+        action_t    = self.model_actor(state_t)
+        action_t    = action_t + epsilon*torch.randn(action_t.shape).to(self.model_actor.device)
+        action_t    = action_t.clamp(-1.0, 1.0)
+
+        action_np   = action_t.detach().to("cpu").numpy()
+
+        return action_t, action_np

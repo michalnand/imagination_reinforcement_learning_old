@@ -16,7 +16,10 @@ class Config():
 
         self.experience_replay_size = 100000
 
-
+ 
         self.imagination_rollouts       = 16
+        
         self.entropy_beta               = 0.1
-        self.env_learning_rate          = 0.0001
+        self.curiosity_beta             = 0.1
+
+        self.env_learning_rate          = 0.0002
