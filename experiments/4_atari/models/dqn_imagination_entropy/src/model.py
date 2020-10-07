@@ -25,6 +25,7 @@ class ResidualBlock(torch.nn.Module):
 
         self.model = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
+ 
 
     def forward(self, x):
         y = self.model(x) 

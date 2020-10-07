@@ -30,7 +30,6 @@ class ResidualBlock(torch.nn.Module):
             if hasattr(self.layers[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers[i].weight)
 
-
     def forward(self, x):
         y = self.model(x) 
         return self.activation(y + x)
