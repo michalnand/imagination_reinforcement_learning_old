@@ -59,11 +59,11 @@ class ExperienceBufferContinuous():
         done_shape      = (batch_size, )
 
 
-        state_t         = torch.zeros(state_shape,  dtype=torch.float32).to(device)
-        action_t        = torch.zeros(action_shape,  dtype=torch.float32).to(device)
-        reward_t        = torch.zeros(reward_shape,  dtype=torch.float32).to(device)
-        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32).to(device)
-        done_t          = torch.zeros(done_shape,  dtype=torch.float32).to(device)
+        state_t         = torch.zeros(state_shape,  dtype=torch.float32)
+        action_t        = torch.zeros(action_shape,  dtype=torch.float32)
+        reward_t        = torch.zeros(reward_shape,  dtype=torch.float32)
+        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32)
+        done_t          = torch.zeros(done_shape,  dtype=torch.float32)
 
         self.indices = []
         for i in range(batch_size):
@@ -73,13 +73,19 @@ class ExperienceBufferContinuous():
         
         for i in range(len(self.indices)):
             n  = self.indices[i]
-            state_t[i]      = torch.from_numpy(self.state_b[n]).to(device)
-            action_t[i]     = torch.from_numpy(self.action_b[n]).to(device).to(device)
-            reward_t[i]     = torch.from_numpy(numpy.asarray(self.reward_b[n])).to(device)
-            state_next_t[i] = torch.from_numpy(self.state_b[n+1]).to(device)
-            done_t[i]       = torch.from_numpy(numpy.asarray(self.done_b[n])).to(device)
+            state_t[i]      = torch.from_numpy(self.state_b[n])
+            action_t[i]     = torch.from_numpy(self.action_b[n])
+            reward_t[i]     = torch.from_numpy(numpy.asarray(self.reward_b[n]))
+            state_next_t[i] = torch.from_numpy(self.state_b[n+1])
+            done_t[i]       = torch.from_numpy(numpy.asarray(self.done_b[n]))
 
-        return state_t.detach(), action_t.detach(), reward_t.detach(), state_next_t.detach(), done_t.detach()
+        state_t         = state_t.to(device).detach()
+        action_t        = action_t.to(device).detach()
+        reward_t        = reward_t.to(device).detach()
+        state_next_t    = state_next_t.to(device).detach()
+        done_t          = done_t.to(device).detach()
+
+        return state_t, action_t, reward_t, state_next_t, done_t
 
     def sample_next_states(self, count, device):
         
