@@ -20,8 +20,13 @@ set xlabel "iterations"
 set ylabel "total score"
 set output 'training_score_total.png'
 
-plot 'ddpg_result_stats.log' using 1:4:5 title 'DDPG'  with filledcurves lc 'light-blue' lw 3, \
+set style fill transparent solid 0.25 noborder
+
+
+plot 'ddpg_result_stats.log' using 1:4:5 notitle  with filledcurves lc 'light-blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 1:4:5 notitle  with filledcurves lc 'light-red' lw 3, \
      'ddpg_result_stats.log' using 1:3 title 'DDPG'  with lines lc 'blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 1:3 title 'DDPG imagination entropy'  with lines lc 'red' lw 3
 
 
 
@@ -29,8 +34,10 @@ set xlabel "iterations"
 set ylabel "score per iteration"
 set output 'training_score_per_iterations.png'
 
-plot 'ddpg_result_stats.log' using 1:7:8 title 'DDPG'  with filledcurves lc 'light-blue' lw 3, \
+plot 'ddpg_result_stats.log' using 1:7:8 notitle  with filledcurves lc 'light-blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 1:7:8 notitle  with filledcurves lc 'light-red' lw 3, \
      'ddpg_result_stats.log' using 1:6 title 'DDPG'  with lines lc 'blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 1:6 title 'DDPG imagination entropy'  with lines lc 'red' lw 3
 
 
 
@@ -38,5 +45,7 @@ set xlabel "episodes"
 set ylabel "score per episode"
 set output 'training_score_per_episode.png'
 
-plot 'ddpg_result_stats.log' using 2:10:11 title 'DDPG'  with filledcurves lc 'light-blue' lw 3, \
+plot 'ddpg_result_stats.log' using 2:10:11 notitle  with filledcurves lc 'light-blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 2:10:11 notitle  with filledcurves lc 'light-red' lw 3, \
      'ddpg_result_stats.log' using 2:9 title 'DDPG'  with lines lc 'blue' lw 3, \
+     'ddpg_imagination_entropy_result_stats.log' using 2:9 title 'DDPG imagination entropy'  with lines lc 'red' lw 3

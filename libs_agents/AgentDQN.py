@@ -59,8 +59,10 @@ class AgentDQN():
         
         q_values    = self.model(state_t)
         q_values    = q_values.squeeze(0).detach().to("cpu").numpy()
+ 
+        _, action_idx_np, _, _ = self._sample_action(state_t, epsilon)
 
-        self.action = self.choose_action_e_greedy(q_values, epsilon)
+        self.action = action_idx_np[0]
 
         state_new, self.reward, done, self.info = self.env.step(self.action)
  
@@ -130,8 +132,32 @@ class AgentDQN():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
-       
+    def _sample_action(self, state_t, epsilon):
+
+        batch_size = state_t.shape[0]
+
+        q_values_t  = self.model(state_t)
+
+        action_idx_t     = torch.zeros(batch_size).to(self.model.device)
+
+        action_one_hot_t = torch.zeros((batch_size, self.actions_count)).to(self.model.device)
+
+        #e-greedy strategy
+        for b in range(batch_size):
+            action = torch.argmax(q_values_t[b])
+            if numpy.random.random() < epsilon:
+                action = numpy.random.randint(self.actions_count)
+
+            action_idx_t[b]                 = action
+            action_one_hot_t[b][action]     = 1.0
         
+        action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
+        action_one_hot_np   = action_one_hot_t.detach().to("cpu").numpy()
+
+
+        return action_idx_t, action_idx_np, action_one_hot_t, action_one_hot_np
+
+    '''  
     def choose_action_e_greedy(self, q_values, epsilon):
         result = numpy.argmax(q_values)
         
@@ -139,6 +165,7 @@ class AgentDQN():
             result = numpy.random.randint(len(q_values))
         
         return result
+    '''
 
     def save(self, save_path):
         self.model.save(save_path)
