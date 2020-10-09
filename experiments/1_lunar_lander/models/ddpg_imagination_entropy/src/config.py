@@ -11,15 +11,15 @@ class Config():
         self.batch_size          = 64
         self.update_frequency    = 4
 
-        self.exploration   = libs_common.decay.Linear(1000000, 0.5, 0.3, 0.3)
+        self.exploration   = libs_common.decay.Exponential(0.99999, 1.0, 0.2, 0.2)
 
-        self.experience_replay_size = 100000
+        self.experience_replay_size = 16384
 
 
  
         self.imagination_rollouts       = 16
         
-        self.entropy_beta               = 1.0
+        self.entropy_beta               = 100.0
         self.curiosity_beta             = 0.0
 
         self.env_learning_rate          = 0.0002

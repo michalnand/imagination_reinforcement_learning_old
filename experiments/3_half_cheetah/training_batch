@@ -1,5 +1,5 @@
-#python3 ddpg.py
-#python3 ddpg_imagination_entropy.py
+python3 ddpg.py
+python3 ddpg_imagination_entropy.py
 cp -r models models_0
 
 python3 ddpg.py

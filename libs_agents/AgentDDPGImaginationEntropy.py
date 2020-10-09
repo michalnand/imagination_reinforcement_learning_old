@@ -122,6 +122,7 @@ class AgentDDPGImaginationEntropy():
         #compute entropy of imagined states
         entropy_t           = self._compute_entropy(states_imagined_t)
 
+
         #filtered entropy mean
         self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
 
@@ -132,6 +133,7 @@ class AgentDDPGImaginationEntropy():
         '''
         #normalise entropy, substract mean, squeeze into -1, 1 range
         entropy       = self.entropy_beta*torch.tanh(entropy_t - self.entropy_mean)
+
 
         #compute curiosity
         curiosity = self.curiosity_beta*torch.tanh( ((state_next_t - state_predicted_t)**2).mean(dim = 1) ).detach()

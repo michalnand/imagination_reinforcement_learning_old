@@ -19,7 +19,7 @@ class Config():
  
         self.imagination_rollouts       = 16
         
-        self.entropy_beta               = 0.1
+        self.entropy_beta               = 1.0
         self.curiosity_beta             = 0.0
 
         self.env_learning_rate          = 0.0002

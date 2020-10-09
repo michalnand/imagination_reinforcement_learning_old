@@ -21,6 +21,10 @@ class Game2048Wrapper(gym.Wrapper):
 
     def reset(self):
         obs = self.env.reset()
+        
+        self.score, self.max_tile = self._update_score(obs)
+        self._update_stats()
+       
         return self._parse_state(obs)
         
     def step(self, action):
