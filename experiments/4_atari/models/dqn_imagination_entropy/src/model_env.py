@@ -72,15 +72,7 @@ class Model(torch.nn.Module):
         d_observation_prediction     = self.model(model_input)
         
 
-        observation_prediction = state.detach() + d_observation_prediction
-       
-        '''
-        frames_count            = state.shape[1]
-        state_tmp               = torch.narrow(state, 1, 0, frames_count-1)
-        frame_prediction        = frame_prediction + torch.narrow(state, 1, 0, 1)
-        observation_prediction  = torch.cat([frame_prediction, state_tmp], dim = 1)
-        '''
-        
+        observation_prediction = d_observation_prediction + state.detach()
         return observation_prediction
 
     def save(self, path):

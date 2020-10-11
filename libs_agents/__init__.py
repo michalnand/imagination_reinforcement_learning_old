@@ -10,6 +10,7 @@ from .AgentA2CContinuous import *
 from .AgentA2CImagination import *
 
 from .AgentDQN import *
+from .AgentDQNImaginationEntropy import *
 from .AgentPDQN import *
 from .AgentDQNCuriosity import *
 from .AgentDQNImagination import *

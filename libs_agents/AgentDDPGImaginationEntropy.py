@@ -120,8 +120,6 @@ class AgentDDPGImaginationEntropy():
         #compute entropy of imagined states
         entropy_t           = self._compute_entropy(states_imagined_t)
 
-        print(entropy_t.mean())
-
         #filtered entropy mean
         self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
 
