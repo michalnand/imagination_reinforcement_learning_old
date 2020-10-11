@@ -20,6 +20,7 @@ class AgentDDPGImaginationEntropy():
         self.actions_count  = self.env.action_space.shape[0]
 
         self.imagination_rollouts   = config.imagination_rollouts
+        self.imagination_steps      = 1
         self.entropy_beta           = config.entropy_beta
         self.curiosity_beta         = config.curiosity_beta
         self.env_learning_rate      = config.env_learning_rate
@@ -113,15 +114,13 @@ class AgentDDPGImaginationEntropy():
         env_loss.backward() 
         self.optimizer_env.step()
 
-
-
-
         #compute imagined states, use state_t as initial state
         states_imagined_t   = self._process_imagination(state_t, self.epsilon).detach()
         
         #compute entropy of imagined states
         entropy_t           = self._compute_entropy(states_imagined_t)
 
+        print(entropy_t.mean())
 
         #filtered entropy mean
         self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
@@ -194,17 +193,24 @@ class AgentDDPGImaginationEntropy():
     def _process_imagination(self, states_t, epsilon):
         batch_size  = states_t.shape[0]
 
-        result      = torch.zeros((self.imagination_rollouts, batch_size, ) + self.state_shape ).to(self.model_env.device)
+        states_imagined_t      = torch.zeros((self.imagination_rollouts, batch_size, ) + self.state_shape ).to(self.model_env.device)
 
-        #imagine rollouts
         for r in range(self.imagination_rollouts):
-            action_t, _ = self._sample_action(states_t, epsilon)
-            result[r]   = self.model_env(states_t, action_t)
+            states_imagined_t[r] = states_t.clone()
+
+
+        for s in range(self.imagination_steps):
+            #imagine rollouts
+            for r in range(self.imagination_rollouts):
+                action_t, _ = self._sample_action(states_imagined_t[r], epsilon)
+                states_imagined_next_t  = self.model_env(states_imagined_t[r], action_t)
+                states_imagined_t[r]    = states_imagined_next_t.clone()
+        
 
         #swap axis, target ordering : batch rollout state
-        result = result.transpose(1, 0)
+        states_imagined_t = states_imagined_t.transpose(1, 0)
 
-        return result
+        return states_imagined_t
 
 
     def _compute_entropy(self, states_t):
