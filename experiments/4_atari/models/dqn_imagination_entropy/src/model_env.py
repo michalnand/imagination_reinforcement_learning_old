@@ -18,9 +18,8 @@ class ResidualBlock(torch.nn.Module):
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
         torch.nn.init.xavier_uniform_(self.layers[2].weight)
 
-        self.model = nn.Sequential(*self.layers)
+        self.model      = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
-
 
     def forward(self, x):
         y = self.model(x) 

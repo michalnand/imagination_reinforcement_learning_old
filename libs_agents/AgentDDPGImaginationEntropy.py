@@ -54,6 +54,7 @@ class AgentDDPGImaginationEntropy():
 
         self.enable_training()
 
+
     def enable_training(self):
         self.enabled_training = True
 
@@ -79,6 +80,9 @@ class AgentDDPGImaginationEntropy():
 
         state_new, self.reward, done, self.info = self.env.step(action)
 
+        state_predicted = self.model_env(state_t, action_t).squeeze().detach().numpy()
+       
+    
         if self.enabled_training:
             self.experience_replay.add(self.state, action, self.reward, done)
 
@@ -92,6 +96,8 @@ class AgentDDPGImaginationEntropy():
             self.state = state_new.copy()
 
         self.iterations+= 1
+
+        
 
         return self.reward, done
         

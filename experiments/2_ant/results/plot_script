@@ -20,7 +20,7 @@ set xlabel "iterations"
 set ylabel "total score"
 set output 'training_score_total.png'
 
-set style fill transparent solid 0.25 noborder
+set style fill transparent solid 0.3 noborder
 
 
 plot 'ddpg_result_stats.log' using 1:4:5 notitle  with filledcurves lc 'light-blue' lw 3, \

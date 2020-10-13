@@ -89,14 +89,15 @@ class AgentDQNImaginationEntropy():
             for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
                 target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
 
+        if show_activity:
+            self._show_curiosity_activity(self.state, state_new, self.action)
+
         if done:
             self.state = self.env.reset()
         else:
             self.state = state_new.copy()
 
-        if show_activity:
-            self._show_activity(self.state)
-
+        
         self.iterations+= 1
 
         return self.reward, done
@@ -112,6 +113,41 @@ class AgentDQNImaginationEntropy():
 
         image = cv2.resize(image, (400, 400), interpolation = cv2.INTER_AREA)
         cv2.imshow('state activity', image)
+        cv2.waitKey(1)
+
+    def _show_curiosity_activity(self, state, state_next, action):
+        size            = 400
+
+        action_t        = torch.zeros(1,  dtype=int)
+        action_t[0]     = action
+
+        state_t              = torch.from_numpy(state).unsqueeze(dim=0).to(self.model_env.device)
+        action_one_hot_t     = self._one_hot_encoding(action_t)
+        state_prediction     = self.model_env(state_t, action_one_hot_t).squeeze().detach().to("cpu").numpy()
+
+      
+        space   = numpy.zeros((state.shape[1], 4)) 
+        
+        dif     =  (state_next - state_prediction)**2
+        dif     =  (dif - dif.min())/(dif.max() - dif.min())
+
+
+        image   =  numpy.hstack((state[0], space, state_prediction[0], space, dif[0]))
+
+        image = cv2.resize(image, (3*size, size), interpolation = cv2.INTER_AREA)
+
+
+        font                   = cv2.FONT_HERSHEY_SIMPLEX
+
+
+        cv2.putText(image,'state', (10 + 0*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+        cv2.putText(image,'prediction', (10 + 1*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+        cv2.putText(image,'error', (10 + 2*size, int(size*0.98)), font, 1, (255,255,255), 2)
+
+
+        cv2.imshow('curiosity activity', image)
         cv2.waitKey(1)
         
     def train_model(self):
@@ -153,8 +189,9 @@ class AgentDQNImaginationEntropy():
         curiosity   = self.curiosity_beta*torch.tanh((state_next_t - state_predicted_t)**2).detach()
         curiosity   = curiosity.view(curiosity.size(0), -1).mean(dim = 1)
 
-        print(entropy.mean())
- 
+        #print(entropy)
+        #print(reward_t[0].abs().mean(), entropy.abs().mean(), entropy.min(), entropy.max())
+  
 
         #q values, state now, state next
         q_predicted      = self.model.forward(state_t)
@@ -235,15 +272,18 @@ class AgentDQNImaginationEntropy():
         return states_imagined_t
 
 
-    def _compute_entropy(self, states_t):
+    def _compute_entropy(self, states_t, eps = 0.001):
         batch_size  = states_t.shape[0]
 
         result      = torch.zeros(batch_size).to(self.model_env.device)
-
+        
         for b in range(batch_size):
             v           = torch.var(states_t[b], dim = 0)
-            result[b]   = v.mean()
-
+            vt          = v[v > eps]
+ 
+            if vt.size()[0] > 0: 
+                result[b]   = vt.mean()
+ 
         return result
     
     def _one_hot_encoding(self, input):
@@ -258,7 +298,9 @@ class AgentDQNImaginationEntropy():
 
     def save(self, save_path):
         self.model.save(save_path)
+        self.model_env.save(save_path)
 
     def load(self, save_path):
         self.model.load(save_path)
+        self.model_env.load(save_path)
     
