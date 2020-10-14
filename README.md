@@ -1,37 +1,44 @@
 # imagination_reinforcement_learning
 imagination RL experiments
 
+DDPG with imagination entropy reward main idea :
 
+![](doc/diagrams/imaginationentropy.png)
 
-# 0 line follower
+main parts :
+- environment model - trained to predict next state from current state and action
+- actor - DDPG actor
+- entropy calculation (+scaling and tanh squashing)
 
-![](doc/images/line_follower.gif)
+the current state is runned in M-rollouts (3 on figure),
+and N-steps (one step on figure)
+terminal imagined states are used to compute entropy
+**higher entropy produce higher internal motivation**
 
-![](experiments/0_line_follower/results/training_score_per_episode.png)
+detail of one rollout and one step
+![](doc/diagrams/imaginationentropydetail.png)
 
-* DDPG : common ddpg
-* DDPG + imagination : DDPG imagination (4 rollouts + 4 steps) and bonus reward from imagination
-* DDPG + imagination with meta-actor : imagined sttes entropty maximization exploration
-
-# 1 lunar lander
-
-![](doc/images/lunar_lander.gif)
-
-![](experiments/1_lunar_lander/results/training_score_per_episode.png)
-
-* DDPG : common ddpg
-* DDPG + imagination : DDPG imagination (4 rollouts + 4 steps) and bonus reward from imagination
-* DDPG + imagination with meta-actor : imagined sttes entropty maximization exploration
-
-# 2 pybullet Ant walking
+# 2 pybullet Ant
 
 ![](doc/images/ant.gif)
 
-![](experiments/2_ant/results/training_score_per_episode.png)
+![](experiments/2_ant/results/score_per_episode.png)
+![](experiments/2_ant/results/score_per_iteration.png)
 
 * DDPG : common ddpg
-* DDPG + imagination : DDPG imagination (4 rollouts + 4 steps) and bonus reward from imagination
-* DDPG + imagination with meta-actor : imagined sttes entropty maximization exploration
+* DDPG imagination entropy : DDPG imagination and bonus reward from imagination entropy
+
+
+# 3 pybullet Half Cheetah
+
+![](doc/images/half_cheetah.gif)
+
+![](experiments/3_half_cheetah/results/score_per_episode.png)
+![](experiments/3_half_cheetah/results/score_per_iteration.png)
+
+* DDPG : common ddpg
+* DDPG imagination entropy : DDPG imagination and bonus reward from imagination entropy
+
 
 
 # 4 atari pacman

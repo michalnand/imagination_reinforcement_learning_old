@@ -63,8 +63,8 @@ class DynamicGraphState:
         
     
 if __name__ == "__main__":
-    state_size = 17
-    dg = DynamicGraphState(state_size)
+    state_size  = 32
+    dg          = DynamicGraphState(state_size)
 
     i = 0
     while True:

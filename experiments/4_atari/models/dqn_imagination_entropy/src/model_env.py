@@ -68,10 +68,8 @@ class Model(torch.nn.Module):
         action_ = action.unsqueeze(1).unsqueeze(1).transpose(3, 1).repeat((1, 1, self.input_shape[1], self.input_shape[2])).to(self.device)
 
         model_input                  = torch.cat([state, action_], dim = 1)
-        d_observation_prediction     = self.model(model_input)
+        observation_prediction     = self.model(model_input)
         
-
-        observation_prediction = d_observation_prediction + state.detach()
         return observation_prediction
 
     def save(self, path):
