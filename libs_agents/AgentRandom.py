@@ -11,7 +11,7 @@ class AgentRandom:
     def main(self):
         self.iterations+= 1
         action = numpy.random.randint(self.actions_count)
-
+        
         self.state, reward, done, info = self.env.step(action)
 
         '''
@@ -20,6 +20,7 @@ class AgentRandom:
         print(reward)
         print("\n\n")
         '''
+        
         if done:
             self.state = self.env.reset()
 

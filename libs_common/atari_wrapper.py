@@ -13,9 +13,18 @@ class NopOpsEnv(gym.Wrapper):
         noops = numpy.random.randint(1, self.max_count + 1)
          
         for _ in range(noops):
-            obs, _, _, _ = self.env.step(0)
-            
+            obs, _, done, _ = self.env.step(0)
+
+            if done:
+                self.env.reset()
+                obs, _, _ ,_ = self.env.step(1)
+                obs, _, _ ,_ = self.env.step(2)
+           
         return obs
+
+    def step(self, action):
+        obs, reward, done, info = self.env.step(action)
+        return obs, reward, done, info
 
 
 class SkipEnv(gym.Wrapper):
@@ -86,8 +95,14 @@ class FireResetEnv(gym.Wrapper):
 
     def reset(self):
         self.env.reset()
-        obs, _, _, _ = self.env.step(1)
-        obs, _, _, _ = self.env.step(2)
+        
+        obs, _, done, _ = self.env.step(1)
+        if done:
+            self.env.reset()
+
+        obs, _, done, _ = self.env.step(2)
+        if done:
+            self.env.reset()
 
         return obs
 
@@ -116,7 +131,10 @@ class EpisodicLifeEnv(gym.Wrapper):
         if self.was_real_done:
             obs = self.env.reset(**kwargs)
         else:
-            obs, _, _, _ = self.env.step(0)
+            obs, _, _, _ = self.env.step(1)
+            obs, _, _, _ = self.env.step(2)
+            obs, _, _, _ = self.env.step(0) 
+
         self.lives = self.env.unwrapped.ale.lives()
         self.inital_lives = self.env.unwrapped.ale.lives()
         return obs

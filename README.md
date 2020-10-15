@@ -15,8 +15,8 @@ and N-steps (one step on figure)
 terminal imagined states are used to compute entropy
 **higher entropy produce higher internal motivation**
 
-detail of one rollout and one step
-![](doc/diagrams/imaginationentropydetail.png)
+detail used models for actor, critic and forward env model
+![](doc/diagrams/ddpgimaginationentropyfull.png)
 
 # 2 pybullet Ant
 
@@ -42,6 +42,9 @@ detail of one rollout and one step
 
 
 # 4 atari pacman
+
+detail of DQN and env model
+![](doc/diagrams/dqnimaginationentropydetail.png)
 
 
 last conv. layer attention visualisation
