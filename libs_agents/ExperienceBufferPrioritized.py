@@ -48,6 +48,7 @@ class ExperienceBufferPrioritized():
 
             self.ptr = (self.ptr + 1)%self.length()
 
+
     def _print(self):
         for i in range(self.length()):
             #print(self.state_b[i], end = " ")
@@ -61,36 +62,38 @@ class ExperienceBufferPrioritized():
         
         state_shape     = (batch_size, ) + self.state_b[0].shape[0:]
         action_shape    = (batch_size, )
-        reward_shape    = (self.n_steps, batch_size, )
-        done_shape      = (self.n_steps, batch_size, )
+        reward_shape    = (batch_size, self.n_steps)
+        done_shape      = (batch_size, self.n_steps)
       
 
         state_t         = torch.zeros(state_shape,  dtype=torch.float32).to(device)
         action_t        = torch.zeros(action_shape,  dtype=int)
-        reward_t        = torch.zeros(reward_shape,  dtype=torch.float32).to(device)
-        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32).to(device)
+        reward_t        = torch.zeros(reward_shape,  dtype=torch.float32)
+        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32)
         done_t          = torch.zeros(done_shape,  dtype=torch.float32).to(device)
 
         #self.indices = self.find_indices_random(self.batch_size)
         self.indices = self.find_indices_priority(batch_size, self.loss)
 
-        for i in range(0, batch_size):
-            n  = self.indices[i]
+        state_t         = torch.from_numpy(numpy.take(self.state_b, self.indices, axis=0)).to(device)
+        action_t        = torch.from_numpy(numpy.take(self.action_b, self.indices, axis=0)).to(device)
+        state_next_t    = torch.from_numpy(numpy.take(self.state_b, self.indices + self.n_steps, axis=0)).to(device)
 
-            state_t[i]      = torch.from_numpy(self.state_b[n]).to(device)
-            action_t[i]     = self.action_b[n]
-            state_next_t[i] = torch.from_numpy(self.state_b[n + self.n_steps]).to(device)
+        for j in range(batch_size):
+            n = self.indices[j]
+            
+            reward_t[j] = torch.from_numpy(numpy.array(self.reward_b[n:n+self.n_steps]))
+            done_t[j]   = torch.from_numpy(numpy.array(self.done_b[n:n+self.n_steps]))
 
-            for j in range(self.n_steps):
-                reward_t[j][i]     = torch.from_numpy(numpy.asarray(self.reward_b[n + j])).to(device)
-                done_t[j][i]       = torch.from_numpy(numpy.asarray(self.done_b[n + j])).to(device)
+        reward_t    = reward_t.to(device)
+        done_t      = done_t.to(device)
         
         return state_t.detach(), action_t, reward_t.detach(), state_next_t.detach(), done_t.detach()
 
     def update_loss(self, loss_new):
         for i in range(len(self.indices)):
             n  = self.indices[i] 
-            self.loss[n] = loss[i]
+            self.loss[n] = loss_new[i]
 
     def find_indices_random(self, count):
         indices = numpy.zeros(count, dtype=int)
@@ -101,10 +104,9 @@ class ExperienceBufferPrioritized():
 
 
     def find_indices_priority(self, count, loss):
-        #probs sum have to be one
-        #higher loss leads to higher probability
-
         loss_aligned = loss[0:loss.size - self.n_steps]
+
+        #probs sum have to be one
         probs = loss_aligned/numpy.sum(loss_aligned)
 
         indices = numpy.random.choice(len(probs), count, p=probs )
@@ -113,22 +115,22 @@ class ExperienceBufferPrioritized():
         
 
 if __name__ == "__main__":
-    state_shape     = (3, 13, 17)
-    action_shape    = (7,)
+    state_shape     = (4, 16, 16)
+    actions_count    = 9
 
-    buffer_size = 107
+    buffer_size = 128 
 
     n_steps = 3
 
-    batch_size = 8
+    batch_size = 20
 
 
     replay_buffer = ExperienceBufferPrioritized(buffer_size, n_steps)
 
     for i in range(1000):
         state   = numpy.random.randn(state_shape[0], state_shape[1], state_shape[2])
-        action  = numpy.random.randn(action_shape[0])[0]
-        reward  = numpy.random.rand(1)
+        action  = numpy.random.randint(actions_count)
+        reward  = numpy.random.rand(1)[0]
         done    = numpy.random.randint(2)
 
         replay_buffer.add(state, action, reward, done)
@@ -137,9 +139,12 @@ if __name__ == "__main__":
             state_t, action_t, reward_t, state_next_t, done_t = replay_buffer.sample(batch_size, device="cpu")
 
 
-    print(state_t.shape)
-    print(action_t.shape)
-    print(reward_t.shape)
-    print(state_next_t.shape)
-    print(done_t.shape)
+    print("state_t shape ", state_t.shape)
+    print("action_t shape ", action_t.shape)
+    print("reward_t shape ",reward_t.shape)
+    print("state_next_t shape ",state_next_t.shape)
+    print("done_t shape ",done_t.shape)
+
+
+    print(done_t[0])
 

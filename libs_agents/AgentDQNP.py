@@ -100,22 +100,23 @@ class AgentDQNP():
 
         #compute target, n-step Q-learning
         q_target         = q_predicted.clone()
-        for i in range(self.batch_size):
+        for j in range(self.batch_size):
             gamma_        = self.gamma
 
             reward_sum = 0.0
-            for j in range(self.bellman_steps):
+            for i in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
                 reward_sum+= reward_t[j][i]*(gamma_**j)
 
-            action_idx    = action_t[i]
-            q_target[i][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[i])
+            action_idx    = action_t[j]
+            q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
 
         #train DQN model
-        loss_ = ((q_target.detach() - q_predicted)**2)
-        
-        loss  = loss_.mean() 
+        loss = ((q_target.detach() - q_predicted)**2)
+        loss_ = loss.mean(dim=1)
+        loss  = loss.mean() 
+
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.model.parameters():
