@@ -9,11 +9,11 @@ import libs_agents
 from libs_common.Training import *
 from libs_common.atari_wrapper import *
 
-import models.dqnp.src.model            as Model
-import models.dqnp.src.config           as Config
+import models.a2c.src.model            as Model
+import models.a2c.src.config           as Config
 
  
-path = "models/dqnp/"
+path = "models/a2c/"
 
 env = gym.make("MsPacmanNoFrameskip-v4")
 
@@ -21,7 +21,7 @@ env = AtariWrapper(env)
 env.reset()
 
 
-agent = libs_agents.AgentDQNP(env, Model, Config)
+agent = libs_agents.AgentA2C(env, Model, Config)
 
 max_iterations = 10*(10**6) 
 
