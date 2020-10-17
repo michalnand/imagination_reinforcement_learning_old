@@ -99,7 +99,8 @@ class AgentA2C():
 
         self.optimizer.zero_grad()        
         loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+        for param in self.model.parameters():
+            param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step() 
 
         
