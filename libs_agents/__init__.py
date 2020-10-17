@@ -9,9 +9,9 @@ from .AgentA2CCuriosity import *
 from .AgentA2CContinuous import *
 from .AgentA2CImagination import *
 
-from .AgentDQN import *
+from .AgentDQN  import *
+from .AgentDQNP import *
 from .AgentDQNImaginationEntropy import *
-from .AgentPDQN import *
 from .AgentDQNCuriosity import *
 from .AgentDQNImagination import *
 
