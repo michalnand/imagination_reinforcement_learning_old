@@ -31,13 +31,14 @@ class ResidualBlock(torch.nn.Module):
         return self.activation(y + x)
 
 
+
+
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count = [32, 32, 64, 64], residual_blocks = [0, 0, 0, 0]):
+    def __init__(self, input_shape, outputs_count, kernels_count   = [32, 32, 64, 64], residual_count  = [0, 0, 0, 0]):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
         self.input_shape    = input_shape
         self.outputs_count  = outputs_count
@@ -64,20 +65,19 @@ class Model(torch.nn.Module):
 
         self.layers_features.append(Flatten())
 
-
-        self.layers_actor = [
-            nn.Linear(fc_inputs_count, 128),
-            nn.ReLU(),                      
-            nn.Linear(128, outputs_count)
+        self.layers_value = [
+                            nn.Linear(fc_inputs_count, 128),
+                            nn.ReLU(),                       
+                            nn.Linear(128, 1)  
         ] 
 
+        self.layers_advantage = [
+                                libs_layers.NoisyLinear(fc_inputs_count, 128),
+                                nn.ReLU(),                      
+                                nn.Linear(128, outputs_count)
+        ] 
 
-        self.layers_critic = [
-            nn.Linear(fc_inputs_count, 128),
-            nn.ReLU(),                       
-            nn.Linear(128, 1)  
-        ]  
-
+  
         for i in range(len(self.layers_features)):
             if hasattr(self.layers_features[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers_features[i].weight)
@@ -85,41 +85,42 @@ class Model(torch.nn.Module):
         self.model_features = nn.Sequential(*self.layers_features)
         self.model_features.to(self.device)
 
-        self.model_critic = nn.Sequential(*self.layers_critic)
-        self.model_critic.to(self.device)
+        self.model_value = nn.Sequential(*self.layers_value)
+        self.model_value.to(self.device)
 
-        self.model_actor = nn.Sequential(*self.layers_actor)
-        self.model_actor.to(self.device)
+        self.model_advantage = nn.Sequential(*self.layers_advantage)
+        self.model_advantage.to(self.device)
 
         print(self.model_features)
-        print(self.model_critic)
-        print(self.model_actor)
+        print(self.model_value)
+        print(self.model_advantage)
 
     def forward(self, state):
         features    = self.model_features(state)
 
-        logits      = self.model_actor(features)
-        advantege   = self.model_critic(features)
+        value       = self.model_value(features)
+        advantage   = self.model_advantage(features)
 
-        return logits, advantege
+        result = value + advantage - advantage.mean()
+        return result
 
     def save(self, path):
         print("saving ", path)
 
         torch.save(self.model_features.state_dict(), path + "trained/model_features.pt")
-        torch.save(self.model_critic.state_dict(), path + "trained/model_critic.pt")
-        torch.save(self.model_actor.state_dict(), path + "trained/model_actor.pt")
+        torch.save(self.model_value.state_dict(), path + "trained/model_value.pt")
+        torch.save(self.model_advantage.state_dict(), path + "trained/model_advantage.pt")
 
     def load(self, path):
         print("loading ", path) 
 
         self.model_features.load_state_dict(torch.load(path + "trained/model_features.pt", map_location = self.device))
-        self.model_critic.load_state_dict(torch.load(path + "trained/model_critic.pt", map_location = self.device))
-        self.model_actor.load_state_dict(torch.load(path + "trained/model_actor.pt", map_location = self.device))
+        self.model_value.load_state_dict(torch.load(path + "trained/model_value.pt", map_location = self.device))
+        self.model_advantage.load_state_dict(torch.load(path + "trained/model_advantage.pt", map_location = self.device))
         
         self.model_features.eval() 
-        self.model_critic.eval() 
-        self.model_actor.eval() 
+        self.model_value.eval() 
+        self.model_advantage.eval() 
 
 
     def get_activity_map(self, state):

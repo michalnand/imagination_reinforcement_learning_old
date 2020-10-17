@@ -9,11 +9,8 @@ from .AgentA2CCuriosity import *
 from .AgentA2CContinuous import *
 from .AgentA2CImagination import *
 
-from .AgentDQN  import *
-from .AgentDQNP import *
+from .AgentDQN import *
 from .AgentDQNImaginationEntropy import *
-from .AgentDQNCuriosity import *
-from .AgentDQNImagination import *
 
 from .AgentPPO import *
 from .AgentPPOCuriosity import *

@@ -1,28 +1,32 @@
 import numpy
 import torch
-from .ExperienceBufferPrioritized import *
+from .ExperienceBuffer import *
 
 import cv2
 
 
-class AgentDQNP():
+class AgentDQN():
     def __init__(self, env, Model, Config):
         self.env = env
 
         config = Config.Config()
 
         self.batch_size     = config.batch_size
+        self.exploration    = config.exploration
         self.gamma          = config.gamma
         self.tau            = config.tau
         self.update_frequency = config.update_frequency
-        
-        self.bellman_steps = config.bellman_steps
-        
+
+        if hasattr(config, 'bellman_steps'):
+            self.bellman_steps = config.bellman_steps
+        else:
+            self.bellman_steps = 1
+
        
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
 
-        self.experience_replay = ExperienceBufferPrioritized(config.experience_replay_size, self.bellman_steps)
+        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
 
         self.model          = Model.Model(self.state_shape, self.actions_count)
         self.model_target   = Model.Model(self.state_shape, self.actions_count)
@@ -45,12 +49,20 @@ class AgentDQNP():
         self.enabled_training = False
     
     def main(self, show_activity = False):
+        if self.enabled_training:
+            self.exploration.process()
+            epsilon = self.exploration.get()
+        else:
+            epsilon = self.exploration.get_testing()
+
         state_t     = torch.from_numpy(self.state).to(self.model.device).unsqueeze(0).float()
         
         q_values    = self.model(state_t)
         q_values    = q_values.squeeze(0).detach().to("cpu").numpy()
  
-        self.action = self._sample_action(state_t)
+        action_idx_np, _,  = self._sample_action(state_t, epsilon)
+
+        self.action = action_idx_np[0]
 
         state_new, self.reward, done, self.info = self.env.step(self.action)
  
@@ -100,40 +112,48 @@ class AgentDQNP():
 
         #compute target, n-step Q-learning
         q_target         = q_predicted.clone()
-        for j in range(self.batch_size):
+        for i in range(self.batch_size):
             gamma_        = self.gamma
 
             reward_sum = 0.0
-            for i in range(self.bellman_steps):
+            for j in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
                 reward_sum+= reward_t[j][i]*(gamma_**j)
 
-            action_idx    = action_t[j]
-            q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
+            action_idx    = action_t[i]
+            q_target[i][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[i])
 
         #train DQN model
-        loss = ((q_target.detach() - q_predicted)**2)
-        loss_ = loss.mean(dim=1)
-        loss  = loss.mean() 
-
+        loss = ((q_target.detach() - q_predicted)**2).mean() 
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.model.parameters():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
-        self.experience_replay.update_loss(loss_.detach().to("cpu").numpy())
+    def _sample_action(self, state_t, epsilon):
 
-    def _sample_action(self, state_t):
+        batch_size = state_t.shape[0]
 
         q_values_t  = self.model(state_t)
 
-        action_probs_t        = torch.nn.functional.softmax(q_values_t.squeeze(0), dim = 0)
-        action_distribution_t = torch.distributions.Categorical(action_probs_t)
-        action_t              = action_distribution_t.sample()
+        action_idx_t     = torch.zeros(batch_size).to(self.model.device)
 
-        return action_t.detach().to("cpu").numpy()
+        action_one_hot_t = torch.zeros((batch_size, self.actions_count)).to(self.model.device)
+
+        #e-greedy strategy
+        for b in range(batch_size):
+            action = torch.argmax(q_values_t[b])
+            if numpy.random.random() < epsilon:
+                action = numpy.random.randint(self.actions_count)
+
+            action_idx_t[b]                 = action
+            action_one_hot_t[b][action]     = 1.0
+        
+        action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
+
+        return action_idx_np, action_one_hot_t
 
 
     def save(self, save_path):

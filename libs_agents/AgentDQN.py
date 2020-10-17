@@ -1,6 +1,6 @@
 import numpy
 import torch
-from .ExperienceBuffer import *
+from .ExperienceBufferPrioritized import *
 
 import cv2
 
@@ -11,22 +11,20 @@ class AgentDQN():
 
         config = Config.Config()
 
-        self.batch_size     = config.batch_size
-        self.exploration    = config.exploration
-        self.gamma          = config.gamma
-        self.tau            = config.tau
-        self.update_frequency = config.update_frequency
-
-        if hasattr(config, 'bellman_steps'):
-            self.bellman_steps = config.bellman_steps
-        else:
-            self.bellman_steps = 1
-
+        self.batch_size         = config.batch_size
+        self.exploration        = config.exploration
+        self.gamma              = config.gamma
+        self.tau                = config.tau
+        self.update_frequency   = config.update_frequency
+        self.prioritized_buffer        = config.prioritized_buffer
+        
+        self.bellman_steps = config.bellman_steps
+        
        
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
 
-        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
+        self.experience_replay = ExperienceBufferPrioritized(config.experience_replay_size, self.bellman_steps)
 
         self.model          = Model.Model(self.state_shape, self.actions_count)
         self.model_target   = Model.Model(self.state_shape, self.actions_count)
@@ -54,13 +52,13 @@ class AgentDQN():
             epsilon = self.exploration.get()
         else:
             epsilon = self.exploration.get_testing()
-
+             
         state_t     = torch.from_numpy(self.state).to(self.model.device).unsqueeze(0).float()
         
         q_values    = self.model(state_t)
         q_values    = q_values.squeeze(0).detach().to("cpu").numpy()
  
-        _, action_idx_np, _, _ = self._sample_action(state_t, epsilon)
+        action_idx_np, _,  = self._sample_action(state_t, epsilon)
 
         self.action = action_idx_np[0]
 
@@ -112,26 +110,33 @@ class AgentDQN():
 
         #compute target, n-step Q-learning
         q_target         = q_predicted.clone()
-        for i in range(self.batch_size):
+        for j in range(self.batch_size):
             gamma_        = self.gamma
 
             reward_sum = 0.0
-            for j in range(self.bellman_steps):
+            for i in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
                 reward_sum+= reward_t[j][i]*(gamma_**j)
 
-            action_idx    = action_t[i]
-            q_target[i][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[i])
+            action_idx    = action_t[j]
+            q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
 
         #train DQN model
-        loss = ((q_target.detach() - q_predicted)**2).mean() 
+        loss = ((q_target.detach() - q_predicted)**2)
+        loss_ = loss.mean(dim=1)
+        loss  = loss.mean() 
+
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.model.parameters():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
+        if self.prioritized_buffer:
+            self.experience_replay.update_loss(loss_.detach().to("cpu").numpy())
+
+    
     def _sample_action(self, state_t, epsilon):
 
         batch_size = state_t.shape[0]
@@ -152,20 +157,8 @@ class AgentDQN():
             action_one_hot_t[b][action]     = 1.0
         
         action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
-        action_one_hot_np   = action_one_hot_t.detach().to("cpu").numpy()
 
-
-        return action_idx_t, action_idx_np, action_one_hot_t, action_one_hot_np
-
-    '''  
-    def choose_action_e_greedy(self, q_values, epsilon):
-        result = numpy.argmax(q_values)
-        
-        if numpy.random.random() < epsilon:
-            result = numpy.random.randint(len(q_values))
-        
-        return result
-    '''
+        return action_idx_np, action_one_hot_t
 
     def save(self, save_path):
         self.model.save(save_path)

@@ -71,7 +71,7 @@ class AgentDQNImaginationEntropy():
         q_values    = self.model(state_t)
         q_values    = q_values.squeeze(0).detach().to("cpu").numpy()
  
-        _, action_idx_np, _, _ = self._sample_action(state_t, self.epsilon)
+        action_idx_np, _ = self._sample_action(state_t, self.epsilon)
 
         self.action = action_idx_np[0]
 
@@ -242,10 +242,8 @@ class AgentDQNImaginationEntropy():
             action_one_hot_t[b][action]     = 1.0
         
         action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
-        action_one_hot_np   = action_one_hot_t.detach().to("cpu").numpy()
 
-
-        return action_idx_t, action_idx_np, action_one_hot_t, action_one_hot_np
+        return action_idx_np, action_one_hot_t
 
 
     
@@ -261,7 +259,7 @@ class AgentDQNImaginationEntropy():
             #imagine rollouts
             for r in range(self.imagination_rollouts):
 
-                _, _,action_one_hot_t, _= self._sample_action(states_imagined_t[r], epsilon)
+                _, action_one_hot_t     = self._sample_action(states_imagined_t[r], epsilon)
                 states_imagined_next_t  = self.model_env(states_imagined_t[r], action_one_hot_t)
                 states_imagined_t[r]    = states_imagined_next_t.clone()
         
