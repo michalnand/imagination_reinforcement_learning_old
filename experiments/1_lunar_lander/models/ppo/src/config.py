@@ -4,7 +4,7 @@ class Config():
 
     def __init__(self):        
         self.gamma                  = 0.99
-        self.learning_rate          = 0.002
+        self.learning_rate          = 0.0005
         self.entropy_beta           = 0.01
         self.eps_clip               = 0.2
 

@@ -7,16 +7,13 @@ class TrainingLog:
 
         self.iterations         = 0
         self.episodes           = 0
-        self.episode_score_sum = 0.0
-        self.episode_score_sum_raw = 0.0
-        self.episode_iterations= 0.0
-        self.episode_iterations_filtered= 0.0
+        self.episode_score_sum  = 0.0
+        self.episode_iterations = 0.0
+        self.episode_iterations_filtered = 0.0
       
         self.total_score        = 0.0
 
-
         self.episode_score_sum_filtered = 0.0
-        self.episode_score_sum_raw_filtered = 0.0
 
         self.episode_score_best = -10**6
 
@@ -35,11 +32,10 @@ class TrainingLog:
             f = open(self.file_name,"w+")
             f.close()
 
-    def add(self, reward, done, raw_reward = 0):
+    def add(self, reward, done, raw_episodes = 0, raw_score_total = 0, raw_score_per_episode = 0):
 
         self.total_score+= reward
         self.episode_score_sum+= reward
-        self.episode_score_sum_raw+= raw_reward
         self.episode_iterations+= 1
 
         self.iterations+= 1
@@ -53,8 +49,6 @@ class TrainingLog:
             self.episode_iterations_filtered    = (1.0 - k)*self.episode_iterations_filtered + k*self.episode_iterations
             self.episode_score_sum_filtered     = (1.0 - k)*self.episode_score_sum_filtered + k*self.episode_score_sum
             
-            self.episode_score_sum_raw_filtered = (1.0 - k)*self.episode_score_sum_raw_filtered + k*self.episode_score_sum_raw
-
             self.episode_time_prev = self.episode_time_now
             self.episode_time_now  = time.time()
             self.episode_time_filtered = (1.0 - k)*self.episode_time_filtered + k*(self.episode_time_now - self.episode_time_prev)
@@ -66,7 +60,6 @@ class TrainingLog:
 
 
             self.episode_score_sum = 0
-            self.episode_score_sum_raw = 0
             self.episode_iterations = 0
         
         if self.iterations_skip_mode:
@@ -83,7 +76,9 @@ class TrainingLog:
             log_str+= str(round(self.total_score, dp)) + " "
             log_str+= str(round(self.episode_score_sum_filtered, dp)) + " "
             log_str+= str(round(self.episode_time_filtered, 4)) + " "
-            log_str+= str(round(self.episode_score_sum_raw_filtered, 4)) + " "
+            log_str+= str(int(raw_episodes)) + " "
+            log_str+= str(round(raw_score_total, 4)) + " "
+            log_str+= str(round(raw_score_per_episode, 4)) + " "
 
             print(log_str)
 

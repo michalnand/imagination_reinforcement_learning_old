@@ -25,10 +25,22 @@ class TrainingEpisodes:
             for i in range(self.episode_max_length):
                 reward, done = self.agent.main()
 
-                raw_reward = 0.0
-                if hasattr(self.env, "raw_reward"):
-                    raw_reward = self.env.raw_reward
-                log.add(reward, done, raw_reward)
+            
+                raw_episodes            = 0
+                raw_score_per_episode   = 0
+                raw_score_total         = 0
+
+                if hasattr(self.env, "raw_episodes"):
+                    raw_episodes = self.env.raw_episodes
+
+                if hasattr(self.env, "raw_score_total"):
+                    raw_score_total = self.env.raw_score_total
+
+                if hasattr(self.env, "raw_score_per_episode"):
+                    raw_score_per_episode = self.env.raw_score_per_episode
+
+                
+                log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode)
 
                 if self.save_best_only == False:
                     new_best = True
@@ -72,10 +84,22 @@ class TrainingIterations:
         for iteration in range(self.iterations_count):
             reward, done = self.agent.main()
             
-            raw_reward = 0.0
-            if hasattr(self.env, "raw_reward"):
-                raw_reward = self.env.raw_reward
-            log.add(reward, done, raw_reward)
+            raw_episodes            = 0 
+            raw_score_per_episode   = 0
+            raw_score_total         = 0
+
+            if hasattr(self.env, "raw_episodes"):
+                raw_episodes = self.env.raw_episodes
+
+            if hasattr(self.env, "raw_score_total"):
+                raw_score_total = self.env.raw_score_total
+
+            if hasattr(self.env, "raw_score_per_episode"):
+                raw_score_per_episode = self.env.raw_score_per_episode
+
+            
+            log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode)
+
             
             if self.save_best_only == False:
                 new_best = True

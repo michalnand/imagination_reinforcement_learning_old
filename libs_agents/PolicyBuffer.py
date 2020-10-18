@@ -4,13 +4,11 @@ import numpy
 
 class PolicyBuffer:
 
-    def __init__(self, buffer_size, state_shape, actions_size, device, contiunous_actions = False):
+    def __init__(self, buffer_size, state_shape, actions_size, device):
         self.buffer_size    = buffer_size
         self.state_shape    = state_shape
         self.actions_size   = actions_size
         self.device         = device
-
-        self.contiunous_actions = contiunous_actions
 
         self.clear()
 
@@ -37,12 +35,7 @@ class PolicyBuffer:
         self.states_b           = torch.zeros((self.buffer_size, ) + self.state_shape).to(self.device)
         self.logits_b           = torch.zeros((self.buffer_size, self.actions_size)).to(self.device)
         self.values_b           = torch.zeros((self.buffer_size, 1)).to(self.device)
-
-        if self.contiunous_actions:
-            self.actions_b          = torch.zeros((self.buffer_size, self.actions_size)).to(self.device)
-        else:
-            self.actions_b          = torch.zeros((self.buffer_size, ), dtype=int).to(self.device)
-
+        self.actions_b          = torch.zeros((self.buffer_size, ), dtype=int).to(self.device)
         self.rewards_b          = torch.zeros((self.buffer_size, )).to(self.device)
         self.dones_b            = torch.zeros((self.buffer_size, )).to(self.device)
        

@@ -35,7 +35,7 @@ env = gym.make("LunarLander-v2")
 env = Wrapper(env)
 env.reset()
 
-agent = libs_agents.AgentDQNP(env, Model, Config)
+agent = libs_agents.AgentDQN(env, Model, Config)
 
 max_iterations = (10**6)
 trainig = TrainingIterations(env, agent, max_iterations, path, 1000)

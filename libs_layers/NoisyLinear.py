@@ -5,21 +5,19 @@ import numpy
 class NoisyLinear(nn.Linear):
     def __init__(self, in_features, out_features, sigma = 0.1, device = "cpu"):
         super(NoisyLinear, self).__init__(in_features, out_features, bias=True)
-
+ 
         self.in_features    = in_features
         self.out_features   = out_features
         self.sigma          = sigma
 
 
-        self.weight_noise = nn.Parameter(torch.Tensor(out_features, in_features)).to(device)
-        self.bias_noise = nn.Parameter(torch.Tensor(out_features))
+        self.weight_noise   = nn.Parameter(torch.Tensor(out_features, in_features)).to(device)
+        self.bias_noise     = nn.Parameter(torch.Tensor(out_features))
         
         r = numpy.sqrt(1.0/(self.in_features + self.out_features))
-        
+
         self.weight_noise.data.uniform_(-r, r)
-        
-        if self.bias_noise is not None:
-            self.bias_noise.data.uniform_(-0.0001, 0.0001)
+        self.bias_noise.data.uniform_(-r, r)
 
     def forward(self, x):
         y       = x.mm(self.weight.t()) + self.bias 

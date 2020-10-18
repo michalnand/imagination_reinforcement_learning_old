@@ -54,10 +54,10 @@ class Model(torch.nn.Module):
         self.layers_features = []
 
         for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=2, padding=1))
+            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size = 3, stride = 2, padding = 1))
             self.layers_features.append(nn.ReLU()) 
 
-            for j in range(residual_count[i]):
+            for j in range(residual_blocks[i]):
                 self.layers_features.append(ResidualBlock(kernels_count[i+1]))
 
 

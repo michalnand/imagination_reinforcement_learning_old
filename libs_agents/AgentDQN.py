@@ -16,7 +16,7 @@ class AgentDQN():
         self.gamma              = config.gamma
         self.tau                = config.tau
         self.update_frequency   = config.update_frequency
-        self.prioritized_buffer        = config.prioritized_buffer
+        self.prioritized_buffer = config.prioritized_buffer
         
         self.bellman_steps = config.bellman_steps
         

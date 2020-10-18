@@ -113,6 +113,11 @@ class EpisodicLifeEnv(gym.Wrapper):
         self.lives = 0
         self.was_real_done  = True
 
+        self.raw_episodes            = 0
+        self.raw_score               = 0.0
+        self.raw_score_per_episode   = 0.0
+        self.raw_score_total         = 0.0  
+
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
         self.was_real_done = done
@@ -123,6 +128,17 @@ class EpisodicLifeEnv(gym.Wrapper):
             reward  = -1.0
         if lives == 0 and self.inital_lives > 0:
             reward = -1.0
+
+        self.raw_score+= reward
+        self.raw_score_total+= reward
+ 
+        if self.was_real_done:
+            self.raw_episodes+= 1
+
+            k = 0.1
+            self.raw_score_per_episode   = (1.0 - k)*self.raw_score_per_episode + k*self.raw_score
+            
+            self.raw_score = 0.0
 
         self.lives = lives
         return obs, reward, done, info
@@ -143,27 +159,19 @@ class ClipRewardEnv(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
 
+        self.raw_episodes            = 0
         self.raw_score_per_episode   = 0.0
-        self.raw_score_per_iteration = 0.0
-        self.raw_reward              = 0.0
-        self.raw_reward_episode_sum  = 0.0
+        self.raw_score_total         = 0.0
+       
 
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
+        
+        self.raw_episodes           = self.env.raw_episodes
+        self.raw_score_per_episode  = self.env.raw_score_per_episode
+        self.raw_score_total        = self.env.raw_score_total
 
-        self.raw_reward_episode_sum+= reward
-
-        self.raw_reward = reward
-
-
-        k = 0.01
-        self.raw_score_per_iteration = (1.0 - k)*self.raw_score_per_iteration + k*reward
-
-        if done:
-            k = 0.05
-            self.raw_score_per_episode   = (1.0 - k)*self.raw_score_per_episode + k*self.raw_reward_episode_sum
-            self.raw_reward_episode_sum  = 0.0
-
+   
         reward = numpy.clip(reward, -1.0, 1.0)
         return obs, reward, done, info
 

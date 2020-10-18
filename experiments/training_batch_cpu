@@ -1,7 +1,0 @@
-cd 2_ant
-./training_batch
-cd ..
-
-cd 3_half_cheetah
-./training_batch
-cd ..

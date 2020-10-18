@@ -14,11 +14,11 @@ class Model(torch.nn.Module):
         self.device = "cpu"
         
         self.layers = [ 
-                                    nn.Linear(input_shape[0], hidden_count),
-                                    nn.ReLU(),           
-                                    nn.Linear(hidden_count, hidden_count),
-                                    nn.ReLU(),    
-                                    libs_layers.NoisyLinear(hidden_count, outputs_count)
+            nn.Linear(input_shape[0], hidden_count),
+            nn.ReLU(),           
+            libs_layers.NoisyLinear(hidden_count, hidden_count, sigma = 1.0),
+            nn.ReLU(),    
+            libs_layers.NoisyLinear(hidden_count, outputs_count, sigma = 1.0)
         ]
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)

@@ -167,9 +167,6 @@ class AgentPPO():
         loss_entropy = (probs*log_probs).sum(dim = 1)
         loss_entropy = self.entropy_beta*loss_entropy.mean()
 
-        #print(loss_value, loss_policy, loss_entropy)
-
-        #train network, with gradient cliping
         loss = loss_value + loss_policy + loss_entropy
 
         return loss

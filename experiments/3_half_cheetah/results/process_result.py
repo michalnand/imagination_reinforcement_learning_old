@@ -13,6 +13,8 @@ files.append("../models_2/ddpg/result/result.log")
 files.append("../models_3/ddpg/result/result.log")
 files.append("../models_4/ddpg/result/result.log")
 files.append("../models_5/ddpg/result/result.log")
+files.append("../models_6/ddpg/result/result.log")
+files.append("../models_7/ddpg/result/result.log")
 rl_stats_compute_ddpg = RLStatsCompute(files, "ddpg_result_stats.log")
 
 
@@ -23,6 +25,8 @@ files.append("../models_2/ddpg_imagination_entropy/result/result.log")
 files.append("../models_3/ddpg_imagination_entropy/result/result.log")
 files.append("../models_4/ddpg_imagination_entropy/result/result.log")
 files.append("../models_5/ddpg_imagination_entropy/result/result.log")
+files.append("../models_6/ddpg_imagination_entropy/result/result.log")
+files.append("../models_7/ddpg_imagination_entropy/result/result.log")
 rl_stats_compute_imagination = RLStatsCompute(files, "ddpg_imagination_entropy_result_stats.log") 
 
 
