@@ -78,13 +78,12 @@ class ExperienceBufferPrioritized():
         #self.indices = self.find_indices_random(self.batch_size)
         self.indices = self.find_indices_priority(batch_size, self.loss)
 
-
-        state_t         = torch.from_numpy(numpy.take(self.state_b,  self.indices, axis=0)).to(device)
-        action_t        = torch.from_numpy(numpy.take(self.action_b, self.indices, axis=0)).to(device)
-        state_next_t    = torch.from_numpy(numpy.take(self.state_b,  self.indices + self.n_steps, axis=0)).to(device)
-
-        for j in range(batch_size):
+        for j in range(batch_size): 
             n = self.indices[j]
+
+            state_t[j]         = torch.from_numpy(self.state_b[n]).to(device)
+            action_t[j]        = torch.from_numpy(self.action_b[n]).to(device)
+            state_next_t[j]    = torch.from_numpy(self.state_b[n + self.n_steps]).to(device)
             
             reward_t[j] = torch.from_numpy(numpy.array(self.reward_b[n:n+self.n_steps]))
             done_t[j]   = torch.from_numpy(numpy.array(self.done_b[n:n+self.n_steps]))
