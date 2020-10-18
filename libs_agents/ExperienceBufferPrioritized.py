@@ -82,7 +82,7 @@ class ExperienceBufferPrioritized():
             n = self.indices[j]
 
             state_t[j]         = torch.from_numpy(self.state_b[n]).to(device)
-            action_t[j]        = torch.from_numpy(self.action_b[n]).to(device)
+            action_t[j]        = self.action_b[n]
             state_next_t[j]    = torch.from_numpy(self.state_b[n + self.n_steps]).to(device)
             
             reward_t[j] = torch.from_numpy(numpy.array(self.reward_b[n:n+self.n_steps]))
