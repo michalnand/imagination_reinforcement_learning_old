@@ -18,11 +18,11 @@ import models.ddpg_imagination_entropy.src.config           as Config
 path = "models/ddpg_imagination_entropy/"
 
 env = gym.make("HalfCheetahPyBulletEnv-v0")
-env.render()
+#env.render()
  
 agent = libs_agents.AgentDDPGImaginationEntropy(env, ModelCritic, ModelActor, ModelEnv, Config)
 
-max_iterations = 10*(10**6)
+max_iterations = 2*(10**6)
 trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
 trainig.run()
 
