@@ -2,14 +2,13 @@ import numpy
 import torch
 
 from torch.distributions import Categorical
-from .CuriosityModule import *
 
 from .PolicyBuffer import *
 
-class AgentPPOCuriosity():
-    def __init__(self, envs, Model, ModelCuriosity, Config):
+class AgentPPO():
+    def __init__(self, envs, Model, Config):
         self.envs = envs
- 
+
         config = Config.Config()
 
         self.envs_count = len(self.envs)
@@ -28,12 +27,7 @@ class AgentPPOCuriosity():
         self.optimizer      = torch.optim.Adam(self.model.parameters(), lr= config.learning_rate)
 
 
-        self.curiosity_update_steps = config.curiosity_update_steps
-        self.curiosity_beta = config.curiosity_beta
-        self.curiosity_module = CuriosityModule(ModelCuriosity, self.state_shape, self.actions_count, config.curiosity_learning_rate, config.curiosity_buffer_size)
-
         self.buffer = PolicyBuffer(self.envs_count, self.batch_size, self.state_shape, self.actions_count, self.model.device)
-
 
         self.states = []
         for env in self.envs:
@@ -54,8 +48,6 @@ class AgentPPOCuriosity():
     def process_env(self, env_id = 0):
         state_t   = torch.tensor(self.states[env_id], dtype=torch.float32).detach().to(self.model.device).unsqueeze(0)
         
-        state_ = self.states[env_id].copy()
-
         logits, value   = self.model_old.forward(state_t)
 
         action_t = self._get_action(logits)
@@ -65,9 +57,6 @@ class AgentPPOCuriosity():
         if self.enabled_training:
             self.buffer.add(env_id, state_t.squeeze(0), logits.squeeze(0), value.squeeze(0), action_t.item(), reward, done)
            
-            if env_id == 0:
-                self.curiosity_module.add(state_, action_t.item(), reward, done)
-
         if done:
             self.states[env_id] = self.envs[env_id].reset()
 
@@ -85,9 +74,6 @@ class AgentPPOCuriosity():
                 reward = tmp
                 done = tmp_done
         
-        if self.enabled_training and self.iterations%self.curiosity_update_steps == 0:
-            self.curiosity_module.train()
-      
 
         if self.buffer.size() > self.batch_size-1:  
 
@@ -96,11 +82,7 @@ class AgentPPOCuriosity():
             for epoch in range(self.training_epochs):
                 loss = 0
                 for env_id in range(self.envs_count):
-
-                    curiosity, _ = self.curiosity_module.eval(self.buffer.states_prev_b[env_id], self.buffer.states_b[env_id], self.buffer.actions_b[env_id])
-                    curiosity = torch.clamp(curiosity*self.curiosity_beta, 0.0, 1.0).unsqueeze(1)
-
-                    loss+= self._compute_loss(env_id, curiosity)
+                    loss+= self._compute_loss(env_id)
 
                 self.optimizer.zero_grad()
                 loss.backward()
@@ -121,12 +103,10 @@ class AgentPPOCuriosity():
             
     def save(self, save_path):
         self.model.save(save_path)
-        self.curiosity_module.save(save_path + "trained/")
 
     def load(self, save_path):
         self.model.load(save_path)
         self.model_old.load_state_dict(self.model.state_dict())
-        self.curiosity_module.load(save_path + "trained/")
 
    
 
@@ -138,10 +118,9 @@ class AgentPPOCuriosity():
         return action_t
   
 
-    def _compute_loss(self, env_id, curiosity):
+    def _compute_loss(self, env_id):
         
         target_values_b = torch.FloatTensor(self.buffer.discounted_rewards[env_id]).to(self.model.device).detach()
-        target_values_b = target_values_b + curiosity
 
 
         probs_old     = torch.nn.functional.softmax(self.buffer.logits_b[env_id], dim = 1).detach()
@@ -168,10 +147,11 @@ class AgentPPOCuriosity():
         '''
         log_probs_      = log_probs[range(len(log_probs)),  self.buffer.actions_b[env_id]]
         log_probs_old_  = log_probs_old[range(len(log_probs_old)), self.buffer.actions_b[env_id]]
-         
+                        
         # Finding Surrogate Loss:
         advantage   = (target_values_b - values).detach()
 
+        
         ratios = torch.exp(log_probs_ - log_probs_old_)
         surr1 = ratios*advantage
         surr2 = torch.clamp(ratios, 1.0 - self.eps_clip, 1.0 + self.eps_clip)*advantage
@@ -179,6 +159,7 @@ class AgentPPOCuriosity():
         loss_policy = -torch.min(surr1, surr2) 
         loss_policy = loss_policy.mean()
     
+
         '''
         compute entropy loss, to avoid greedy strategy
         L = beta*H(pi(s)) = beta*pi(s)*log(pi(s))
