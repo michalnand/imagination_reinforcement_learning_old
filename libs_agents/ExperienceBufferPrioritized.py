@@ -72,7 +72,7 @@ class ExperienceBufferPrioritized():
         state_t         = torch.zeros(state_shape,  dtype=torch.float32).to(device)
         action_t        = torch.zeros(action_shape,  dtype=int)
         reward_t        = torch.zeros(reward_shape,  dtype=torch.float32)
-        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32)
+        state_next_t    = torch.zeros(state_shape,  dtype=torch.float32).to(device)
         done_t          = torch.zeros(done_shape,  dtype=torch.float32).to(device)
 
         #self.indices = self.find_indices_random(self.batch_size)
