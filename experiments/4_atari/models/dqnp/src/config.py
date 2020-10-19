@@ -17,5 +17,5 @@ class Config():
         self.bellman_steps          = 4
                 
         self.experience_replay_size = 32768
-        self.exploration            = libs_common.decay.Linear(1000000, 1.0, 0.05, 0.05)
+        self.exploration            = libs_common.decay.Linear(100000, 1.0, 0.05, 0.05)
       

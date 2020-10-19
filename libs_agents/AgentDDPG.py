@@ -66,7 +66,7 @@ class AgentDDPG():
         if self.enabled_training:
             self.experience_replay.add(self.state, action, self.reward, done)
 
-        if self.enabled_training and (self.iterations > self.experience_replay.size):
+        if self.enabled_training and self.experience_replay.length() > 0.1*self.experience_replay.size:
             if self.iterations%self.update_frequency == 0:
                 self.train_model()
 

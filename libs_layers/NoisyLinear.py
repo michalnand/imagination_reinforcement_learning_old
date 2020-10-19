@@ -8,11 +8,12 @@ class NoisyLinear(nn.Module):
         super(NoisyLinear, self).__init__()
 
         self.sigma = sigma
-        self.layer = nn.Linear(in_features*2, out_features, bias = bias)
+        self.out_features = out_features
+        self.layer = nn.Linear(in_features + out_features, out_features, bias = bias)
 
 
     def forward(self, x):
-        noise_x =  self.sigma*torch.randn(x.shape).to(x.device)
+        noise_x =  self.sigma*torch.randn((x.shape[0], self.out_features)).to(x.device)
         x_input = torch.cat([x, noise_x], dim = 1)
 
         return self.layer(x_input) 
