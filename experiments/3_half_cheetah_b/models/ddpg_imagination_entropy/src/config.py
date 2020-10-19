@@ -12,7 +12,7 @@ class Config():
         self.update_frequency    = 1
 
         self.experience_replay_size = 100000
-        self.exploration   = libs_common.decay.Linear(100000, 0.5, 0.1, 0.1)
+        self.exploration   = libs_common.decay.Linear(1000000, 0.5, 0.1, 0.1)
         
  
         self.imagination_rollouts       = 16

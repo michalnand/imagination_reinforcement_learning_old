@@ -51,3 +51,4 @@ if __name__ == "__main__":
             output = layer.forward(input)
             print(output)
         print("\n\n\n")
+    
