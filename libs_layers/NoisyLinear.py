@@ -11,8 +11,9 @@ class NoisyLinear(nn.Module):
         self.out_features = out_features
         self.layer = nn.Linear(in_features + out_features, out_features, bias = bias)
 
+        torch.nn.init.xavier_uniform_(self.layer.weight)
 
-    def forward(self, x):
+    def forward(self, x): 
         noise_x =  self.sigma*torch.randn((x.shape[0], self.out_features)).to(x.device)
         x_input = torch.cat([x, noise_x], dim = 1)
 
