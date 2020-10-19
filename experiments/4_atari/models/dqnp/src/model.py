@@ -66,15 +66,15 @@ class Model(torch.nn.Module):
         self.layers_features.append(Flatten())
 
         self.layers_value = [
-            nn.Linear(fc_inputs_count, 256),
+            nn.Linear(fc_inputs_count, 128),
             nn.ReLU(),                       
-            nn.Linear(256, 1)  
+            nn.Linear(128, 1)  
         ] 
 
         self.layers_advantage = [ 
-            libs_layers.NoisyLinear(fc_inputs_count, 256, sigma = 0.1),
-            nn.ReLU(),                      
-            libs_layers.NoisyLinear(256, outputs_count, sigma = 0.1)
+            nn.Linear(fc_inputs_count, 128),
+            nn.ReLU(),                       
+            libs_layers.NoisyLinear(128, outputs_count, sigma = 1.0)
         ] 
 
   
