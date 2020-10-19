@@ -11,7 +11,7 @@ class Config():
         self.learning_rate          = 0.0001
         self.bellman_steps          = 4
         
-        self.prioritized_buffer     = True
+        self.prioritized_buffer     = False
         
         self.exploration            = libs_common.decay.Linear(1000000, 1.0, 0.05, 0.05)        
         self.experience_replay_size = 32768

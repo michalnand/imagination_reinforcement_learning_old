@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy
 
 class NoisyLinear(nn.Module):
-    def __init__(self, in_features, out_features, bias = True, sigma = 1.0):
+    def __init__(self, in_features, out_features, bias = True, sigma = 0.1):
 
         super(NoisyLinear, self).__init__()
 

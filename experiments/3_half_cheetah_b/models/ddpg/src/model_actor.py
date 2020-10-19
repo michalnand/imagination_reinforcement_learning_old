@@ -1,6 +1,10 @@
 import torch
 import torch.nn as nn
 
+import sys
+sys.path.insert(0, '../../..')
+
+import libs_layers
 
 
 class Model(torch.nn.Module):
@@ -15,7 +19,7 @@ class Model(torch.nn.Module):
             nn.ReLU(),           
             nn.Linear(hidden_count, hidden_count//2),
             nn.ReLU(),    
-            nn.Linear(hidden_count//2, outputs_count),
+            libs_layers.NoisyLinear(hidden_count//2, outputs_count),
             nn.Tanh()
         ]
 

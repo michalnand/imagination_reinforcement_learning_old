@@ -7,7 +7,7 @@ class ExperienceBufferPrioritized():
     def __init__(self, size, n_steps = 1):
         self.size   = size
        
-        self.ptr    = 0 
+        self.ptr      = 0 
         self.state_b  = []
         self.action_b = []
         self.reward_b = []
