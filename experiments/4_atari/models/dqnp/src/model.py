@@ -55,7 +55,7 @@ class Model(torch.nn.Module):
         self.layers_features = []
 
         for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size = 3, stride = 1, padding = 1))
+            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=1, padding=1))
             self.layers_features.append(nn.ReLU()) 
 
             for j in range(residual_count[i]):
@@ -66,15 +66,15 @@ class Model(torch.nn.Module):
         self.layers_features.append(Flatten())
 
         self.layers_value = [
-            nn.Linear(fc_inputs_count, 128),
-            nn.ReLU(),                       
-            nn.Linear(128, 1)  
+                            nn.Linear(fc_inputs_count, 128),
+                            nn.ReLU(),                       
+                            nn.Linear(128, 1)  
         ] 
 
-        self.layers_advantage = [ 
-            libs_layers.NoisyLinear(fc_inputs_count, 128),
-            nn.ReLU(),                       
-            libs_layers.NoisyLinear(128, outputs_count)
+        self.layers_advantage = [
+                                libs_layers.NoisyLinear(fc_inputs_count, 128),
+                                nn.ReLU(),                      
+                                nn.Linear(128, outputs_count)
         ] 
 
   

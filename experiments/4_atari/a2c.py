@@ -15,7 +15,8 @@ import models.a2c.src.config           as Config
  
 path = "models/a2c/"
 
-env = gym.make("MsPacmanNoFrameskip-v4")
+#env = gym.make("MsPacmanNoFrameskip-v4")
+env = gym.make("QbertNoFrameskip-v4")
 
 env = AtariWrapper(env)
 env.reset()

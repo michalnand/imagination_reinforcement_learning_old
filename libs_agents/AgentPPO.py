@@ -134,7 +134,6 @@ class AgentPPO():
 
         actions_b = self._sample_actions(logits)
 
-
         '''
         compute critic loss, as MSE
         L = (T - V(s))^2
@@ -145,7 +144,7 @@ class AgentPPO():
         ''' 
         compute actor loss 
         '''
-        log_probs_      = log_probs[range(len(log_probs)),  self.policy_buffer.actions_b]
+        log_probs_      = log_probs[range(len(log_probs)), self.policy_buffer.actions_b]
         log_probs_old_  = log_probs_old[range(len(log_probs_old)), self.policy_buffer.actions_b]
                         
         # Finding Surrogate Loss:

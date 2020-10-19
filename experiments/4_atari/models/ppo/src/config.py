@@ -8,5 +8,5 @@ class Config():
 
         self.batch_size             = 512
         self.episodes_to_train      = 8
-        self.training_epochs        = 8
+        self.training_epochs        = 1
 

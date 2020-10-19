@@ -6,4 +6,4 @@ class Config():
         self.entropy_beta           = 0.01
 
         self.batch_size             = 512
-        self.episodes_to_train      = 8
+        self.episodes_to_train      = 1
