@@ -11,12 +11,12 @@ class Model(torch.nn.Module):
         
          
         self.layers = [ 
-                                    nn.Linear(input_shape[0], hidden_count),
-                                    nn.ReLU(),           
-                                    nn.Linear(hidden_count, hidden_count//2),
-                                    nn.ReLU(),    
-                                    nn.Linear(hidden_count//2, outputs_count),
-                                    nn.Tanh()
+            nn.Linear(input_shape[0], hidden_count),
+            nn.ReLU(),           
+            nn.Linear(hidden_count, hidden_count//2),
+            nn.ReLU(),    
+            nn.Linear(hidden_count//2, outputs_count),
+            nn.Tanh() 
         ]
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
