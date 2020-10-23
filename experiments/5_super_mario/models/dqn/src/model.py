@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+
+
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
@@ -9,16 +11,15 @@ class NoiseLayer(torch.nn.Module):
         super(NoiseLayer, self).__init__()
         
         self.inputs_count   = inputs_count
-        self.device         = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        w_initial   = init_range*torch.rand(self.inputs_count, device = self.device)
+        w_initial   = init_range*torch.rand(self.inputs_count)
         
         self.w      = torch.nn.Parameter(w_initial, requires_grad = True)     
         self.distribution = torch.distributions.normal.Normal(0.0, 1.0)
  
     def forward(self, x):
-        noise =  self.distribution.sample((self.inputs_count, )).detach().to(self.device)
-        return x + self.w*noise
+        noise =  self.distribution.sample((x.shape[0], self.inputs_count)).detach().to(x.device)
+        return x + self.w*noise 
 
 class Model(torch.nn.Module):
 
@@ -31,50 +32,59 @@ class Model(torch.nn.Module):
         self.outputs_count  = outputs_count
         
         input_channels  = self.input_shape[0]
-        fc_input_height = self.input_shape[1]
-        fc_input_width  = self.input_shape[2]    
+        input_height    = self.input_shape[1]
+        input_width     = self.input_shape[2]    
 
-        ratio           = 2**4
-
-        fc_inputs_count = 64*((fc_input_width)//ratio)*((fc_input_height)//ratio)
+        fc_inputs_count = 64*(input_width//16)*(input_height//16)
  
-        self.layers_features = [ 
-                        nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1),
-                        nn.ReLU(), 
-                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+        self.layers_features = [
+            nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
-                        nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
-                        nn.ReLU(),
-                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
- 
-                        nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-                        nn.ReLU(),
-                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
-            
-                        nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
-                        nn.ReLU(),
-                        nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
-                        
-                        Flatten(),
-                        NoiseLayer(fc_inputs_count, 0.001)
-                    ]
+            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+
+            Flatten(),
+            NoiseLayer(fc_inputs_count)
+        ]
 
 
         self.layers_value = [
-                            nn.Linear(fc_inputs_count, 128),
-                            nn.ReLU(),                      
-                            nn.Linear(128, 1) 
-                        ]
+            nn.Linear(fc_inputs_count, 128),
+            nn.ReLU(),                       
+            nn.Linear(128, 1)  
+        ] 
 
         self.layers_advantage = [
-                                nn.Linear(fc_inputs_count, 128),
-                                nn.ReLU(),                      
-                                nn.Linear(128, outputs_count)
-                            ]
+            nn.Linear(fc_inputs_count, 256),
+            nn.ReLU(),                      
+            nn.Linear(256, outputs_count)
+        ]
+ 
   
         for i in range(len(self.layers_features)):
             if hasattr(self.layers_features[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers_features[i].weight)
+
+        
+        for i in range(len(self.layers_value)):
+            if hasattr(self.layers_value[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_value[i].weight)
+
+        for i in range(len(self.layers_advantage)):
+            if hasattr(self.layers_advantage[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_advantage[i].weight)
+
 
         self.model_features = nn.Sequential(*self.layers_features)
         self.model_features.to(self.device)
@@ -89,14 +99,14 @@ class Model(torch.nn.Module):
         print(self.model_value)
         print(self.model_advantage)
 
-
-
     def forward(self, state):
         features    = self.model_features(state)
+
         value       = self.model_value(features)
         advantage   = self.model_advantage(features)
 
-        result = value + advantage - advantage.mean()
+        result = value + advantage - advantage.mean(dim=1).unsqueeze(1).repeat(1, self.outputs_count).detach()
+
         return result
 
     def save(self, path):
@@ -135,3 +145,24 @@ class Model(torch.nn.Module):
         result = k*result + q
         
         return result
+
+
+if __name__ == "__main__":
+    batch_size = 8
+
+    channels = 4
+    height   = 96
+    width    = 96
+
+    actions_count = 9
+
+
+    state   = torch.rand((batch_size, channels, height, width))
+
+    model = Model((channels, height, width), actions_count)
+
+
+    q_values = model.forward(state)
+
+    print(q_values.shape)
+

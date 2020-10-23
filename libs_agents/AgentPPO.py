@@ -119,7 +119,7 @@ class AgentPPO():
 
     def _compute_loss(self):
         
-        target_values_b = self.policy_buffer.q_values_b
+        target_values_b = self.policy_buffer.q_values_b.detach()
 
 
         probs_old     = torch.nn.functional.softmax(self.policy_buffer.logits_b, dim = 1).detach()

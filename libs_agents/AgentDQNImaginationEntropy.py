@@ -206,7 +206,7 @@ class AgentDQNImaginationEntropy():
             for j in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
-                reward_sum+= reward_t[j][i]*(gamma_**j)
+                reward_sum+= reward_t[j][i]*(gamma_**i)
 
             reward_sum+= entropy[i]
             reward_sum+= curiosity[i]

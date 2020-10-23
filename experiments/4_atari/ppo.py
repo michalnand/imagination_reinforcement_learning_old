@@ -17,6 +17,7 @@ path = "models/ppo/"
 
 env = gym.make("MsPacmanNoFrameskip-v4")
 
+
 env = AtariWrapper(env)
 env.reset()
 

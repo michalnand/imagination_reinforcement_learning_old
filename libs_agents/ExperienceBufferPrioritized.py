@@ -94,11 +94,12 @@ class ExperienceBufferPrioritized():
         return state_t.detach(), action_t, reward_t.detach(), state_next_t.detach(), done_t.detach()
 
     def update_loss(self, loss_new):
+        k = 0.1
         for i in range(len(self.indices)):
             n  = self.indices[i] 
-            self.loss[n] = loss_new[i]
+            self.loss[n] = (1.0 - k)*self.loss[n] + k*loss_new[i]
 
-        k = 0.02 
+         
         self.loss_mean = (1.0 - k)*self.loss_mean + k*loss_new.mean()
 
     def find_indices_random(self, count):

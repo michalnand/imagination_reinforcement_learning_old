@@ -90,7 +90,7 @@ class AgentDDPGImaginationEntropy():
         if self.enabled_training:
             self.experience_replay.add(self.state, action, self.reward, done)
 
-        if self.enabled_training and (self.iterations > self.experience_replay.size):
+        if self.enabled_training and self.experience_replay.length() > 0.1*self.experience_replay.size:
             if self.iterations%self.update_frequency == 0:
                 self.train_model()
 
@@ -205,11 +205,13 @@ class AgentDDPGImaginationEntropy():
         self.model_critic.save(save_path)
         self.model_actor.save(save_path)
         self.model_env.save(save_path)
+        self.model_reward.save(save_path)
 
-    def load(self, save_path):
-        self.model_critic.load(save_path)
-        self.model_actor.load(save_path)
-        self.model_env.load(save_path)
+    def load(self, load_path):
+        self.model_critic.load(load_path)
+        self.model_actor.load(load_path)
+        self.model_env.load(load_path)
+        self.model_reward.load(load_path)
 
     def _sample_action(self, state_t, epsilon):
         action_t    = self.model_actor(state_t)

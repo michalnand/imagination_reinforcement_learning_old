@@ -5,18 +5,18 @@ import gym_super_mario_bros
 import numpy
 import time
 
-import agents
+import libs_agents
 
-import common.super_mario_wrapper
-
-
+import libs_common.super_mario_wrapper
 
 
-env = gym.make("SuperMarioBros-v0")
-env = common.super_mario_wrapper.SuperMarioWrapper(env)
+
+
+env = gym.make("SuperMarioBrosRandomStages-v0")
+env = libs_common.super_mario_wrapper.SuperMarioWrapper(env)
 env.reset()
 
-agent = agents.AgentRandom(env)
+agent = libs_agents.AgentRandom(env)
 
 
 obs, _, _, _ = env.step(0)

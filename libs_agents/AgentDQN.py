@@ -1,6 +1,6 @@
 import numpy
 import torch
-from .ExperienceBufferPrioritized import *
+from .ExperienceBuffer import *
 
 import cv2
 
@@ -14,17 +14,25 @@ class AgentDQN():
         self.batch_size         = config.batch_size
         self.exploration        = config.exploration
         self.gamma              = config.gamma
-        self.tau                = config.tau
-        self.update_frequency   = config.update_frequency
-        self.prioritized_buffer = config.prioritized_buffer
         
+        if hasattr(config, "tau"):
+            self.soft_update        = True
+            self.tau                = config.tau
+        elif hasattr(config, "target_update"):
+            self.soft_update        = False
+            self.target_update      = config.target_update
+        else:
+            self.soft_update        = False
+            self.target_update      = 10000
+
+        self.update_frequency   = config.update_frequency        
         self.bellman_steps = config.bellman_steps
         
        
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
 
-        self.experience_replay = ExperienceBufferPrioritized(config.experience_replay_size, self.bellman_steps)
+        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
 
         self.model          = Model.Model(self.state_shape, self.actions_count)
         self.model_target   = Model.Model(self.state_shape, self.actions_count)
@@ -72,9 +80,14 @@ class AgentDQN():
             if self.iterations%self.update_frequency == 0:
                 self.train_model()
             
-            #soft update target network
-            for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
-                target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
+            if self.soft_update:
+                for target_param, param in zip(self.model_target.parameters(), self.model.parameters()):
+                    target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
+            else:
+                if self.iterations%self.target_update == 0:
+                    self.model_target.load_state_dict(self.model.state_dict())
+
+
 
         if done:
             self.state = self.env.reset()
@@ -117,14 +130,13 @@ class AgentDQN():
             for i in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
-                reward_sum+= reward_t[j][i]*(gamma_**j)
+                reward_sum+= reward_t[j][i]*(gamma_**i)
 
             action_idx    = action_t[j]
             q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
 
         #train DQN model
         loss = ((q_target.detach() - q_predicted)**2)
-        loss_ = loss.mean(dim=1)
         loss  = loss.mean() 
 
         self.optimizer.zero_grad()
@@ -132,9 +144,6 @@ class AgentDQN():
         for param in self.model.parameters():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
-
-        if self.prioritized_buffer:
-            self.experience_replay.update_loss(loss_.detach().to("cpu").numpy())
 
     
     def _sample_action(self, state_t, epsilon):

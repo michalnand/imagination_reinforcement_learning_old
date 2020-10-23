@@ -1,10 +1,6 @@
 import torch
 import torch.nn as nn
 
-import sys
-sys.path.insert(0, '../../..')
-
-import libs_layers
 
 class Flatten(nn.Module):
     def forward(self, input):
@@ -33,55 +29,55 @@ class ResidualBlock(torch.nn.Module):
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, kernels_count = [32, 32, 64, 64], residual_blocks = [0, 0, 0, 0]):
+    def __init__(self, input_shape, outputs_count):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 
         self.input_shape    = input_shape
         self.outputs_count  = outputs_count
         
         input_channels  = self.input_shape[0]
-        fc_input_height = self.input_shape[1]
-        fc_input_width  = self.input_shape[2]    
+        input_height    = self.input_shape[1]
+        input_width     = self.input_shape[2]    
 
-        kernels_count   = [input_channels] + kernels_count
+        fc_inputs_count = 64*(input_width//8)*(input_height//8)
 
-        ratio           = 2**(len(kernels_count) - 1)
-        fc_inputs_count = kernels_count[-1]*((fc_input_width)//ratio)*((fc_input_height)//ratio)
+        self.layers_features = [
+            nn.Conv2d(input_channels, 32, kernel_size=8, stride=4, padding=2),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            Flatten()
+        ]
 
-        self.layers_features = []
-
-        for i in range(len(kernels_count)-1):
-            self.layers_features.append(nn.Conv2d(kernels_count[i], kernels_count[i+1], kernel_size=3, stride=1, padding=1))
-            self.layers_features.append(nn.ReLU()) 
-
-            for j in range(residual_blocks[i]):
-                self.layers_features.append(ResidualBlock(kernels_count[i+1]))
-
-            self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
-
-
-        self.layers_features.append(Flatten())
-
-
+      
         self.layers_actor = [
-            nn.Linear(fc_inputs_count, 128),
+            nn.Linear(fc_inputs_count, 256),
             nn.ReLU(),                      
-            nn.Linear(128, outputs_count)
+            nn.Linear(256, outputs_count)
         ] 
 
 
         self.layers_critic = [
-            nn.Linear(fc_inputs_count, 128),
+            nn.Linear(fc_inputs_count, 256),
             nn.ReLU(),                       
-            nn.Linear(128, 1)  
+            nn.Linear(256, 1)  
         ]  
 
         for i in range(len(self.layers_features)):
             if hasattr(self.layers_features[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers_features[i].weight)
+
+        for i in range(len(self.layers_actor)):
+            if hasattr(self.layers_actor[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_actor[i].weight)
+
+        for i in range(len(self.layers_critic)):
+            if hasattr(self.layers_critic[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_critic[i].weight)
 
         self.model_features = nn.Sequential(*self.layers_features)
         self.model_features.to(self.device)
@@ -99,10 +95,12 @@ class Model(torch.nn.Module):
     def forward(self, state):
         features    = self.model_features(state)
 
-        logits      = self.model_actor(features)
-        advantege   = self.model_critic(features)
+        print(">>>> ", features.shape)
 
-        return logits, advantege
+        logits      = self.model_actor(features)
+        value       = self.model_critic(features)
+
+        return logits, value
 
     def save(self, path):
         print("saving ", path)
@@ -127,7 +125,7 @@ class Model(torch.nn.Module):
  
         state_t     = torch.tensor(state, dtype=torch.float32).detach().to(self.device).unsqueeze(0)
         features    = self.model_features(state_t)
-        features    = features.reshape((1, 64, 6, 6))
+        features    = features.reshape((1, 64, 12, 12))
 
         upsample = nn.Upsample(size=(self.input_shape[1], self.input_shape[2]), mode='bicubic')
 
@@ -140,3 +138,24 @@ class Model(torch.nn.Module):
         result = k*result + q
         
         return result
+
+
+if __name__ == "__main__":
+    batch_size = 8
+
+    channels = 4
+    height   = 96
+    width    = 96
+
+    actions_count = 9
+
+
+    state   = torch.rand((batch_size, channels, height, width))
+
+    model = Model((channels, height, width), actions_count)
+
+
+    logits, value = model.forward(state)
+
+    print(logits.shape, value.shape)
+

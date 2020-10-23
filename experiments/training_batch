@@ -1,0 +1,11 @@
+cd 4_breakout
+python3 dqn.py
+cd ..
+
+cd 4_pacman
+python3 dqn.py
+cd ..
+
+cd 4_qbert
+python3 dqn.py
+cd ..

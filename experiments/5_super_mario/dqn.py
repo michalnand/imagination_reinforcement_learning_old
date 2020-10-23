@@ -1,5 +1,6 @@
 import gym
-import pybulletgym
+import gym_super_mario_bros
+
 import numpy
 import time
 
@@ -15,7 +16,7 @@ import models.dqn.src.config           as Config
 
 path = "models/dqn/"
 
-env = gym.make("SuperMarioBros-v0")
+env = gym.make("SuperMarioBrosRandomStages-v0")
 env = SuperMarioWrapper(env)
 env.reset()
 
@@ -24,9 +25,10 @@ agent = libs_agents.AgentDQN(env, Model, Config)
 
 max_iterations = 10*(10**6)
 
-#trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
-#trainig.run() 
+trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
+trainig.run() 
 
+'''
 agent.load(path)
 agent.disable_training()
 while True:
@@ -34,3 +36,4 @@ while True:
 
     env.render()
     time.sleep(0.01)
+'''
