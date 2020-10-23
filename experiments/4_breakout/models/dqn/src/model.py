@@ -66,9 +66,9 @@ class Model(torch.nn.Module):
         ] 
 
         self.layers_advantage = [
-            nn.Linear(fc_inputs_count, 256),
+            nn.Linear(fc_inputs_count, 128),
             nn.ReLU(),                      
-            nn.Linear(256, outputs_count)
+            nn.Linear(128, outputs_count)
         ]
  
   
@@ -105,7 +105,7 @@ class Model(torch.nn.Module):
         value       = self.model_value(features)
         advantage   = self.model_advantage(features)
 
-        result = value + advantage - advantage.mean(dim=1).unsqueeze(1).repeat(1, self.outputs_count).detach()
+        result = value + advantage - advantage.mean(dim=1, keepdim=True)
 
         return result
 
