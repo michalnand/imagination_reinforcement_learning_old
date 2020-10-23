@@ -58,7 +58,7 @@ pacman with curiosity - forward model for state prediction used
 cmake python3 pip3 swig
 
 **basic python libs**
-pip3 install numpy numpy matplotlib torch pillow opencv-python 
+pip3 install numpy matplotlib torch pillow opencv-python 
 
 **graph neural networks**
 when CPU only :

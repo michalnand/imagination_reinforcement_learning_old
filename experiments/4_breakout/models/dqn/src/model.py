@@ -1,15 +1,25 @@
 import torch
 import torch.nn as nn
 
-import sys
-sys.path.insert(0, '../../..')
-
-import libs_layers
 
 class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
+class NoiseLayer(torch.nn.Module):
+    def __init__(self, inputs_count, init_range = 0.1):
+        super(NoiseLayer, self).__init__()
+        
+        self.inputs_count   = inputs_count
+
+        w_initial   = init_range*torch.rand(self.inputs_count)
+        
+        self.w      = torch.nn.Parameter(w_initial, requires_grad = True)     
+        self.distribution = torch.distributions.normal.Normal(0.0, 1.0)
+ 
+    def forward(self, x):
+        noise =  self.distribution.sample((x.shape[0], self.inputs_count)).detach().to(x.device)
+        return x + self.w*noise 
 
 class Model(torch.nn.Module):
 
@@ -44,7 +54,8 @@ class Model(torch.nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
-            Flatten()
+            Flatten(),
+            NoiseLayer(fc_inputs_count)
         ]
 
 
@@ -55,9 +66,9 @@ class Model(torch.nn.Module):
         ] 
 
         self.layers_advantage = [
-            libs_layers.NoisyLinear(fc_inputs_count, 128),
+            nn.Linear(fc_inputs_count, 256),
             nn.ReLU(),                      
-            libs_layers.NoisyLinear(128, outputs_count)
+            nn.Linear(256, outputs_count)
         ]
  
   
