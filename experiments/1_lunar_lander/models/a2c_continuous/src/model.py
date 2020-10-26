@@ -63,6 +63,7 @@ class Model(torch.nn.Module):
         print(self.model_actor_mu)
         print(self.model_actor_var)
         print(self.model_critic)
+        print("\n\n")
        
     def forward(self, state):
         features = self.model_features(state)

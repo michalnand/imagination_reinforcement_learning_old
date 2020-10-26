@@ -11,12 +11,12 @@ class Model(torch.nn.Module):
         
          
         self.layers = [ 
-                                    nn.Linear(input_shape[0], hidden_count),
-                                    nn.ReLU(),           
-                                    nn.Linear(hidden_count, hidden_count),
-                                    nn.ReLU(),    
-                                    nn.Linear(hidden_count, outputs_count),
-                                    nn.Tanh()
+            nn.Linear(input_shape[0], hidden_count),
+            nn.ReLU(),           
+            nn.Linear(hidden_count, hidden_count),
+            nn.ReLU(),    
+            nn.Linear(hidden_count, outputs_count),
+            nn.Tanh()
         ]
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
@@ -27,7 +27,7 @@ class Model(torch.nn.Module):
         self.model.to(self.device)
 
         print(self.model)
-       
+        print("\n\n")
 
     def forward(self, state):
         return self.model(state)

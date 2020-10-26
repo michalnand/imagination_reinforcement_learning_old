@@ -116,7 +116,7 @@ class AgentDQN():
         
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model.device)
-        
+
         #q values, state now, state next
         q_predicted      = self.model.forward(state_t)
         q_predicted_next = self.model_target.forward(state_next_t)
@@ -134,7 +134,7 @@ class AgentDQN():
 
             action_idx    = action_t[j]
             q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
-
+ 
         #train DQN model
         loss = ((q_target.detach() - q_predicted)**2)
         loss  = loss.mean() 
@@ -145,15 +145,14 @@ class AgentDQN():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
-    
+    '''
     def _sample_action(self, state_t, epsilon):
 
         batch_size = state_t.shape[0]
 
-        q_values_t  = self.model(state_t)
+        q_values_t          = self.model(state_t)
 
         action_idx_t     = torch.zeros(batch_size).to(self.model.device)
-
         action_one_hot_t = torch.zeros((batch_size, self.actions_count)).to(self.model.device)
 
         #e-greedy strategy
@@ -165,6 +164,36 @@ class AgentDQN():
             action_idx_t[b]                 = action
             action_one_hot_t[b][action]     = 1.0
         
+        action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
+
+        return action_idx_np, action_one_hot_t
+    '''
+
+    def _sample_action(self, state_t, epsilon):
+
+        batch_size = state_t.shape[0]
+
+        q_values_t          = self.model(state_t).to("cpu")
+
+        #best actions indices
+        q_max_indices_t     = torch.argmax(q_values_t, dim = 1)
+
+        #random actions indices
+        q_random_indices_t  = torch.randint(self.actions_count, (batch_size,))
+
+        #create mask, which actions will be from q_random_indices_t and which from q_max_indices_t
+        select_random_mask_t= torch.tensor((torch.rand(batch_size) < epsilon).clone(), dtype = int)
+
+        #apply mask
+        action_idx_t    = select_random_mask_t*q_random_indices_t + (1 - select_random_mask_t)*q_max_indices_t
+        action_idx_t    = torch.tensor(action_idx_t, dtype=int)
+
+        #create one hot encoding
+        action_one_hot_t = torch.zeros((batch_size, self.actions_count))
+        action_one_hot_t[range(batch_size), action_idx_t] = 1.0  
+        action_one_hot_t = action_one_hot_t.to(self.model.device)
+
+        #numpy result
         action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
 
         return action_idx_np, action_one_hot_t

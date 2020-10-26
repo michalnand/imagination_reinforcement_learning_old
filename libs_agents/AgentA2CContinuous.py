@@ -58,7 +58,6 @@ class AgentA2CContinuous():
                 self.passed_episodes+= 1
 
             if self.passed_episodes >= self.episodes_to_train or self.policy_buffer.is_full():
-
                 self.policy_buffer.cut_zeros()
                 self._train()
                 self.policy_buffer.clear()   
@@ -138,7 +137,7 @@ class AgentA2CContinuous():
         '''
         compute entropy loss, to avoid greedy strategy
         ''' 
-        loss_entropy = -(1.0 + torch.log(2.0*numpy.pi*self.policy_buffer.actions_var_b))*0.5
+        loss_entropy = 0.5*torch.log(2.0*numpy.pi*numpy.e*(self.policy_buffer.actions_var_b**2))
         loss_entropy = self.entropy_beta*loss_entropy.mean()
 
 

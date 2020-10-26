@@ -57,15 +57,15 @@ class Model(torch.nn.Module):
 
 
         self.layers_value = [
-            nn.Linear(fc_inputs_count, 256),
+            nn.Linear(fc_inputs_count, 512),
             nn.ReLU(),                       
-            nn.Linear(256, 1)  
+            nn.Linear(512, 1)  
         ] 
 
         self.layers_advantage = [
-            nn.Linear(fc_inputs_count, 256),
+            nn.Linear(fc_inputs_count, 512),
             nn.ReLU(),                      
-            nn.Linear(256, outputs_count)
+            nn.Linear(512, outputs_count)
         ]
  
   

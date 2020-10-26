@@ -10,18 +10,18 @@ import libs_agents
 from libs_common.Training import *
 
 
-import models.ddpg.src.model_critic     as ModelCritic
-import models.ddpg.src.model_actor      as ModelActor
-import models.ddpg.src.config           as Config
+import models.ddpg.model.src.model_critic     as ModelCritic
+import models.ddpg.model.src.model_actor      as ModelActor
+import models.ddpg.model.src.config           as Config
 
-path = "models/ddpg/"
+path = "models/ddpg/model/"
 
 env = gym.make("HalfCheetahPyBulletEnv-v0")
 env.render()
 
 agent = libs_agents.AgentDDPG(env, ModelCritic, ModelActor, Config)
 
-max_iterations = 10*(10**6)
+max_iterations = 4*(10**6)
 #trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
 #trainig.run()
 

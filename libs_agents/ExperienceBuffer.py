@@ -12,12 +12,9 @@ class ExperienceBuffer():
         self.action_b = []
         self.reward_b = []
         self.done_b   = []
-        self.priority = []
 
         self.n_steps = n_steps
 
-        self.loss       = numpy.ones(size)
-        self.loss_mean  = 1.0
 
     def length(self):
         return len(self.state_b)
@@ -40,14 +37,12 @@ class ExperienceBuffer():
             self.action_b.append(int(action))
             self.reward_b.append(reward)
             self.done_b.append(done_)
-            self.priority.append(1.0)
             
         else:
             self.state_b[self.ptr]  = state.copy()
             self.action_b[self.ptr] = int(action)
             self.reward_b[self.ptr] = reward
             self.done_b[self.ptr]   = done_
-            self.priority[self.ptr] = self.loss_mean
 
             self.ptr = (self.ptr + 1)%self.length()
 
