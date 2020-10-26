@@ -1,23 +1,23 @@
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_0
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_0
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_1
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_1
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_2
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_2
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_3
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_3
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_4
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_4
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_5
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_5
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_6
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_6
 
-python3 a2c.py
-cp -r models/a2c/model models/a2c/run_7
+python3 ddpg_imagination_entropy.py
+cp -r models/ddpg_imagination_entropy/model/run_7

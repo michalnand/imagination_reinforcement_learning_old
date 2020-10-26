@@ -100,7 +100,7 @@ class AgentA2CContinuous():
         return result
 
     def _train(self):
-        self.policy_buffer.compute_returns(self.gamma, normalise=True) 
+        self.policy_buffer.compute_returns(self.gamma, normalise=False) 
         
         loss = self._compute_loss()
 
