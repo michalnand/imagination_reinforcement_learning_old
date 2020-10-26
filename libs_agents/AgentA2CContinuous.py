@@ -86,7 +86,8 @@ class AgentA2CContinuous():
    
   
     def _sample_action(self, mu, var):
-        dist     = torch.distributions.Normal(mu, var)
+        sigma    = torch.sqrt(var)
+        dist     = torch.distributions.Normal(mu, sigma)
         
         action_t = dist.sample()[0].detach().clamp(-1.0, 1.0)
 
@@ -136,7 +137,7 @@ class AgentA2CContinuous():
         '''
         compute entropy loss, to avoid greedy strategy
         ''' 
-        loss_entropy = 0.5*torch.log(2.0*numpy.pi*numpy.e*(self.policy_buffer.actions_var_b**2))
+        loss_entropy = -0.5*torch.log(2.0*numpy.pi*self.policy_buffer.actions_var_b)
         loss_entropy = self.entropy_beta*loss_entropy.mean()
 
 
