@@ -99,7 +99,7 @@ class AgentA2CContinuous():
         return result
 
     def _train(self):
-        self.policy_buffer.compute_q_values(self.gamma) 
+        self.policy_buffer.compute_returns(self.gamma, normalise=True) 
         
         loss = self._compute_loss()
 
@@ -110,11 +110,10 @@ class AgentA2CContinuous():
         self.optimizer.step() 
 
         
-
+ 
 
     def _compute_loss(self):
-        
-        target_values_b = self.policy_buffer.q_values_b
+        returns = self.policy_buffer.returns_b.unsqueeze(1)
 
         log_probs   = self._calc_log_prob(self.policy_buffer.actions_mu_b, self.policy_buffer.actions_var_b, self.policy_buffer.actions_b)
 
@@ -122,15 +121,15 @@ class AgentA2CContinuous():
         compute critic loss, as MSE
         L = (T - V(s))^2
         '''
-        loss_value = (target_values_b - self.policy_buffer.values_b)**2
+        loss_value = (returns - self.policy_buffer.values_b)**2
         loss_value = loss_value.mean()
-
 
         '''
         compute actor loss 
         L = log(pi(s, a, mu, var))*(T - V(s)) = _calc_log_prob(mu, var, action)*A
         '''
-        advantage   = (target_values_b - self.policy_buffer.values_b).detach()
+        advantage   = (returns - self.policy_buffer.values_b).detach()
+
         loss_policy = -log_probs*advantage
         loss_policy = loss_policy.mean()
 

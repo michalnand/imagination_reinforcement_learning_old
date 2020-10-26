@@ -93,7 +93,7 @@ class AgentA2C():
   
     
     def _train(self):
-        self.policy_buffer.compute_q_values(self.gamma) 
+        self.policy_buffer.compute_discounted_rewards(self.gamma, True) 
         
         loss = self._compute_loss()
 
@@ -108,7 +108,7 @@ class AgentA2C():
 
     def _compute_loss(self):
         
-        target_values_b = self.policy_buffer.q_values_b
+        discounted_rewards = self.policy_buffer.discounted_rewards_b.unsqueeze(1)
 
         probs     = torch.nn.functional.softmax(self.policy_buffer.logits_b, dim = 1)
         log_probs = torch.nn.functional.log_softmax(self.policy_buffer.logits_b, dim = 1)
@@ -117,7 +117,7 @@ class AgentA2C():
         compute critic loss, as MSE
         L = (T - V(s))^2
         '''
-        loss_value = (target_values_b - self.policy_buffer.values_b)**2
+        loss_value = (discounted_rewards - self.policy_buffer.values_b)**2
         loss_value = loss_value.mean()
 
 
@@ -125,7 +125,7 @@ class AgentA2C():
         compute actor loss 
         L = log(pi(s, a))*(T - V(s)) = log(pi(s, a))*A 
         '''
-        advantage   = (target_values_b - self.policy_buffer.values_b).detach()
+        advantage   = (discounted_rewards - self.policy_buffer.values_b).detach()
         loss_policy = -log_probs[range(len(log_probs)), self.policy_buffer.actions_b]*advantage
         loss_policy = loss_policy.mean()
 

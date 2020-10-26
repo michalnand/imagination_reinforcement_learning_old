@@ -45,7 +45,7 @@ class PolicyBufferContinuous:
         self.rewards_b          = torch.zeros((self.buffer_size, )).to(self.device)
         self.dones_b            = torch.zeros((self.buffer_size, )).to(self.device)
        
-        self.q_values_b         = torch.zeros((self.buffer_size, 1)).to(self.device)
+        self.returns_b         = torch.zeros((self.buffer_size, )).to(self.device)
 
         self.ptr = 0 
 
@@ -60,10 +60,10 @@ class PolicyBufferContinuous:
         self.rewards_b          = self.rewards_b[0:self.ptr]
         self.dones_b            = self.dones_b[0:self.ptr]
        
-        self.q_values_b         = self.q_values_b[0:self.ptr]
+        self.returns_b         = self.returns_b[0:self.ptr]
 
 
-    def compute_q_values(self, gamma):
+    def compute_returns(self, gamma, normalise = False):
         
         q = 0.0
         for n in reversed(range(len(self.rewards_b))):
@@ -74,6 +74,9 @@ class PolicyBufferContinuous:
                 gamma_ = gamma
 
             q = self.rewards_b[n] + gamma_*q
-            self.q_values_b[n][0] = q
+            self.returns_b[n] = q
+
+        if normalise:
+            self.returns_b = (self.returns_b - self.returns_b.mean())/(self.returns_b.std() + 0.00001)
         
 
