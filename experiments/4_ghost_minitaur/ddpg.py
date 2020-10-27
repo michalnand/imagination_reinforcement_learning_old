@@ -34,7 +34,7 @@ class Wrapper(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
 
     def step(self, action):
-        action_ = numpy.pi*(0.2*action + 0.5)
+        action_ = numpy.pi*(0.1*action + 0.5)
         return self.env.step(action_)
 
 env = Wrapper(env)

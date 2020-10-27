@@ -24,7 +24,7 @@ class Wrapper(gym.Wrapper):
         gym.Wrapper.__init__(self, env)
 
     def step(self, action):
-        action_ = numpy.pi*(action + 0.5)
+        action_ = numpy.pi*(0.1*action + 0.5)
         return self.env.step(action_)
 
 env = Wrapper(env)
@@ -51,7 +51,7 @@ for i in range(8):
 while True:
 
     x+= 0.2
-    action = 0.2*numpy.sin(x + phase)
+    action = numpy.sin(x + phase)
 
     _, _, done, _ = env.step(action)
 
