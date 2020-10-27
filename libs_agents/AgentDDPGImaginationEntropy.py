@@ -221,16 +221,14 @@ class AgentDDPGImaginationEntropy():
         return states_imagined_t
 
 
-    def _compute_entropy(self, states_t):
+    def _compute_entropy(self, states_t, states_initial_t):
         batch_size  = states_t.shape[0]
         result      = torch.zeros(batch_size).to(self.model_env.device)
 
         for b in range(batch_size):
-            s           = states_t[b]
-            #std         = torch.std(s.view(s.size(0), -1), dim=0).mean()
-            #result[b]   = 0.5*torch.log(2.0*numpy.pi*numpy.e*(std**2))
-
-            result[b]   = torch.std(s.view(s.size(0), -1), dim=0).mean()
+            s_dif       = states_t[b] - states_initial_t[b]
+            
+            result[b]   = torch.std(s_dif.view(s_dif.size(0), -1), dim=0).mean()
 
         return result
 
@@ -242,7 +240,7 @@ class AgentDDPGImaginationEntropy():
         
 
         #compute entropy of imagined states
-        im_entropy           = self._compute_entropy(states_imagined_t.detach())
+        im_entropy           = self._compute_entropy(states_imagined_t.detach(), state_t)
        
         #compute curiosity
         im_curiosity         = ((state_next_t - state_predicted_t)**2).mean(dim = 1).detach()
