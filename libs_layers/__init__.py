@@ -1,4 +1,5 @@
 from .NoiseLayer import *
+from .NoisyLinear import *
 from .SkipInit2D import *
 from .LSTM import *
 from .GRU import *

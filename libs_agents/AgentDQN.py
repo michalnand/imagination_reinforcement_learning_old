@@ -133,7 +133,7 @@ class AgentDQN():
                 reward_sum+= reward_t[j][i]*(gamma_**i)
 
             action_idx    = action_t[j]
-            q_target[j][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[j])
+            q_target[j][action_idx]   = reward_sum + (gamma_**self.bellman_steps)*torch.max(q_predicted_next[j])
  
         #train DQN model
         loss = ((q_target.detach() - q_predicted)**2)

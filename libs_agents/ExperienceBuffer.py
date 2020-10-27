@@ -13,7 +13,7 @@ class ExperienceBuffer():
         self.reward_b = []
         self.done_b   = []
 
-        self.n_steps = n_steps
+        self.n_steps        = n_steps
 
 
     def length(self):
@@ -79,11 +79,12 @@ class ExperienceBuffer():
             action_t[j]        = self.action_b[n]
             state_next_t[j]    = torch.from_numpy(self.state_b[n + self.n_steps]).to(device)
             
-            reward_t[j] = torch.from_numpy(numpy.array(self.reward_b[n:n+self.n_steps]))
-            done_t[j]   = torch.from_numpy(numpy.array(self.done_b[n:n+self.n_steps]))
+            for i in range(self.n_steps): 
+                reward_t[j][i] = self.reward_b[n+i]
+                done_t[j][i]   = self.done_b[n+i]
 
         reward_t    = reward_t.to(device)
-        done_t      = done_t.to(device)
+        done_t      = done_t.to(device) 
         
         return state_t.detach(), action_t, reward_t.detach(), state_next_t.detach(), done_t.detach()
 
