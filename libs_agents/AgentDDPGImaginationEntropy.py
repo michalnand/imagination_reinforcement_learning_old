@@ -129,7 +129,7 @@ class AgentDDPGImaginationEntropy():
         intrinsics_motivation_t = self.entropy_beta*im_entropy + self.curiosity_beta*im_curiosity
 
 
-        if self.iterations%1000 == 0:
+        if self.iterations%10000 == 0:
             print("env_model_loss       = ", env_loss) 
             print("im_entropy           = ", im_entropy.shape, im_entropy.mean(), im_entropy.max())
             print("im_curiosity         = ", im_curiosity.shape, im_curiosity.mean(), im_curiosity.max())
