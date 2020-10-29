@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 import sys
-sys.path.insert(0, '../../..')
-#sys.path.insert(0, '../../../../..')
+#sys.path.insert(0, '../../..')
+sys.path.insert(0, '../../../../..')
 
 import libs_layers
 
@@ -16,13 +16,13 @@ class ResidualBlock(torch.nn.Module):
     def __init__(self, channels):
         super(ResidualBlock, self).__init__()
 
-        self.layers = []
+        self.layers = [] 
         
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit2D(channels))
+        self.layers.append(libs_layers.SkipInit())
         self.layers.append(nn.ReLU())
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit2D(channels))
+        self.layers.append(libs_layers.SkipInit())
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
         torch.nn.init.xavier_uniform_(self.layers[3].weight)
@@ -37,7 +37,7 @@ class ResidualBlock(torch.nn.Module):
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, residual_count = [0, 0, 0, 0]):
+    def __init__(self, input_shape, outputs_count, kernels_count = [32, 32, 64, 64], residual_count = [1, 1, 2, 2]):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -49,34 +49,27 @@ class Model(torch.nn.Module):
         input_height    = self.input_shape[1]
         input_width     = self.input_shape[2]    
 
+        kernels_count_  = [input_channels] + kernels_count
+
         fc_inputs_count = 64*(input_width//16)*(input_height//16)
  
-        self.layers_features = [ ]
+        self.layers_features = [ ] 
 
-        self.layers_features.append(nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1))
-        self.layers_features.append(nn.ReLU())
-        for i in range(residual_count[0]):
-            self.layers_features.append(ResidualBlock(32))
-        self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+        for k in range(len(kernels_count_) - 1):
 
-        self.layers_features.append(nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1))
-        self.layers_features.append(nn.ReLU())
-        for i in range(residual_count[1]):
-            self.layers_features.append(ResidualBlock(32))
-        self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+            k_in  = kernels_count_[k]
+            k_out = kernels_count_[k+1]
 
-        self.layers_features.append(nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1))
-        self.layers_features.append(nn.ReLU())
-        for i in range(residual_count[2]):
-            self.layers_features.append(ResidualBlock(64))
-        self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+            self.layers_features.append(nn.Conv2d(k_in, k_out, kernel_size=3, stride=1, padding=1))
+            self.layers_features.append(libs_layers.SkipInit())
+            self.layers_features.append(nn.ReLU())
+            
+            for i in range(residual_count[k]):
+                self.layers_features.append(ResidualBlock(k_out))
 
-        self.layers_features.append(nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1))
-        self.layers_features.append(nn.ReLU())
-        for i in range(residual_count[3]):
-            self.layers_features.append(ResidualBlock(64))
-        self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
+            self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
 
+      
         self.layers_features.append(Flatten())
             
 

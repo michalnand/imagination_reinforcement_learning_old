@@ -22,15 +22,15 @@ class ResidualBlock(torch.nn.Module):
         self.layers = []
         
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit2D(channels))
+        self.layers.append(libs_layers.SkipInit())
         self.layers.append(nn.ReLU())
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit2D(channels))
+        self.layers.append(libs_layers.SkipInit())
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
         torch.nn.init.xavier_uniform_(self.layers[3].weight)
 
-        self.model = nn.Sequential(*self.layers)
+        self.model      = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
 
     def forward(self, x):
@@ -53,7 +53,8 @@ class Model(torch.nn.Module):
         
         self.layers_features = []
 
-        self.layers_features.append(nn.Conv2d(input_shape[0], features_count, kernel_size=1, stride=1, padding=0))
+        self.layers_features.append(nn.Conv2d(input_shape[0], features_count, kernel_size=3, stride=1, padding=1))
+        self.layers_features.append(libs_layers.SkipInit())
         self.layers_features.append(nn.ReLU())
 
         for l in range(residual_blocks):
@@ -62,6 +63,7 @@ class Model(torch.nn.Module):
 
         self.layers_value = [
             nn.Conv2d(features_count, 2, kernel_size=1, stride=1, padding=0),
+            libs_layers.SkipInit(),
             nn.ReLU(),
             Flatten(),
 
@@ -74,10 +76,11 @@ class Model(torch.nn.Module):
 
         self.layers_advantage = [
             nn.Conv2d(features_count, 2, kernel_size=1, stride=1, padding=0),
+            libs_layers.SkipInit(),
             nn.ReLU(),
-            Flatten(),
-            libs_layers.NoiseLayer(input_height*input_width*2),
+            Flatten(), 
 
+            libs_layers.NoisyLinear(input_height*input_width*2),
             nn.Linear(input_height*input_width*2, self.outputs_count)
         ]
 

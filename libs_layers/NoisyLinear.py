@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy
 
 class NoisyLinear(torch.nn.Module):
-    def __init__(self, in_features, out_features, sigma = 0.1):
+    def __init__(self, in_features, out_features, sigma = 1.0):
         super(NoisyLinear, self).__init__()
         
         self.out_features   = out_features
@@ -18,8 +18,8 @@ class NoisyLinear(torch.nn.Module):
         self.weight_noise  = nn.Parameter(torch.zeros(in_features, out_features))
         torch.nn.init.xavier_uniform_(self.weight_noise)
 
-        self.bias_noise  = nn.Parameter(0.01*torch.randn(out_features)) 
-
+        self.bias_noise  = nn.Parameter((0.1/out_features)*torch.randn(out_features)) 
+ 
 
     def forward(self, x): 
         weight_noise    = self.sigma*torch.randn((self.in_features, self.out_features)).to(x.device).detach()
