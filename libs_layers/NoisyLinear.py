@@ -22,7 +22,11 @@ class NoisyLinear(torch.nn.Module):
  
 
     def forward(self, x): 
-        weight_noise    = self.sigma*torch.randn((self.in_features, self.out_features)).to(x.device).detach()
+        col_noise       = torch.randn((1, self.out_features)).to(x.device).detach()
+        row_noise       = torch.randn((self.in_features, 1)).to(x.device).detach()
+
+        weight_noise    = self.sigma*row_noise.matmul(col_noise)
+
         bias_noise      = self.sigma*torch.randn((self.out_features)).to(x.device).detach()
 
         weight_noised   = self.weight + self.weight_noise*weight_noise
@@ -33,12 +37,12 @@ class NoisyLinear(torch.nn.Module):
 
 if __name__ == "__main__":
     in_features     = 6*6*64
-    out_features    = 8
+    out_features    = 7
 
     layer = NoisyLinear(in_features, out_features)
 
     for j in range(4):
-        input  = torch.randn(in_features)
+        input  = torch.randn((10, in_features))
         for i in range(10):
             output = layer.forward(input)
             print(output)
