@@ -1,4 +1,24 @@
 
+class Const():
+    def __init__(self, training_value = 0.1, testing_value = 0.1):
+        self.training_value = training_value
+        self.testing_value  = testing_value
+
+    def process(self):
+        return self.training_value
+
+    def get(self):
+        return self.training_value
+
+    def get_start(self):
+        return self.training_value
+
+    def get_end(self):
+        return self.training_value
+
+    def get_testing(self):
+        return self.testing_value
+
 
 class Step():
     def __init__(self, iterations = 1000000, start_value = 1.0, end_value = 0.1, testing_value = 0.02):

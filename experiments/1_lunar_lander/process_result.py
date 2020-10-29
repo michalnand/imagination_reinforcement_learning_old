@@ -12,6 +12,10 @@ files.append("./models/ddpg/result/result.log")
 files.append("./models/ddpg/result/result.log")
 rl_stats_compute_ddpg = RLStatsCompute(files, result_path + "ddpg_result_stats.log")
 
+files = []
+files.append("./models/ddpg_noisy/result/result.log")
+files.append("./models/ddpg_noisy/result/result.log")
+rl_stats_compute_ddpg_noisy = RLStatsCompute(files, result_path + "ddpg_noisy_result_stats.log")
 
 
 files = []
@@ -28,6 +32,9 @@ plt.grid(color='black', linestyle='-', linewidth=0.1)
 plt.plot(rl_stats_compute_ddpg.games_mean, rl_stats_compute_ddpg.episode_mean, label="ddpg", color='blue')
 plt.fill_between(rl_stats_compute_ddpg.games_mean, rl_stats_compute_ddpg.episode_lower, rl_stats_compute_ddpg.episode_upper, color='blue', alpha=0.2)
 
+plt.plot(rl_stats_compute_ddpg_noisy.games_mean, rl_stats_compute_ddpg_noisy.episode_mean, label="ddpg noisy", color='green')
+plt.fill_between(rl_stats_compute_ddpg_noisy.games_mean, rl_stats_compute_ddpg_noisy.episode_lower, rl_stats_compute_ddpg_noisy.episode_upper, color='blue', alpha=0.2)
+
 plt.plot(rl_stats_compute_imagination.games_mean, rl_stats_compute_imagination.episode_mean, label="ddpg imagination entropy", color='red')
 plt.fill_between(rl_stats_compute_imagination.games_mean, rl_stats_compute_imagination.episode_lower, rl_stats_compute_imagination.episode_upper, color='red', alpha=0.2)
 
@@ -43,6 +50,9 @@ plt.grid(color='black', linestyle='-', linewidth=0.1)
 
 plt.plot(rl_stats_compute_ddpg.iterations, rl_stats_compute_ddpg.per_iteration_mean, label="ddpg", color='blue')
 plt.fill_between(rl_stats_compute_ddpg.iterations, rl_stats_compute_ddpg.per_iteration_lower, rl_stats_compute_ddpg.per_iteration_upper, color='blue', alpha=0.2)
+
+plt.plot(rl_stats_compute_ddpg_noisy.iterations, rl_stats_compute_ddpg_noisy.per_iteration_mean, label="ddpg noisy", color='green')
+plt.fill_between(rl_stats_compute_ddpg_noisy.iterations, rl_stats_compute_ddpg_noisy.per_iteration_lower, rl_stats_compute_ddpg_noisy.per_iteration_upper, color='blue', alpha=0.2)
 
 plt.plot(rl_stats_compute_imagination.iterations, rl_stats_compute_imagination.per_iteration_mean, label="ddpg imagination entropy", color='red')
 plt.fill_between(rl_stats_compute_imagination.iterations, rl_stats_compute_imagination.per_iteration_lower, rl_stats_compute_imagination.per_iteration_upper, color='red', alpha=0.2)

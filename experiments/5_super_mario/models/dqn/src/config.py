@@ -9,8 +9,8 @@ class Config():
 
         self.batch_size             = 32 
         self.learning_rate          = 0.0001
-        self.bellman_steps          = 4
+        self.bellman_steps          = 1
                  
-        self.exploration     = libs_common.decay.Exponential(0.999999, 1.0, 0.1, 0.02)        
+        self.exploration     = libs_common.decay.Exponential(0.999999, 1.0, 0.1, 0.05)        
         self.experience_replay_size = 65536
  
