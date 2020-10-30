@@ -126,7 +126,7 @@ class Model(torch.nn.Module):
         upsample = nn.Upsample(size=(self.input_shape[1], self.input_shape[2]), mode='bicubic')
 
         features = upsample(features).sum(dim = 1)
-              
+
         result = features[0].to("cpu").detach().numpy()
 
         k = 1.0/(result.max() - result.min())

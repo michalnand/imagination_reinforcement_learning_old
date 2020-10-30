@@ -11,6 +11,6 @@ class Config():
         self.learning_rate          = 0.0001
         self.bellman_steps          = 1
                  
-        self.exploration     = libs_common.decay.Exponential(0.999999, 1.0, 0.1, 0.05)        
-        self.experience_replay_size = 65536
+        self.exploration     = libs_common.decay.Const(0.05)        
+        self.experience_replay_size = 32768
  

@@ -80,27 +80,10 @@ class EpisodicLifeEnv(gym.Wrapper):
         
         self.was_real_done  = True
 
-        self.raw_episodes            = 0
-        self.raw_score               = 0.0
-        self.raw_score_per_episode   = 0.0
-        self.raw_score_total         = 0.0  
-
+        
     def _step(self, action):
         obs, reward, done, info = self.env.step(action)
         self.was_real_done = done
-
-        self.raw_score+= reward
-        self.raw_score_total+= reward
- 
-        if self.was_real_done:
-            self.raw_episodes+= 1
-
-            k = 0.1
-            self.raw_score_per_episode   = (1.0 - k)*self.raw_score_per_episode + k*self.raw_score
-            
-            self.raw_score = 0.0
-
-
         return obs, reward, done, info
 
     def _reset(self, **kwargs):
@@ -116,9 +99,25 @@ class ClipRewardEnv(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
 
+        self.raw_episodes            = 0
+        self.raw_score               = 0.0
+        self.raw_score_per_episode   = 0.0
+        self.raw_score_total         = 0.0  
+
+
     def step(self, action):
         obs, reward, done, info = self.env.step(action)
 
+        self.raw_score+= reward
+        self.raw_score_total+= reward
+
+        if done:
+            self.raw_episodes+= 1
+            k = 0.1
+            self.raw_score_per_episode   = (1.0 - k)*self.raw_score_per_episode + k*self.raw_score
+            self.raw_score = 0.0
+
+ 
         if done:
             if info["flag_get"]:
                 reward+= 50.0

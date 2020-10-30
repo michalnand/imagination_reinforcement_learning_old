@@ -40,6 +40,17 @@ detail used models for actor, critic and forward env model
 * DDPG imagination entropy : DDPG imagination and bonus reward from imagination entropy
 
 
+# 4 pybullet Ghost Minitaur
+
+![](doc/images/ghost_minitaur.gif)
+
+![](experiments/4_ghost_minitaur/results/score_per_episode.png)
+![](experiments/4_ghost_minitaur/results/score_per_iteration.png)
+
+* DDPG : common ddpg
+* DDPG imagination entropy : DDPG imagination and bonus reward from imagination entropy
+
+
 
 # 4 atari pacman
 
@@ -53,6 +64,10 @@ last conv. layer attention visualisation
 
 pacman with curiosity - forward model for state prediction used
 ![](doc/images/pacman_curiosity.gif)
+
+
+![](experiments/5_pacman/results/score_per_episode.png)
+
 
 # dependences
 cmake python3 pip3 swig

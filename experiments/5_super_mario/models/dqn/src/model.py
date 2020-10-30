@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 
 import sys
-sys.path.insert(0, '../../..')
+#sys.path.insert(0, '../../..')
+sys.path.insert(0, '../../../../..')
+
 import libs_layers
 
 
@@ -10,10 +12,30 @@ class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
+class ResidualBlock(torch.nn.Module):
+    def __init__(self, channels):
+        super(ResidualBlock, self).__init__()
+
+        self.layers = [] 
+        
+        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
+        self.layers.append(nn.ReLU())
+        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
+
+        torch.nn.init.xavier_uniform_(self.layers[0].weight)
+        torch.nn.init.xavier_uniform_(self.layers[2].weight)
+
+        self.model = nn.Sequential(*self.layers)
+        self.activation = nn.ReLU()
+
+    def forward(self, x):
+        y = self.model(x) 
+        return self.activation(y + x)
+
 
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count):
+    def __init__(self, input_shape, outputs_count, kernels_count = [32, 32, 64, 64], residual_count = [1, 1, 1, 1]):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -25,40 +47,40 @@ class Model(torch.nn.Module):
         input_height    = self.input_shape[1]
         input_width     = self.input_shape[2]    
 
+        kernels_count_  = [input_channels] + kernels_count
+
         fc_inputs_count = 64*(input_width//16)*(input_height//16)
  
-        self.layers_features = [
-            nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+        self.layers_features = [ ] 
 
-            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+        for k in range(len(kernels_count_) - 1):
 
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            k_in  = kernels_count_[k]
+            k_out = kernels_count_[k+1]
 
-            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+            self.layers_features.append(nn.Conv2d(k_in, k_out, kernel_size=3, stride=1, padding=1))
+            #self.layers_features.append(libs_layers.SkipInit())
+            self.layers_features.append(nn.ReLU())
+            
+            for i in range(residual_count[k]):
+                self.layers_features.append(ResidualBlock(k_out))
 
-            Flatten()
-        ]
+            self.layers_features.append(nn.MaxPool2d(kernel_size=2, stride=2, padding=0))
 
+      
+        self.layers_features.append(Flatten())
+            
 
         self.layers_value = [
             nn.Linear(fc_inputs_count, 512),
             nn.ReLU(),                       
             nn.Linear(512, 1)  
-        ] 
+        ]  
 
         self.layers_advantage = [
-            libs_layers.NoiseLayer(fc_inputs_count),
-            nn.Linear(fc_inputs_count, 512),
+            libs_layers.NoisyLinear(fc_inputs_count, 512),
             nn.ReLU(),                      
-            nn.Linear(512, outputs_count)
+            libs_layers.NoisyLinear(512, outputs_count)
         ]
  
   
@@ -66,7 +88,6 @@ class Model(torch.nn.Module):
             if hasattr(self.layers_features[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers_features[i].weight)
 
-        
         for i in range(len(self.layers_value)):
             if hasattr(self.layers_value[i], "weight"):
                 torch.nn.init.xavier_uniform_(self.layers_value[i].weight)

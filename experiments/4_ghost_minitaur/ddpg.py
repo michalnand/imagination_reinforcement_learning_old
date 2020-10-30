@@ -32,10 +32,19 @@ env = minitaur_gym_env.MinitaurBulletEnv(   render=False,
 class Wrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
+        self.iterations_max = 1000
+        self.iterations     = 0
 
     def step(self, action):
-        action_ = numpy.pi*(0.1*action + 0.5)
-        return self.env.step(action_)
+        action_ = numpy.pi*(0.3*action + 0.5)
+        obs, reward, done, info = self.env.step(action_)
+        
+        self.iterations+= 1
+        if self.iterations > self.iterations_max:
+            self.iterations = 0
+            done = True
+
+        return obs, reward, done, info
 
 env = Wrapper(env)
 
