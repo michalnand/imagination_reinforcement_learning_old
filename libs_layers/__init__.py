@@ -1,3 +1,4 @@
+from .Bias2D import *
 from .NoiseLayer import *
 from .NoisyLinear import *
 from .SkipInit import *

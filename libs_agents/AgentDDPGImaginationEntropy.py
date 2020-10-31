@@ -238,7 +238,6 @@ class AgentDDPGImaginationEntropy():
         #compute imagined states, use state_t as initial state
         states_imagined_t   = self._process_imagination(state_t, self.epsilon)
         
-
         #compute entropy of imagined states
         im_entropy           = self._compute_entropy(states_imagined_t.detach(), state_t)
        

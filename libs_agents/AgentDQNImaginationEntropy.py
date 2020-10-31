@@ -11,25 +11,27 @@ class AgentDQNImaginationEntropy():
 
         config = Config.Config()
 
-        self.batch_size     = config.batch_size
-        self.exploration    = config.exploration
-        self.gamma          = config.gamma
-        self.tau            = config.tau
-        self.update_frequency = config.update_frequency
 
-        if hasattr(config, 'bellman_steps'):
-            self.bellman_steps = config.bellman_steps
-        else:
-            self.bellman_steps = 1
+        self.gamma                  = config.gamma
+        self.update_frequency       = config.update_frequency
+        self.tau                    = config.tau
 
+        self.batch_size             = config.batch_size 
+        self.bellman_steps          = config.bellman_steps
+                 
         self.imagination_rollouts   = config.imagination_rollouts
         self.imagination_steps      = config.imagination_steps
+
         self.entropy_beta           = config.entropy_beta
         self.curiosity_beta         = config.curiosity_beta
-        self.env_learning_rate      = config.env_learning_rate
-       
+
+        self.exploration            = config.exploration
+
+
+
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
+
 
         self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
 
@@ -44,13 +46,9 @@ class AgentDQNImaginationEntropy():
         self.model_env          = ModelEnv.Model(self.state_shape, self.actions_count)
         self.optimizer_env      = torch.optim.Adam(self.model_env.parameters(), lr= config.env_learning_rate)
 
-        self.entropy_alpha  = 0.01
-        self.entropy_mean   = 0.0
-
+    
         self.state    = env.reset()
-
         self.iterations     = 0
-
         self.enable_training()
 
     def enable_training(self):
@@ -90,7 +88,7 @@ class AgentDQNImaginationEntropy():
                 target_param.data.copy_((1.0 - self.tau)*target_param.data + self.tau*param.data)
 
         if show_activity:
-            self._show_curiosity_activity(self.state, state_new, self.action)
+            self._show_entropy_activity(state_t)
 
         if done:
             self.state = self.env.reset()
@@ -115,7 +113,53 @@ class AgentDQNImaginationEntropy():
         cv2.imshow('state activity', image)
         cv2.waitKey(1)
 
-    def _show_curiosity_activity(self, state, state_next, action):
+    def _tensor_to_numpy(self, x, spacing = 4):
+        x_np    = x.detach().to("cpu").numpy()
+        height  = x_np.shape[2]
+        width   = x_np.shape[3]
+
+        rows    = 4
+        cols    = 4
+        
+        result  = numpy.zeros((rows*(height+spacing), cols*(width+spacing)))
+        for row in range(rows):
+            for col in range(cols):
+                idx = col + row*cols
+                result[row*width + row*spacing:(row+1)*width + row*spacing, col*height + col*spacing:(col+1)*height + col*spacing] = x_np[idx][0]
+
+        k = 1.0/(result.max() - result.min())
+        q = 1.0 - k*result.max()   
+        result = k*result + q
+
+        return result
+
+
+    def _show_entropy_activity(self, state_t):
+        if self.iterations%10 != 0:
+            return
+
+        size                = 400
+        states_imagined_t   = self._process_imagination(state_t, self.epsilon).squeeze(0)
+
+        states_dif_t        = state_t.squeeze(0) - states_imagined_t
+ 
+        entropy_t           = torch.std(states_dif_t, dim=0).mean(dim=0)
+        
+
+        states_imagined_np  = self._tensor_to_numpy(states_imagined_t)
+        states_dif_np       = self._tensor_to_numpy(states_dif_t**2)
+        
+        entropy_np          = entropy_t.detach().to("cpu").numpy()
+        k = 1.0/(entropy_np.max() - entropy_np.min())
+        q = 1.0 - k*entropy_np.max()   
+        entropy_np = k*entropy_np + q
+
+        cv2.imshow('states_imagined_np', entropy_np)
+        cv2.waitKey(1)
+       
+        print(">>>> ", states_imagined_t.shape, states_imagined_np.shape, entropy_t.shape)
+        pass
+        '''
         size            = 400
 
         action_t        = torch.zeros(1,  dtype=int)
@@ -149,6 +193,7 @@ class AgentDQNImaginationEntropy():
 
         cv2.imshow('curiosity activity', image)
         cv2.waitKey(1)
+        '''
         
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model.device)
@@ -167,31 +212,10 @@ class AgentDQNImaginationEntropy():
         self.optimizer_env.step()
 
 
-        #compute imagined states, use state_t as initial state
-        states_imagined_t   = self._process_imagination(state_t, self.epsilon).detach()
-        
-        #compute entropy of imagined states
-        entropy_t           = self._compute_entropy(states_imagined_t)
 
-        #filtered entropy mean
-        self.entropy_mean   = (1.0 - self.entropy_alpha)*self.entropy_mean + self.entropy_alpha*entropy_t.mean()
+        im_entropy, im_curiosity = self.intrinsics_motivation(state_t, action_t, state_next_t, state_predicted_t)
 
-        
-        '''
-        #normalise entropy reward
-        entropy       = (entropy_t - self.entropy_mean)/(self.entropy_mean + 0.000001)
-        entropy       = torch.tanh(self.entropy_beta*(entropy**2))
-        '''
-        #normalise entropy, substract mean, squeeze into -1, 1 range
-        entropy       = self.entropy_beta*torch.tanh(entropy_t - self.entropy_mean)
-
-        #compute curiosity
-        curiosity   = self.curiosity_beta*torch.tanh((state_next_t - state_predicted_t)**2).detach()
-        curiosity   = curiosity.view(curiosity.size(0), -1).mean(dim = 1)
-
-        #print(entropy)
-        #print(reward_t[0].abs().mean(), entropy.abs().mean(), entropy.min(), entropy.max())
-  
+        intrinsics_motivation_t = self.entropy_beta*im_entropy + self.curiosity_beta*im_curiosity
 
         #q values, state now, state next
         q_predicted      = self.model.forward(state_t)
@@ -199,28 +223,37 @@ class AgentDQNImaginationEntropy():
 
         #compute target, n-step Q-learning
         q_target         = q_predicted.clone()
-        for i in range(self.batch_size):
+        for j in range(self.batch_size):
             gamma_        = self.gamma
 
             reward_sum = 0.0
-            for j in range(self.bellman_steps):
+            for i in range(self.bellman_steps):
                 if done_t[j][i]:
                     gamma_ = 0.0
                 reward_sum+= reward_t[j][i]*(gamma_**i)
 
-            reward_sum+= entropy[i]
-            reward_sum+= curiosity[i]
-
-            action_idx    = action_t[i]
-            q_target[i][action_idx]   = reward_sum + gamma_*torch.max(q_predicted_next[i])
-
+            action_idx    = action_t[j]
+            q_target[j][action_idx]   = reward_sum + (gamma_**self.bellman_steps)*torch.max(q_predicted_next[j]) + intrinsics_motivation_t[j]
+ 
         #train DQN model
-        loss = ((q_target.detach() - q_predicted)**2).mean() 
+        loss = ((q_target.detach() - q_predicted)**2)
+        loss  = loss.mean() 
+
         self.optimizer.zero_grad()
         loss.backward()
         for param in self.model.parameters():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
+
+    
+    def save(self, save_path):
+        self.model.save(save_path)
+        self.model_env.save(save_path)
+
+    def load(self, load_path):
+        self.model.load(load_path)
+        self.model_env.load(load_path)
+    
 
     def _sample_action(self, state_t, epsilon):
 
@@ -248,6 +281,10 @@ class AgentDQNImaginationEntropy():
 
     
     def _process_imagination(self, states_t, epsilon):
+
+        self.model.eval()
+        self.model_env.eval()
+
         batch_size  = states_t.shape[0]
 
         states_imagined_t      = torch.zeros((self.imagination_rollouts, batch_size, ) + self.state_shape ).to(self.model_env.device)
@@ -258,47 +295,41 @@ class AgentDQNImaginationEntropy():
         for s in range(self.imagination_steps):
             #imagine rollouts
             for r in range(self.imagination_rollouts):
-
-                _, action_one_hot_t     = self._sample_action(states_imagined_t[r], epsilon)
-                states_imagined_next_t  = self.model_env(states_imagined_t[r], action_one_hot_t)
+                _, action_t             = self._sample_action(states_imagined_t[r], epsilon)
+                states_imagined_next_t  = self.model_env(states_imagined_t[r], action_t)
                 states_imagined_t[r]    = states_imagined_next_t.clone()
-        
 
-        #swap axis, target ordering : batch rollout state
+        #swap axis (batch first) : batch rollout state
         states_imagined_t = states_imagined_t.transpose(1, 0)
+
+
+        self.model.train()
+        self.model_env.train()
 
         return states_imagined_t
 
 
-    def _compute_entropy(self, states_t, eps = 0.001):
+    def _compute_entropy(self, states_t, states_initial_t):
         batch_size  = states_t.shape[0]
-
         result      = torch.zeros(batch_size).to(self.model_env.device)
-        
+
         for b in range(batch_size):
-            v           = torch.var(states_t[b], dim = 0)
-            vt          = v[v > eps]
- 
-            if vt.size()[0] > 0: 
-                result[b]   = vt.mean()
- 
+            s_dif       = states_t[b] - states_initial_t[b]
+            
+            result[b]   = torch.std(s_dif.view(s_dif.size(0), -1), dim=0).mean()
+
         return result
-    
-    def _one_hot_encoding(self, input):
-        size = len(input)
-        result = torch.zeros((size, self.actions_count))
+
+
+    def intrinsics_motivation(self, state_t, action_t, state_next_t, state_predicted_t):
         
-        result[range(size), input] = 1.0
+        #compute imagined states, use state_t as initial state
+        states_imagined_t   = self._process_imagination(state_t, self.epsilon)
         
-        return result.to(self.model.device)
-
-  
-
-    def save(self, save_path):
-        self.model.save(save_path)
-        self.model_env.save(save_path)
-
-    def load(self, save_path):
-        self.model.load(save_path)
-        self.model_env.load(save_path)
-    
+        #compute entropy of imagined states
+        im_entropy           = self._compute_entropy(states_imagined_t.detach(), state_t)
+       
+        #compute curiosity
+        im_curiosity         = ((state_next_t - state_predicted_t)**2).mean(dim = 1).detach()
+        
+        return im_entropy, im_curiosity
