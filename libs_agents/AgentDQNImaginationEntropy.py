@@ -51,6 +51,12 @@ class AgentDQNImaginationEntropy():
         self.iterations     = 0
         self.enable_training()
 
+        self.env_loss       = 0.0
+        self.im_entropy     = 0.0
+        self.im_curiosity   = 0.0
+        self.intrinsics_motivation_t = 0.0
+
+
     def enable_training(self):
         self.enabled_training = True
 
@@ -134,11 +140,13 @@ class AgentDQNImaginationEntropy():
         return result
 
 
-    def _show_entropy_activity(self, state_t):
-        if self.iterations%10 != 0:
-            return
+    def _show_entropy_activity(self, state_t, size = 256):
+        if self.iterations%50 != 0:
+            return 
 
-        size                = 400
+        state_np  = state_t[0][0].detach().to("cpu").numpy()
+        state_np  = cv2.resize(state_np, (size, size), interpolation = cv2.INTER_AREA)
+
         states_imagined_t   = self._process_imagination(state_t, self.epsilon).squeeze(0)
 
         states_dif_t        = state_t.squeeze(0) - states_imagined_t
@@ -147,53 +155,24 @@ class AgentDQNImaginationEntropy():
         
 
         states_imagined_np  = self._tensor_to_numpy(states_imagined_t)
+        states_imagined_np  = cv2.resize(states_imagined_np, (size, size), interpolation = cv2.INTER_AREA)
+
         states_dif_np       = self._tensor_to_numpy(states_dif_t**2)
+        states_dif_np       = cv2.resize(states_dif_np, (size, size), interpolation = cv2.INTER_AREA)
         
         entropy_np          = entropy_t.detach().to("cpu").numpy()
         k = 1.0/(entropy_np.max() - entropy_np.min())
         q = 1.0 - k*entropy_np.max()   
         entropy_np = k*entropy_np + q
 
-        cv2.imshow('states_imagined_np', entropy_np)
+        entropy_np = cv2.resize(entropy_np, (size, size), interpolation = cv2.INTER_AREA)
+
+
+        image   =  numpy.hstack((state_np, states_dif_np, entropy_np))
+
+        cv2.imshow('states_imagined_np', image)
         cv2.waitKey(1)
        
-        print(">>>> ", states_imagined_t.shape, states_imagined_np.shape, entropy_t.shape)
-        pass
-        '''
-        size            = 400
-
-        action_t        = torch.zeros(1,  dtype=int)
-        action_t[0]     = action
-
-        state_t              = torch.from_numpy(state).unsqueeze(dim=0).to(self.model_env.device)
-        action_one_hot_t     = self._one_hot_encoding(action_t)
-        state_prediction     = self.model_env(state_t, action_one_hot_t).squeeze().detach().to("cpu").numpy()
-
-      
-        space   = numpy.zeros((state.shape[1], 4)) 
-        
-        dif     =  (state_next - state_prediction)**2
-        dif     =  (dif - dif.min())/(dif.max() - dif.min())
-
-
-        image   =  numpy.hstack((state[0], space, state_prediction[0], space, dif[0]))
-
-        image = cv2.resize(image, (3*size, size), interpolation = cv2.INTER_AREA)
-
-
-        font                   = cv2.FONT_HERSHEY_SIMPLEX
-
-
-        cv2.putText(image,'state', (10 + 0*size, int(size*0.98)), font, 1, (255,255,255), 2)
-
-        cv2.putText(image,'prediction', (10 + 1*size, int(size*0.98)), font, 1, (255,255,255), 2)
-
-        cv2.putText(image,'error', (10 + 2*size, int(size*0.98)), font, 1, (255,255,255), 2)
-
-
-        cv2.imshow('curiosity activity', image)
-        cv2.waitKey(1)
-        '''
         
     def train_model(self):
         state_t, action_t, reward_t, state_next_t, done_t = self.experience_replay.sample(self.batch_size, self.model.device)
@@ -214,8 +193,12 @@ class AgentDQNImaginationEntropy():
 
 
         im_entropy, im_curiosity = self.intrinsics_motivation(state_t, action_t, state_next_t, state_predicted_t)
-
         intrinsics_motivation_t = self.entropy_beta*im_entropy + self.curiosity_beta*im_curiosity
+
+        self.env_loss       = env_loss.mean().detach().to("cpu").numpy()
+        self.im_entropy     = im_entropy.mean().detach().to("cpu").numpy()
+        self.im_curiosity   = im_curiosity.mean().detach().to("cpu").numpy()
+        self.intrinsics_motivation_t = intrinsics_motivation_t.mean().detach().to("cpu").numpy()
 
         #q values, state now, state next
         q_predicted      = self.model.forward(state_t)
@@ -320,8 +303,25 @@ class AgentDQNImaginationEntropy():
 
         return result
 
+    def _one_hot_encoding(self, action_t):
+        batch_size  = action_t.shape[0]
+        action_one_hot_t = torch.zeros((batch_size, self.actions_count)).to(self.model.device)
+         
+        for b in range(batch_size):
+            action_one_hot_t[b][action_t[b]] = 1.0
 
-    def intrinsics_motivation(self, state_t, action_t, state_next_t, state_predicted_t):
+        return action_one_hot_t
+
+    def get_log(self):
+        result = ""
+        result+= str(self.env_loss) + " "
+        result+= str(self.im_entropy) + " "
+        result+= str(self.im_curiosity) + " "
+        result+= str(self.intrinsics_motivation_t) + " "
+
+        return result
+
+    def intrinsics_motivation(self, state_t, action_t, state_next_t, state_predicted_t, curiosity_threshold = 0.1):
         
         #compute imagined states, use state_t as initial state
         states_imagined_t   = self._process_imagination(state_t, self.epsilon)
@@ -330,6 +330,8 @@ class AgentDQNImaginationEntropy():
         im_entropy           = self._compute_entropy(states_imagined_t.detach(), state_t)
        
         #compute curiosity
-        im_curiosity         = ((state_next_t - state_predicted_t)**2).mean(dim = 1).detach()
+        im_curiosity        = ((state_next_t - state_predicted_t)**2).detach()
+        im_curiosity        = im_curiosity.view(im_curiosity.size(0), -1)     
+        im_curiosity        = im_curiosity.mean(dim = 1)
         
         return im_entropy, im_curiosity

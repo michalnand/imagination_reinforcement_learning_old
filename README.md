@@ -70,15 +70,15 @@ pacman with curiosity - forward model for state prediction used
 
 
 # dependences
-cmake python3 pip3 swig
+cmake python3 python3-pip
 
 **basic python libs**
-pip3 install numpy matplotlib torch pillow opencv-python 
+pip3 install numpy matplotlib torch torchviz pillow opencv-python networkx
 
 **graph neural networks**
 when CPU only :
 
-pip3 install networkx torch_geometric torch_sparse torch_scatter
+pip3 install torch_geometric torch_sparse torch_scatter
 
 
 for CUDA different packages are reuired :

@@ -32,7 +32,7 @@ class TrainingLog:
             f = open(self.file_name,"w+")
             f.close()
 
-    def add(self, reward, done, raw_episodes = 0, raw_score_total = 0, raw_score_per_episode = 0):
+    def add(self, reward, done, raw_episodes = 0, raw_score_total = 0, raw_score_per_episode = 0, extra_stats=""):
 
         self.total_score+= reward
         self.episode_score_sum+= reward
@@ -79,6 +79,7 @@ class TrainingLog:
             log_str+= str(int(raw_episodes)) + " "
             log_str+= str(round(raw_score_total, 4)) + " "
             log_str+= str(round(raw_score_per_episode, 4)) + " "
+            log_ste+= extra_stats
 
             print(log_str)
 

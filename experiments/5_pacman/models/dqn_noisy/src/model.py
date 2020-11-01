@@ -19,13 +19,11 @@ class ResidualBlock(torch.nn.Module):
         self.layers = [] 
         
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit())
         self.layers.append(nn.ReLU())
         self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(libs_layers.SkipInit())
 
         torch.nn.init.xavier_uniform_(self.layers[0].weight)
-        torch.nn.init.xavier_uniform_(self.layers[3].weight)
+        torch.nn.init.xavier_uniform_(self.layers[2].weight)
 
         self.model = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
@@ -61,7 +59,6 @@ class Model(torch.nn.Module):
             k_out = kernels_count_[k+1]
 
             self.layers_features.append(nn.Conv2d(k_in, k_out, kernel_size=3, stride=1, padding=1))
-            #self.layers_features.append(libs_layers.SkipInit())
             self.layers_features.append(nn.ReLU())
             
             for i in range(residual_count[k]):
@@ -179,3 +176,10 @@ if __name__ == "__main__":
 
     print(q_values.shape)
 
+
+
+
+
+
+WRONG   : q = value + advantage - advantage.mean()
+CORRECT : a = value + advantage - advantage.mean(dim=1, keepdim=True)

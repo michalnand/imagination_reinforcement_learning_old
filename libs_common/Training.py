@@ -39,8 +39,11 @@ class TrainingEpisodes:
                 if hasattr(self.env, "raw_score_per_episode"):
                     raw_score_per_episode = self.env.raw_score_per_episode
 
-                
-                log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode)
+                log_agent = ""
+                if hasattr(self.agent, "get_log"):
+                    log_agent = self.agent.get_log() 
+
+                log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode, log_agent)
 
                 if self.save_best_only == False:
                     new_best = True
@@ -77,7 +80,6 @@ class TrainingIterations:
         self.save_best_only = save_best_only
 
     def run(self):
-        
         log = TrainingLog(self.saving_path + "result/result.log", self.saving_period_iterations, True)
         new_best = False
 
@@ -97,8 +99,11 @@ class TrainingIterations:
             if hasattr(self.env, "raw_score_per_episode"):
                 raw_score_per_episode = self.env.raw_score_per_episode
 
-            
-            log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode)
+            log_agent = ""
+            if hasattr(self.agent, "get_log"):
+                log_agent = self.agent.get_log() 
+
+            log.add(reward, done, raw_episodes, raw_score_total, raw_score_per_episode, log_agent)
 
             
             if self.save_best_only == False:
