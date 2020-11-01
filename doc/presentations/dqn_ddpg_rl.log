@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  1 NOV 2020 20:17
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  1 NOV 2020 20:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1585,20 +1585,16 @@ ut line 216.
  [8
 
  <../diagrams/basic/deepqlearningdetail.png>]
-<../diagrams/architectures/duelingdqn.png, id=137, 2059.695pt x 626.34pt>
-File: ../diagrams/architectures/duelingdqn.png Graphic file (type png)
-<use ../diagrams/architectures/duelingdqn.png>
-Package pdftex.def Info: ../diagrams/architectures/duelingdqn.png  used on inpu
-t line 233.
-(pdftex.def)             Requested size: 308.94092pt x 93.94695pt.
+<../diagrams/architectures/dqnbasic.png, id=137, 2019.545pt x 463.7325pt>
+File: ../diagrams/architectures/dqnbasic.png Graphic file (type png)
+<use ../diagrams/architectures/dqnbasic.png>
+Package pdftex.def Info: ../diagrams/architectures/dqnbasic.png  used on input 
+line 233.
+(pdftex.def)             Requested size: 302.91869pt x 69.55687pt.
+ [9
 
-Overfull \hbox (1.65105pt too wide) in paragraph at lines 233--233
-[][]  
- []
-
-[9
-
- <../diagrams/architectures/duelingdqn.png>]
+ <../diagrams/architectures/dqnbasic.png>]
+<../diagrams/architectures/duelingdqn.png, id=162, 2059.695pt x 626.34pt>
 File: ../diagrams/architectures/duelingdqn.png Graphic file (type png)
 <use ../diagrams/architectures/duelingdqn.png>
 Package pdftex.def Info: ../diagrams/architectures/duelingdqn.png  used on inpu
@@ -1609,7 +1605,7 @@ Overfull \hbox (1.65105pt too wide) in paragraph at lines 247--247
 [][]  
  []
 
-<../images/dueling_dqn_code.png, id=162, 606.265pt x 69.25874pt>
+<../images/dueling_dqn_code.png, id=163, 606.265pt x 69.25874pt>
 File: ../images/dueling_dqn_code.png Graphic file (type png)
 <use ../images/dueling_dqn_code.png>
 Package pdftex.def Info: ../images/dueling_dqn_code.png  used on input line 247
@@ -1617,15 +1613,15 @@ Package pdftex.def Info: ../images/dueling_dqn_code.png  used on input line 247
 (pdftex.def)             Requested size: 303.13176pt x 34.62927pt.
 [10
 
- <../images/dueling_dqn_code.png>]
-<../diagrams/architectures/noisylayerbasic.png, id=173, 1001.7425pt x 560.0925p
+ <../diagrams/architectures/duelingdqn.png> <../images/dueling_dqn_code.png>]
+<../diagrams/architectures/noisylayerbasic.png, id=175, 1001.7425pt x 560.0925p
 t>
 File: ../diagrams/architectures/noisylayerbasic.png Graphic file (type png)
 <use ../diagrams/architectures/noisylayerbasic.png>
 Package pdftex.def Info: ../diagrams/architectures/noisylayerbasic.png  used on
  input line 261.
 (pdftex.def)             Requested size: 150.25488pt x 84.01024pt.
-<../diagrams/architectures/noisylayerparameter.png, id=174, 1656.1875pt x 441.6
+<../diagrams/architectures/noisylayerparameter.png, id=176, 1656.1875pt x 441.6
 5pt>
 File: ../diagrams/architectures/noisylayerparameter.png Graphic file (type png)
 
@@ -1639,7 +1635,7 @@ d on input line 261.
 sylayerparameter.png>] [12
 
 ]
-<../images/me.jpg, id=208, 1606.0pt x 1606.0pt>
+<../images/me.jpg, id=210, 1606.0pt x 1606.0pt>
 File: ../images/me.jpg Graphic file (type jpg)
 <use ../images/me.jpg>
 Package pdftex.def Info: ../images/me.jpg  used on input line 288.
@@ -1677,10 +1673,10 @@ Package rerunfilecheck Info: File `dqn_ddpg_rl.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 35289 strings out of 492616
- 668283 string characters out of 6129482
+ 35294 strings out of 492616
+ 668466 string characters out of 6129482
  882773 words of memory out of 5000000
- 38548 multiletter control sequences out of 15000+600000
+ 38552 multiletter control sequences out of 15000+600000
  579004 words of font info for 56 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,15n,70p,802b,781s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1700,10 +1696,10 @@ lm/lmsso8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy10.
 pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/l
 ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texliv
 e/2019/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on dqn_ddpg_rl.pdf (13 pages, 4135083 bytes).
+Output written on dqn_ddpg_rl.pdf (13 pages, 4164419 bytes).
 PDF statistics:
- 277 PDF objects out of 1000 (max. 8388607)
+ 279 PDF objects out of 1000 (max. 8388607)
  180 compressed objects within 2 object streams
  27 named destinations out of 1000 (max. 500000)
- 328 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 333 words of extra memory for PDF output out of 10000 (max. 10000000)
 
