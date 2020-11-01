@@ -262,6 +262,64 @@
 
 
 
+\begin{frame}{\bf results on MsPacman}
+
+\centering{\includegraphics[scale=0.5]{../../experiments/5_pacman/results/score_per_episode.png}}
+
+\end{frame}
+
+
+\begin{frame}{\bf DDPG}
+
+  {\bf deep deterministic policy gradietnt}
+
+  \begin{itemize}
+    \item continuous action space
+    \item natural extension of DQN
+    \item actor-critic structure
+  \end{itemize}
+
+  {\centering \includegraphics[scale=0.15]{../diagrams/basic/ddpgnetwork.png}}
+
+\end{frame}
+
+
+
+
+\begin{frame}{\bf DDPG}
+
+  {\centering \includegraphics[scale=0.12]{../diagrams/basic/ddpgtraining.png}}
+
+\end{frame}
+
+
+\begin{frame}{\bf DDPG}
+
+  {\centering \includegraphics[scale=0.08]{../diagrams/basic/ddpgtraining.png}}
+
+  \begin{align*}
+    \mathcal{L(\theta)} &= \left( R + \gamma Q(s', A(s'; \phi^-); \theta^-) - Q(s, A(s; \phi); \theta)  \right)^2 \\
+    \mathcal{L(\phi)} &= -Q(s, A(s; \phi); \theta)
+  \end{align*}
+
+  where
+  \begin{itemize}
+    \item $Q$ is critic network with parameters $\theta$
+    \item $A$ is actor network with parameters $\phi$
+  \end{itemize}
+  
+\end{frame}
+
+
+\begin{frame}{\bf model architecture}
+
+  {\centering \includegraphics[scale=0.12]{../diagrams/architectures/ddpgbasic.png}}
+  {\centering \includegraphics[scale=0.12]{../diagrams/architectures/ddpgexploration.png}}
+
+\end{frame}
+
+
+
 \begin{frame}{\bf books to read}
 
 \begin{itemize}
