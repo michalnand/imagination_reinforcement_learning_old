@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  1 NOV 2020 19:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  1 NOV 2020 20:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1700,7 +1700,7 @@ lm/lmsso8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy10.
 pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/l
 ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texliv
 e/2019/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on dqn_ddpg_rl.pdf (13 pages, 4135178 bytes).
+Output written on dqn_ddpg_rl.pdf (13 pages, 4135083 bytes).
 PDF statistics:
  277 PDF objects out of 1000 (max. 8388607)
  180 compressed objects within 2 object streams
