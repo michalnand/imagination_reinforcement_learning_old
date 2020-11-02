@@ -123,13 +123,13 @@
   \begin{columns}
 
     \begin{column}{0.5\textwidth}
-      {\centering \includegraphics[scale=0.2]{../images/ant.png}}
-      {\centering \includegraphics[scale=0.1]{../images/sac_car.jpg}}
+      \centering{\includegraphics[scale=0.2]{../images/ant.png}}
+      \centering{\includegraphics[scale=0.1]{../images/sac_car.jpg}}
     \end{column}
 
     \begin{column}{0.5\textwidth}
-      {\centering \includegraphics[scale=0.03]{../images/go.jpg}}
-      {\centering \includegraphics[scale=0.1]{../images/sac_minitaur.jpg}}
+      \centering{\includegraphics[scale=0.03]{../images/go.jpg}}
+      \centering{\includegraphics[scale=0.1]{../images/sac_minitaur.jpg}}
     \end{column}
 
 
@@ -138,10 +138,13 @@
 \end{frame}
 
 
+
+
+
 \begin{frame}{\bf reinforcement learning}
 
   {\bf learning from punishments and rewards \\}
-  {\centering \includegraphics[scale=0.2]{../diagrams/basic/reinforcementlearning.png}}
+  \centering{\includegraphics[scale=0.2]{../diagrams/basic/reinforcementlearning.png}}
 
 \end{frame}
 
@@ -151,7 +154,7 @@
   \begin{columns}
 
     \begin{column}{0.5\textwidth}
-      {\centering \includegraphics[scale=0.15]{../diagrams/basic/reinforcementlearning.png}}
+      \centering{\includegraphics[scale=0.15]{../diagrams/basic/reinforcementlearning.png}}
     \end{column}
 
     \begin{column}{0.5\textwidth}
@@ -168,6 +171,43 @@
 \end{frame}
 
 
+\begin{frame}{\bf reinforcement learning - algorithms}
+   \begin{itemize}
+    \item discrete actions space
+
+        \begin{itemize}
+          \item Deep Q-network, DQN
+          \item Dueling DQN
+          \item Reinbow DQN
+        \end{itemize}
+
+    \item continuous actions space
+    
+        \begin{itemize}
+          \item Actor Critic
+          \item Advantage Actor Critic
+          \item Proximal policy optimization
+          \item Soft Actor critic
+          \item Deep deterministc policy gradient
+          \item D4PG, SDDPG
+        \end{itemize}
+
+    \item model based
+    
+        \begin{itemize}
+          \item curiosity
+          \item world models
+          \item imagination agents
+        \end{itemize}
+
+  \end{itemize}
+
+  f.e. SDDPG - sampled DDPG, based on Wasserstein loss : Optimal transport, Cédric Villani, 600+ pages
+
+\end{frame}
+
+
+
 \begin{frame}{\bf action space}
 
   \begin{itemize}
@@ -177,14 +217,14 @@
       - motors, PWMs, steering, force controll
   \end{itemize}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/basic/actionspace.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/basic/actionspace.png}}
 
 \end{frame}
 
 
 \begin{frame}{\bf deep Q learning}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/basic/deepqnetwork.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/basic/deepqnetwork.png}}
 
   \begin{enumerate}
     \item play games
@@ -197,14 +237,14 @@
 
 \begin{frame}{\bf deep Q learning}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/basic/deepqlearning.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/basic/deepqlearning.png}}
 
 \end{frame}
 
 
 \begin{frame}{\bf deep Q learning}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/basic/deepqlearningdetail.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/basic/deepqlearningdetail.png}}
 
   \begin{align*}
     Q(s, a; \theta) = \underset{\textcolor{cyan}{reward}}{R} + \underset{\textcolor{OrangeRed}{discounted\ future\ reward}}{\gamma \max \limits_{a'} Q(s', a'; \theta^-)}
@@ -218,7 +258,7 @@
 
 \begin{frame}{\bf model architecture}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/architectures/dqnbasic.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/architectures/dqnbasic.png}}
 
   \begin{itemize}
     \item input 96x96 grayscale, 4 stacked frames
@@ -235,7 +275,7 @@
 
 \begin{frame}{\bf dueling DQN, model architecture}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/architectures/duelingdqn.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/architectures/duelingdqn.png}}
 
   \begin{align*}
     Q(s, a) &= V(s) + A(s, a) \\
@@ -269,6 +309,21 @@
 \end{frame}
 
 
+\begin{frame}{\bf wise Wizard's DQN spell chart}
+  \begin{itemize}
+    \item use {\bf \color{red} input} with nice size $k2^j$, 64, 96, 128 ...
+    \item {\bf \color{red} conv layers} use 3x3 convs, poolings or strides > 1
+    \item for {\bf \color{red} weight init} use Xavier
+    \item {\bf \color{red} dont use} batchnorm (use SkipInit - not tested yet),
+    \item {\bf \color{red} dont use} weight regularisation
+    \item use {\bf \color{red} soft} target network update, $\tau = 0.001$
+    \item slow learning rate $\eta = 0.0001$ works better
+    \item for exploration use $\epsilon$-greedy decay from 1.0 to 0.05 in 1M steps, or use noisy layers
+  \end{itemize}
+\end{frame}
+
+
+
 \begin{frame}{\bf DDPG}
 
   {\bf deep deterministic policy gradietnt}
@@ -279,7 +334,7 @@
     \item actor-critic structure
   \end{itemize}
 
-  {\centering \includegraphics[scale=0.15]{../diagrams/basic/ddpgnetwork.png}}
+  \centering{\includegraphics[scale=0.15]{../diagrams/basic/ddpgnetwork.png}}
 
 \end{frame}
 
@@ -288,14 +343,14 @@
 
 \begin{frame}{\bf DDPG}
 
-  {\centering \includegraphics[scale=0.12]{../diagrams/basic/ddpgtraining.png}}
+  \centering{\includegraphics[scale=0.12]{../diagrams/basic/ddpgtraining.png}}
 
 \end{frame}
 
 
 \begin{frame}{\bf DDPG}
 
-  {\centering \includegraphics[scale=0.08]{../diagrams/basic/ddpgtraining.png}}
+  \centering{\includegraphics[scale=0.08]{../diagrams/basic/ddpgtraining.png}}
 
   \begin{align*}
     \mathcal{L(\theta)} &= \left( R + \gamma Q(s', A(s'; \phi^-); \theta^-) - Q(s, A(s; \phi); \theta)  \right)^2 \\
@@ -313,8 +368,47 @@
 
 \begin{frame}{\bf model architecture}
 
-  {\centering \includegraphics[scale=0.12]{../diagrams/architectures/ddpgbasic.png}}
-  {\centering \includegraphics[scale=0.12]{../diagrams/architectures/ddpgexploration.png}}
+  \centering{\includegraphics[scale=0.12]{../diagrams/architectures/ddpgbasic.png}}
+  \centering{\includegraphics[scale=0.12]{../diagrams/architectures/ddpgexploration.png}}
+
+\end{frame}
+
+
+\begin{frame}{\bf wise Wizard's DDPG spell chart}
+  \begin{itemize}
+    \item {\bf \color{red} neurons count} on 1st layer = 10x  state vector size
+    \item {\bf \color{red} neurons count} on 2nd layer = 0.5x neurons on 1st layer
+    \item {\bf \color{red} weight init} for hidden layers : use Xavier
+    \item {\bf \color{red} weight init} actor output  : use uniform $\langle -0.3, 0.3 \rangle$
+    \item {\bf \color{red} weight init} critic output : use uniform $\langle -0.003, 0.003 \rangle$
+    \item {\bf \color{red} gaussian noise} : linear decay variance, from 0.5 to 0.1, for 1M steps, or noisy layers
+    \item use {\bf \color{red} soft} target network update, $\tau = 0.001$
+    \item actor learning rate $\eta_a = 0.0001$
+    \item critic learning rate $\eta_c = 0.0002$
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{\bf wise Wizard's magic staff}
+
+  \begin{columns}
+
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item fully connected nets (robotic envs) {\bf \color{red} train on CPU} - AMD Ryzen
+        \item convolutional nets (visual inputs envs) {\bf \color{red} train on GPU}
+        \item use fast CPU - envs are slow
+        \item 32GB of RAM is enough
+        \item for small visual envs (Atari, DOOM, Nec) - GTX1060, GTX1080ti, RTX2080 ...
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      {\centering \includegraphics[scale=0.1]{../images/computer.jpg}}
+    \end{column}
+
+  \end{columns}
+
 
 \end{frame}
 
@@ -336,7 +430,7 @@
 
 \begin{frame}{\bf Q\&A}
 
-{\centering \includegraphics[scale=0.1]{../images/me.jpg}}
+\centering{\includegraphics[scale=0.1]{../images/me.jpg}}
 
 \url{michal.nand@gmail.com}
 

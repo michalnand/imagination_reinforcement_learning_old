@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  1 NOV 2020 22:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2020.3.3)  2 NOV 2020 09:15
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1531,7 +1531,7 @@ minitaur.jpg>]
 File: ../diagrams/basic/reinforcementlearning.png Graphic file (type png)
 <use ../diagrams/basic/reinforcementlearning.png>
 Package pdftex.def Info: ../diagrams/basic/reinforcementlearning.png  used on i
-nput line 146.
+nput line 149.
 (pdftex.def)             Requested size: 203.1554pt x 181.07329pt.
  [3
 
@@ -1539,167 +1539,186 @@ nput line 146.
 File: ../diagrams/basic/reinforcementlearning.png Graphic file (type png)
 <use ../diagrams/basic/reinforcementlearning.png>
 Package pdftex.def Info: ../diagrams/basic/reinforcementlearning.png  used on i
-nput line 168.
+nput line 171.
 (pdftex.def)             Requested size: 152.36267pt x 135.80151pt.
  [4
 
+] [5
+
 ]
-<../diagrams/basic/actionspace.png, id=78, 2007.5pt x 1027.84pt>
+<../diagrams/basic/actionspace.png, id=117, 2007.5pt x 1027.84pt>
 File: ../diagrams/basic/actionspace.png Graphic file (type png)
 <use ../diagrams/basic/actionspace.png>
 Package pdftex.def Info: ../diagrams/basic/actionspace.png  used on input line 
-182.
+222.
 (pdftex.def)             Requested size: 301.11201pt x 154.16934pt.
- [5
+ [6
 
  <../diagrams/basic/actionspace.png>]
-<../diagrams/basic/deepqnetwork.png, id=89, 1585.925pt x 853.1875pt>
+<../diagrams/basic/deepqnetwork.png, id=128, 1585.925pt x 853.1875pt>
 File: ../diagrams/basic/deepqnetwork.png Graphic file (type png)
 <use ../diagrams/basic/deepqnetwork.png>
 Package pdftex.def Info: ../diagrams/basic/deepqnetwork.png  used on input line
- 195.
+ 235.
 (pdftex.def)             Requested size: 237.87848pt x 127.9726pt.
- [6
+ [7
 
  <../diagrams/basic/deepqnetwork.png>]
-<../diagrams/basic/deepqlearning.png, id=106, 2099.845pt x 1509.64pt>
+<../diagrams/basic/deepqlearning.png, id=146, 2099.845pt x 1509.64pt>
 File: ../diagrams/basic/deepqlearning.png Graphic file (type png)
 <use ../diagrams/basic/deepqlearning.png>
 Package pdftex.def Info: ../diagrams/basic/deepqlearning.png  used on input lin
-e 202.
+e 242.
 (pdftex.def)             Requested size: 314.96317pt x 226.43623pt.
 
-Overfull \hbox (7.6733pt too wide) in paragraph at lines 202--202
-[][]  
+Overfull \hbox (7.6733pt too wide) in paragraph at lines 242--242
+ [][] 
  []
 
-[7
+[8
 
  <../diagrams/basic/deepqlearning.png>]
-<../diagrams/basic/deepqlearningdetail.png, id=118, 1601.985pt x 871.255pt>
+<../diagrams/basic/deepqlearningdetail.png, id=157, 1601.985pt x 871.255pt>
 File: ../diagrams/basic/deepqlearningdetail.png Graphic file (type png)
 <use ../diagrams/basic/deepqlearningdetail.png>
 Package pdftex.def Info: ../diagrams/basic/deepqlearningdetail.png  used on inp
-ut line 216.
+ut line 256.
 (pdftex.def)             Requested size: 240.28738pt x 130.6826pt.
- [8
+ [9
 
  <../diagrams/basic/deepqlearningdetail.png>]
-<../diagrams/architectures/dqnbasic.png, id=137, 2019.545pt x 463.7325pt>
+<../diagrams/architectures/dqnbasic.png, id=176, 2019.545pt x 463.7325pt>
 File: ../diagrams/architectures/dqnbasic.png Graphic file (type png)
 <use ../diagrams/architectures/dqnbasic.png>
 Package pdftex.def Info: ../diagrams/architectures/dqnbasic.png  used on input 
-line 233.
+line 273.
 (pdftex.def)             Requested size: 302.91869pt x 69.55687pt.
- [9
+ [10
 
  <../diagrams/architectures/dqnbasic.png>]
-<../diagrams/architectures/duelingdqn.png, id=162, 2059.695pt x 626.34pt>
+<../diagrams/architectures/duelingdqn.png, id=202, 2059.695pt x 626.34pt>
 File: ../diagrams/architectures/duelingdqn.png Graphic file (type png)
 <use ../diagrams/architectures/duelingdqn.png>
 Package pdftex.def Info: ../diagrams/architectures/duelingdqn.png  used on inpu
-t line 247.
+t line 287.
 (pdftex.def)             Requested size: 308.94092pt x 93.94695pt.
 
-Overfull \hbox (1.65105pt too wide) in paragraph at lines 247--247
-[][]  
+Overfull \hbox (1.65105pt too wide) in paragraph at lines 287--287
+ [][] 
  []
 
-<../images/dueling_dqn_code.png, id=163, 606.265pt x 69.25874pt>
+<../images/dueling_dqn_code.png, id=203, 606.265pt x 69.25874pt>
 File: ../images/dueling_dqn_code.png Graphic file (type png)
 <use ../images/dueling_dqn_code.png>
-Package pdftex.def Info: ../images/dueling_dqn_code.png  used on input line 247
+Package pdftex.def Info: ../images/dueling_dqn_code.png  used on input line 287
 .
 (pdftex.def)             Requested size: 303.13176pt x 34.62927pt.
-[10
+[11
 
  <../diagrams/architectures/duelingdqn.png> <../images/dueling_dqn_code.png>]
-<../diagrams/architectures/noisylayerbasic.png, id=175, 1001.7425pt x 560.0925p
+<../diagrams/architectures/noisylayerbasic.png, id=215, 1001.7425pt x 560.0925p
 t>
 File: ../diagrams/architectures/noisylayerbasic.png Graphic file (type png)
 <use ../diagrams/architectures/noisylayerbasic.png>
 Package pdftex.def Info: ../diagrams/architectures/noisylayerbasic.png  used on
- input line 261.
+ input line 301.
 (pdftex.def)             Requested size: 150.25488pt x 84.01024pt.
-<../diagrams/architectures/noisylayerparameter.png, id=176, 1656.1875pt x 441.6
+<../diagrams/architectures/noisylayerparameter.png, id=216, 1656.1875pt x 441.6
 5pt>
 File: ../diagrams/architectures/noisylayerparameter.png Graphic file (type png)
 
 <use ../diagrams/architectures/noisylayerparameter.png>
 Package pdftex.def Info: ../diagrams/architectures/noisylayerparameter.png  use
-d on input line 261.
+d on input line 301.
 (pdftex.def)             Requested size: 248.4174pt x 66.24463pt.
- [11
+ [12
 
  <../diagrams/architectures/noisylayerbasic.png> <../diagrams/architectures/noi
 sylayerparameter.png>]
-<../../experiments/5_pacman/results/score_per_episode.png, id=188, 462.528pt x 
+<../../experiments/5_pacman/results/score_per_episode.png, id=228, 462.528pt x 
 346.896pt>
 File: ../../experiments/5_pacman/results/score_per_episode.png Graphic file (ty
 pe png)
 <use ../../experiments/5_pacman/results/score_per_episode.png>
 Package pdftex.def Info: ../../experiments/5_pacman/results/score_per_episode.p
-ng  used on input line 269.
+ng  used on input line 309.
 (pdftex.def)             Requested size: 231.26343pt x 173.44757pt.
- [12
+ [13
 
- <../../experiments/5_pacman/results/score_per_episode.png>]
-<../diagrams/basic/ddpgnetwork.png, id=206, 1515.6625pt x 668.4975pt>
+ <../../experiments/5_pacman/results/score_per_episode.png>] [14
+
+]
+<../diagrams/basic/ddpgnetwork.png, id=271, 1515.6625pt x 668.4975pt>
 File: ../diagrams/basic/ddpgnetwork.png Graphic file (type png)
 <use ../diagrams/basic/ddpgnetwork.png>
 Package pdftex.def Info: ../diagrams/basic/ddpgnetwork.png  used on input line 
-284.
+339.
 (pdftex.def)             Requested size: 227.33957pt x 100.2703pt.
- [13
+ [15
 
  <../diagrams/basic/ddpgnetwork.png>]
-<../diagrams/basic/ddpgtraining.png, id=218, 2270.4825pt x 1250.6725pt>
+<../diagrams/basic/ddpgtraining.png, id=282, 2270.4825pt x 1250.6725pt>
 File: ../diagrams/basic/ddpgtraining.png Graphic file (type png)
 <use ../diagrams/basic/ddpgtraining.png>
 Package pdftex.def Info: ../diagrams/basic/ddpgtraining.png  used on input line
- 293.
+ 348.
 (pdftex.def)             Requested size: 272.44614pt x 150.07422pt.
- [14
+ [16
 
  <../diagrams/basic/ddpgtraining.png>]
 File: ../diagrams/basic/ddpgtraining.png Graphic file (type png)
 <use ../diagrams/basic/ddpgtraining.png>
 Package pdftex.def Info: ../diagrams/basic/ddpgtraining.png  used on input line
- 311.
+ 366.
 (pdftex.def)             Requested size: 181.6423pt x 100.05585pt.
- [15
+ [17
 
 ]
-<../diagrams/architectures/ddpgbasic.png, id=242, 1648.1575pt x 620.3175pt>
+<../diagrams/architectures/ddpgbasic.png, id=306, 1648.1575pt x 620.3175pt>
 File: ../diagrams/architectures/ddpgbasic.png Graphic file (type png)
 <use ../diagrams/architectures/ddpgbasic.png>
 Package pdftex.def Info: ../diagrams/architectures/ddpgbasic.png  used on input
- line 319.
+ line 374.
 (pdftex.def)             Requested size: 197.77037pt x 74.43488pt.
-<../diagrams/architectures/ddpgexploration.png, id=243, 1648.1575pt x 798.985pt
+<../diagrams/architectures/ddpgexploration.png, id=307, 1648.1575pt x 798.985pt
 >
 File: ../diagrams/architectures/ddpgexploration.png Graphic file (type png)
 <use ../diagrams/architectures/ddpgexploration.png>
 Package pdftex.def Info: ../diagrams/architectures/ddpgexploration.png  used on
- input line 319.
+ input line 374.
 (pdftex.def)             Requested size: 197.77037pt x 95.87405pt.
- [16
+ [18
 
  <../diagrams/architectures/ddpgbasic.png> <../diagrams/architectures/ddpgexplo
-ration.png>] [17
+ration.png>] [19
 
 ]
-<../images/me.jpg, id=275, 1606.0pt x 1606.0pt>
+<../images/computer.jpg, id=357, 1606.0pt x 1606.0pt>
+File: ../images/computer.jpg Graphic file (type jpg)
+<use ../images/computer.jpg>
+Package pdftex.def Info: ../images/computer.jpg  used on input line 413.
+(pdftex.def)             Requested size: 160.6094pt x 160.6094pt.
+
+Overfull \hbox (6.96448pt too wide) in paragraph at lines 413--413
+[][]  
+ []
+
+[20
+
+ <../images/computer.jpg>] [21
+
+]
+<../images/me.jpg, id=389, 1606.0pt x 1606.0pt>
 File: ../images/me.jpg Graphic file (type jpg)
 <use ../images/me.jpg>
-Package pdftex.def Info: ../images/me.jpg  used on input line 346.
+Package pdftex.def Info: ../images/me.jpg  used on input line 440.
 (pdftex.def)             Requested size: 160.6094pt x 160.6094pt.
-LaTeX Font Info:    Try loading font information for T1+lmtt on input line 346.
+LaTeX Font Info:    Try loading font information for T1+lmtt on input line 440.
 
 
 (/usr/local/texlive/2019/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [18
+) [22
 
  <../images/me.jpg>]
 \tf@nav=\write6
@@ -1718,24 +1737,20 @@ Package movie15 Warning: @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 (movie15)                @@ superseded by `media9'.           @@
 (movie15)                @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 349.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 349.
-(./dqn_ddpg_rl.aux
-
-Package pdfbase Warning: Rerun to get internal references right!
-
-)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 349.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 349.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 443.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 443.
+(./dqn_ddpg_rl.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 443.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 443.
 Package rerunfilecheck Info: File `dqn_ddpg_rl.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 35338 strings out of 492616
- 669667 string characters out of 6129482
- 882773 words of memory out of 5000000
- 38580 multiletter control sequences out of 15000+600000
- 579004 words of font info for 56 fonts, out of 8000000 for 9000
+ 35395 strings out of 492616
+ 670986 string characters out of 6129482
+ 884773 words of memory out of 5000000
+ 38628 multiletter control sequences out of 15000+600000
+ 581774 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  56i,15n,70p,802b,781s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2019/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/usr/local/
@@ -1754,10 +1769,10 @@ lm/lmsso8.pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy10.
 pfb></usr/local/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/l
 ocal/texlive/2019/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texliv
 e/2019/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on dqn_ddpg_rl.pdf (18 pages, 4652705 bytes).
+Output written on dqn_ddpg_rl.pdf (22 pages, 5168028 bytes).
 PDF statistics:
- 349 PDF objects out of 1000 (max. 8388607)
- 224 compressed objects within 3 object streams
- 37 named destinations out of 1000 (max. 500000)
- 418 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 462 PDF objects out of 1000 (max. 8388607)
+ 291 compressed objects within 3 object streams
+ 45 named destinations out of 1000 (max. 500000)
+ 669 words of extra memory for PDF output out of 10000 (max. 10000000)
 
