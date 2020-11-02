@@ -179,7 +179,3 @@ if __name__ == "__main__":
 
 
 
-
-
-WRONG   : q = value + advantage - advantage.mean()
-CORRECT : a = value + advantage - advantage.mean(dim=1, keepdim=True)

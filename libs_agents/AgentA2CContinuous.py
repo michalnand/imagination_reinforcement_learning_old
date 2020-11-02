@@ -138,8 +138,7 @@ class AgentA2CContinuous():
         compute entropy loss, to avoid greedy strategy
         ''' 
         loss_entropy = -0.5*torch.log(2.0*numpy.pi*self.policy_buffer.actions_var_b)
-        loss_entropy = self.entropy_beta*loss_entropy.mean()
-
+        loss_entropy = loss_entropy.mean()
 
 
         loss = loss_value + loss_policy + loss_entropy

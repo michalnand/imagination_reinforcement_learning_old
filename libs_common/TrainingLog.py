@@ -79,7 +79,7 @@ class TrainingLog:
             log_str+= str(int(raw_episodes)) + " "
             log_str+= str(round(raw_score_total, 4)) + " "
             log_str+= str(round(raw_score_per_episode, 4)) + " "
-            log_ste+= extra_stats
+            log_str+= extra_stats
 
             print(log_str)
 

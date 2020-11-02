@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+
 class Model(torch.nn.Module):
     def __init__(self, input_shape, outputs_count, hidden_count = 128):
         super(Model, self).__init__()
@@ -9,26 +10,26 @@ class Model(torch.nn.Module):
         
         self.layers_features = [ 
             nn.Linear(input_shape[0], hidden_count),
-            nn.ReLU()
+            nn.Tanh()
         ]
 
         self.layers_actor_mu  = [
             nn.Linear(hidden_count, hidden_count//2),
-            nn.ReLU(),    
+            nn.Tanh(),    
             nn.Linear(hidden_count//2, outputs_count),
             nn.Tanh()
         ]
 
         self.layers_actor_var  = [
             nn.Linear(hidden_count, hidden_count//2),
-            nn.ReLU(),    
+            nn.Tanh(),    
             nn.Linear(hidden_count//2, outputs_count),
             nn.Softplus()
         ]
-
+ 
         self.layers_critic  = [
             nn.Linear(hidden_count, hidden_count//2),
-            nn.ReLU(),    
+            nn.Tanh(),    
             nn.Linear(hidden_count//2, 1)
         ]           
 
@@ -36,7 +37,7 @@ class Model(torch.nn.Module):
                                    
         torch.nn.init.xavier_uniform_(self.layers_features[0].weight)
         
-        torch.nn.init.xavier_uniform_(self.layers_actor_mu[0].weight)
+        torch.nn.init.uniform_(self.layers_actor_mu[0].weight, -0.01, 0.01)
         torch.nn.init.xavier_uniform_(self.layers_actor_mu[2].weight)
  
         torch.nn.init.xavier_uniform_(self.layers_actor_var[0].weight)
