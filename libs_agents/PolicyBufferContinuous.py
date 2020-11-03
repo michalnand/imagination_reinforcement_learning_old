@@ -68,7 +68,7 @@ class PolicyBufferContinuous:
         if normalise:
             self.rewards_b = (self.rewards_b - self.rewards_b.mean())/(self.rewards_b.std() + 0.00001)
         
-        q = 0.0
+        r = 0.0
         for n in reversed(range(len(self.rewards_b))):
 
             if self.dones_b[n]:
@@ -76,5 +76,5 @@ class PolicyBufferContinuous:
             else:
                 gamma_ = gamma
 
-            q = self.rewards_b[n] + gamma_*q
-            self.returns_b[n] = q
+            r = self.rewards_b[n] + gamma_*r
+            self.returns_b[n] = r

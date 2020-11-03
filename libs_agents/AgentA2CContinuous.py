@@ -12,6 +12,7 @@ class AgentA2CContinuous():
         config = Config.Config()
  
         self.gamma              = config.gamma
+        self.lam                = 0.99
         self.entropy_beta       = config.entropy_beta
         self.batch_size         = config.batch_size
         self.episodes_to_train  = config.episodes_to_train
@@ -100,9 +101,10 @@ class AgentA2CContinuous():
         return result
 
     def _train(self):
-        self.policy_buffer.compute_returns(self.gamma, normalise=False) 
-        
-        loss = self._compute_loss()
+        #
+        #loss = self._compute_loss()
+
+        loss = self._compute_loss_gae()
 
         self.optimizer.zero_grad()        
         loss.backward()
@@ -110,10 +112,80 @@ class AgentA2CContinuous():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step() 
 
-        
+    def _compute_gae_return(self):
+        rewards = self.policy_buffer.rewards_b
+        dones   = self.policy_buffer.dones_b
+        values  = self.policy_buffer.values_b
  
+        batch_size = len(rewards)
 
+        returns_t = torch.zeros((batch_size, 1)).to(self.model.device)
+        gae_t     = torch.zeros((batch_size, 1)).to(self.model.device)
+
+        r   = 0.0
+        gae = 0.0
+        for i in reversed(range(batch_size-1)):
+
+            if dones[i]:
+                gamma_ = 0.0
+            else:
+                gamma_ = self.gamma
+                
+            r = gamma_*r + rewards[i]
+
+            returns_t[i][0] = r
+                
+            # Compute TD-error
+            delta_t = rewards[i] + gamma_ * values[i+1][0] - values[i][0]
+                
+            # Generalized Advantage Estimation
+            gae = gae * gamma_ * self.lam + delta_t
+            gae_t[i][0] = gae
+
+
+        return returns_t.detach(), gae_t.detach()
+
+
+    def _compute_loss_gae(self):
+
+        returns, gae = self._compute_gae_return()
+        
+
+        log_probs   = self._calc_log_prob(self.policy_buffer.actions_mu_b, self.policy_buffer.actions_var_b, self.policy_buffer.actions_b)
+
+        '''
+        compute critic loss, as MSE
+        L = (T - V(s))^2
+        '''
+        loss_value = (returns - self.policy_buffer.values_b)**2
+        loss_value = loss_value.mean()
+
+        '''
+        compute actor loss 
+        L = log(pi(s, a, mu, var))*(T - V(s)) = _calc_log_prob(mu, var, action)*A
+        '''
+        advantage   = (gae - self.policy_buffer.values_b).detach()
+
+        loss_policy = -log_probs*advantage
+        loss_policy = loss_policy.mean()
+
+        '''
+        compute entropy loss, to avoid greedy strategy
+        ''' 
+        loss_entropy = -0.5*torch.log(2.0*numpy.pi*self.policy_buffer.actions_var_b)
+        loss_entropy = loss_entropy.mean()
+
+
+        loss = loss_value + loss_policy + loss_entropy
+
+        return loss
+
+
+
+
+    
     def _compute_loss(self):
+        self.policy_buffer.compute_returns(self.gamma, normalise=False) 
         returns = self.policy_buffer.returns_b.unsqueeze(1)
 
         log_probs   = self._calc_log_prob(self.policy_buffer.actions_mu_b, self.policy_buffer.actions_var_b, self.policy_buffer.actions_b)

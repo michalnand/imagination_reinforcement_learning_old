@@ -25,6 +25,11 @@ class AgentDQN():
             self.soft_update        = False
             self.target_update      = 10000
 
+        if hasattr(config, "priority_buffer"):
+            self.priority_buffer        = True
+        else:        
+            self.priority_buffer        = False
+
         self.update_frequency   = config.update_frequency        
         self.bellman_steps = config.bellman_steps
         
@@ -32,7 +37,7 @@ class AgentDQN():
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
 
-        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
+        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps, self.priority_buffer)
 
         self.model          = Model.Model(self.state_shape, self.actions_count)
         self.model_target   = Model.Model(self.state_shape, self.actions_count)
@@ -136,8 +141,8 @@ class AgentDQN():
             q_target[j][action_idx]   = reward_sum + (gamma_**self.bellman_steps)*torch.max(q_predicted_next[j])
  
         #train DQN model
-        loss = ((q_target.detach() - q_predicted)**2)
-        loss  = loss.mean() 
+        loss_ = ((q_target.detach() - q_predicted)**2)
+        loss  = loss_.mean() 
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -145,29 +150,9 @@ class AgentDQN():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
-    '''
-    def _sample_action(self, state_t, epsilon):
-
-        batch_size = state_t.shape[0]
-
-        q_values_t          = self.model(state_t)
-
-        action_idx_t     = torch.zeros(batch_size).to(self.model.device)
-        action_one_hot_t = torch.zeros((batch_size, self.actions_count)).to(self.model.device)
-
-        #e-greedy strategy
-        for b in range(batch_size):
-            action = torch.argmax(q_values_t[b])
-            if numpy.random.random() < epsilon:
-                action = numpy.random.randint(self.actions_count)
-
-            action_idx_t[b]                 = action
-            action_one_hot_t[b][action]     = 1.0
-        
-        action_idx_np       = action_idx_t.detach().to("cpu").numpy().astype(dtype=int)
-
-        return action_idx_np, action_one_hot_t
-    '''
+        loss_ = loss_.mean(dim=1).detach().to("cpu").numpy()
+        if self.priority_buffer:
+            self.experience_replay.set_loss_for_priority(loss_)
 
     def _sample_action(self, state_t, epsilon):
 

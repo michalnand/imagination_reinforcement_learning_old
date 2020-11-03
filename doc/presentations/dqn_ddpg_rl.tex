@@ -118,6 +118,24 @@
     \end{frame}
 }
 
+
+\begin{frame}{\bf reinforcement learning}
+
+  \begin{columns}
+
+    \begin{column}{0.5\textwidth}
+      \centering{\includegraphics[scale=0.35]{../images/breakout.png}}
+    \end{column}
+
+    \begin{column}{0.5\textwidth}
+      \centering{\includegraphics[scale=0.3]{../images/pacman.png}}
+    \end{column}
+
+
+  \end{columns}
+
+\end{frame}
+
 \begin{frame}{\bf reinforcement learning}
 
   \begin{columns}
@@ -245,6 +263,20 @@
 \begin{frame}{\bf deep Q learning}
 
   \centering{\includegraphics[scale=0.15]{../diagrams/basic/deepqlearningdetail.png}}
+
+  \begin{align*}
+    Q(s, a; \theta) = \underset{\textcolor{cyan}{reward}}{R} + \underset{\textcolor{OrangeRed}{discounted\ future\ reward}}{\gamma \max \limits_{a'} Q(s', a'; \theta^-)}
+  \end{align*}
+
+  \begin{align*}
+    \mathcal{L(\theta)} = \left( R + \gamma \max \limits_{a'} Q(s', a'; \theta^-) - Q(s, a; \theta)  \right)^2
+  \end{align*}
+\end{frame}
+
+
+\begin{frame}{\bf deep Q learning}
+
+  \centering{\includegraphics[scale=0.12]{../diagrams/basic/qlearning.png}}
 
   \begin{align*}
     Q(s, a; \theta) = \underset{\textcolor{cyan}{reward}}{R} + \underset{\textcolor{OrangeRed}{discounted\ future\ reward}}{\gamma \max \limits_{a'} Q(s', a'; \theta^-)}
