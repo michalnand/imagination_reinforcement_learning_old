@@ -47,7 +47,7 @@ class Model(torch.nn.Module):
             Flatten()
         ]
 
-
+ 
         self.layers_value = [
             nn.Linear(fc_inputs_count, 512),
             nn.ReLU(),                       
