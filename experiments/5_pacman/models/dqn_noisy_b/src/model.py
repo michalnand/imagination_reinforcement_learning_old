@@ -13,7 +13,7 @@ class Flatten(nn.Module):
         return input.view(input.size(0), -1)
 
 class ResidualBlock(torch.nn.Module):
-    def __init__(self, channels):
+    def __init__(self, channels, weight_init_gain = 1.0):
         super(ResidualBlock, self).__init__()
 
         self.layers = [ 
@@ -22,8 +22,8 @@ class ResidualBlock(torch.nn.Module):
             nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1)
         ]
 
-        torch.nn.init.xavier_uniform_(self.layers[0].weight)
-        torch.nn.init.xavier_uniform_(self.layers[2].weight)
+        torch.nn.init.xavier_uniform_(self.layers[0].weight, gain=weight_init_gain)
+        torch.nn.init.xavier_uniform_(self.layers[2].weight, gain=weight_init_gain)
 
         self.model      = nn.Sequential(*self.layers)
         self.activation = nn.ReLU()
@@ -32,7 +32,7 @@ class ResidualBlock(torch.nn.Module):
         y = self.model(x) 
         return self.activation(y + x)
 
-
+  
 class Model(torch.nn.Module):
 
     def __init__(self, input_shape, outputs_count):
@@ -53,23 +53,23 @@ class Model(torch.nn.Module):
         self.layers_features = [ 
             nn.Conv2d(input_channels, 64, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
-            ResidualBlock(64),
-            ResidualBlock(64),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
 
             nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
-            ResidualBlock(64),
-            ResidualBlock(64),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
             
-            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
-            ResidualBlock(128),
-            ResidualBlock(128),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
 
-            nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(64, 64, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
-            ResidualBlock(128),
-            ResidualBlock(128),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
+            ResidualBlock(64, weight_init_gain = 0.1/2.0),
 
             Flatten()
         ] 
@@ -112,6 +112,7 @@ class Model(torch.nn.Module):
         print(self.model_features)
         print(self.model_value)
         print(self.model_advantage)
+
 
     def forward(self, state):
         features    = self.model_features(state)
