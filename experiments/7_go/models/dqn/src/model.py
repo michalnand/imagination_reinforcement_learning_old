@@ -16,28 +16,28 @@ class ResidualBlock(torch.nn.Module):
     def __init__(self, channels, weight_init_gain = 1.0):
         super(ResidualBlock, self).__init__()
 
-        
-        self.conv0  = nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1)
-        self.act0   = nn.ReLU()
-        self.conv1  = nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1)
-        self.act1   = nn.ReLU()
-            
-        torch.nn.init.xavier_uniform_(self.conv0.weight, gain=weight_init_gain)
-        torch.nn.init.xavier_uniform_(self.conv1.weight, gain=weight_init_gain)
+        self.layers = [ 
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
+            libs_layers.SkipInit(),
+            nn.ReLU(),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
+            libs_layers.SkipInit()
+        ]
 
+        torch.nn.init.xavier_uniform_(self.layers[0].weight, gain=weight_init_gain)
+        torch.nn.init.xavier_uniform_(self.layers[3].weight, gain=weight_init_gain)
+
+        self.model      = nn.Sequential(*self.layers)
+        self.activation = nn.ReLU()
 
     def forward(self, x):
-        y  = self.conv0(x)
-        y  = self.act0(y)
-        y  = self.conv1(y)
-        y  = self.act1(y + x)
-
-        return y
+        y = self.model(x) 
+        return self.activation(y + x)
 
   
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count):
+    def __init__(self, input_shape, outputs_count, residual_count = 16, kernels_count = 256):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,41 +50,37 @@ class Model(torch.nn.Module):
         input_width     = self.input_shape[2]    
 
 
-        fc_inputs_count = 128*(input_width//16)*(input_height//16)
+        fc_inputs_count = kernels_count*input_width*input_height//16
  
-        self.layers_features = [ 
-            nn.Conv2d(input_channels, 64, kernel_size=3, stride=2, padding=1),
-            nn.ReLU(),
-           
-            ResidualBlock(64),
-            ResidualBlock(64),
+        self.layers_features = [ ]
 
-            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
-            nn.ReLU(),
+        self.layers_features.append(nn.Conv2d(input_channels, kernels_count, kernel_size=3, stride=1, padding=1))
+        self.layers_features.append(libs_layers.SkipInit())
+        self.layers_features.append(nn.ReLU())
 
-            ResidualBlock(128),
-            ResidualBlock(128),
-            ResidualBlock(128), 
-            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
+        for i in range(residual_count): 
+            self.layers_features.append(ResidualBlock(kernels_count, weight_init_gain = 1.0/residual_count))
 
-            ResidualBlock(128),
-            ResidualBlock(128),
-            ResidualBlock(128),
-            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
-
-            Flatten()
-        ] 
 
         self.layers_value = [
-            nn.Linear(fc_inputs_count, 512),
-            nn.ReLU(),                       
-            nn.Linear(512, 1)  
-        ]  
+            nn.Conv2d(kernels_count, 4, kernel_size=1, stride=1, padding=0),
+            nn.ReLU(),
+
+            Flatten(),
+
+            nn.Linear(4*input_height*input_width, 256),
+            nn.ReLU(),
+
+            nn.Linear(256, 1)
+        ]
+
 
         self.layers_advantage = [
-            libs_layers.NoisyLinear(fc_inputs_count, 512),
-            nn.ReLU(),                      
-            libs_layers.NoisyLinear(512, outputs_count)
+            nn.Conv2d(kernels_count, 4, kernel_size=1, stride=1, padding=0),
+            nn.ReLU(),
+
+            Flatten(), 
+            libs_layers.NoisyLinear(4*input_height*input_width, self.outputs_count)
         ]
  
   
@@ -164,13 +160,13 @@ class Model(torch.nn.Module):
 
 
 if __name__ == "__main__":
-    batch_size = 8
+    batch_size = 1
 
-    channels = 4
-    height   = 96
-    width    = 96
+    channels = 8
+    height   = 19
+    width    = 19
 
-    actions_count = 9
+    actions_count = 19*19 + 1
 
 
     state   = torch.rand((batch_size, channels, height, width))
