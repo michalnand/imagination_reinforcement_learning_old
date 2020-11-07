@@ -15,14 +15,15 @@ env = libs_envs.go.go_wrapper.GoEnv(size=19)
 
 agent = libs_agents.AgentDQNDuel(env, Model, Config)
 
-max_iterations = 10*(10**6) 
+max_iterations = 100*(10**6) 
 
-#trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
-#trainig.run() 
+trainig = TrainingIterations(env, agent, max_iterations, path, 10000)
+trainig.run() 
 
-
-#agent.load(path)
+'''
+agent.load(path)
 agent.disable_training()
 while True:
     reward, done = agent.main()
     env.render()
+'''

@@ -16,28 +16,32 @@ class ResidualBlock(torch.nn.Module):
     def __init__(self, channels, weight_init_gain = 1.0):
         super(ResidualBlock, self).__init__()
 
-        self.layers = [ 
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
-            libs_layers.SkipInit(),
-            nn.ReLU(),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
-            libs_layers.SkipInit()
-        ]
+        self.conv0 = nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1)
+        self.si0   = libs_layers.SkipInit()
+        self.act0  = nn.ReLU()
 
-        torch.nn.init.xavier_uniform_(self.layers[0].weight, gain=weight_init_gain)
-        torch.nn.init.xavier_uniform_(self.layers[3].weight, gain=weight_init_gain)
+        self.conv1 = nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1)
+        self.si1   = libs_layers.SkipInit()
+        self.act1  = nn.ReLU()
 
-        self.model      = nn.Sequential(*self.layers)
-        self.activation = nn.ReLU()
+        torch.nn.init.xavier_uniform_(self.conv0.weight, gain=weight_init_gain)
+        torch.nn.init.xavier_uniform_(self.conv1.weight, gain=weight_init_gain)
 
     def forward(self, x):
-        y = self.model(x) 
-        return self.activation(y + x)
+        y = self.conv0(x)
+        y = self.si0(y)
+        y = self.act0(y)
+
+        y = self.si1(y)
+        y = self.si1(y)
+        y = self.act1(y + x)
+        
+        return y
 
   
 class Model(torch.nn.Module):
 
-    def __init__(self, input_shape, outputs_count, residual_count = 16, kernels_count = 256):
+    def __init__(self, input_shape, outputs_count, residual_count = 32, kernels_count = 256):
         super(Model, self).__init__()
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -47,10 +51,9 @@ class Model(torch.nn.Module):
         
         input_channels  = self.input_shape[0]
         input_height    = self.input_shape[1]
-        input_width     = self.input_shape[2]    
+        input_width     = self.input_shape[2]  
 
-
-        fc_inputs_count = kernels_count*input_width*input_height//16
+        self.kernels_count = kernels_count  
  
         self.layers_features = [ ]
 
@@ -59,7 +62,7 @@ class Model(torch.nn.Module):
         self.layers_features.append(nn.ReLU())
 
         for i in range(residual_count): 
-            self.layers_features.append(ResidualBlock(kernels_count, weight_init_gain = 1.0/residual_count))
+            self.layers_features.append(ResidualBlock(kernels_count, 1.0/residual_count ))
 
 
         self.layers_value = [
@@ -80,6 +83,7 @@ class Model(torch.nn.Module):
             nn.ReLU(),
 
             Flatten(), 
+
             libs_layers.NoisyLinear(4*input_height*input_width, self.outputs_count)
         ]
  
@@ -144,13 +148,9 @@ class Model(torch.nn.Module):
  
         state_t     = torch.tensor(state, dtype=torch.float32).detach().to(self.device).unsqueeze(0)
         features    = self.model_features(state_t)
-        features    = features.reshape((1, 64, 6, 6))
+        features    = features.reshape((1, self.kernels_count, self.input_shape[1], self.input_shape[2]))
 
-        upsample = nn.Upsample(size=(self.input_shape[1], self.input_shape[2]), mode='bicubic')
-
-        features = upsample(features).sum(dim = 1)
-
-        result = features[0].to("cpu").detach().numpy()
+        result      = features[0].to("cpu").detach().numpy()
 
         k = 1.0/(result.max() - result.min())
         q = 1.0 - k*result.max()

@@ -47,7 +47,7 @@ class GoEnv:
     def _step_e_greedy(self, q_values, epsilon):
         #mask q_values with legal moves and covnert into probs
         probs = self.legal_moves*numpy.exp(q_values - numpy.max(q_values))
-        probs = probs/numpy.sum(probs) 
+        probs = probs/numpy.sum(probs)  
 
         move = -1 
 
@@ -60,8 +60,8 @@ class GoEnv:
         
         return int(move)
 
-    def render(self):
-        self.env.render()
+    def render(self, mode="terminal"):
+        self.env.render(mode)
 
     def get_active_player(self):
         if self.observation[2][0][0] == 0:
