@@ -12,7 +12,6 @@ class AgentA2CContinuous():
         config = Config.Config()
  
         self.gamma              = config.gamma
-        self.lam                = 0.99
         self.entropy_beta       = config.entropy_beta
         self.batch_size         = config.batch_size
         self.episodes_to_train  = config.episodes_to_train
@@ -101,9 +100,7 @@ class AgentA2CContinuous():
         return result
 
     def _train(self):
-        #
         #loss = self._compute_loss()
-
         loss = self._compute_loss_gae()
 
         self.optimizer.zero_grad()        
@@ -112,7 +109,7 @@ class AgentA2CContinuous():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step() 
 
-    def _compute_gae_return(self):
+    def _compute_gae_return(self, lambda_ = 0.95):
         rewards = self.policy_buffer.rewards_b
         dones   = self.policy_buffer.dones_b
         values  = self.policy_buffer.values_b
@@ -136,10 +133,10 @@ class AgentA2CContinuous():
             returns_t[i][0] = r
                 
             # Compute TD-error
-            delta_t = rewards[i] + gamma_ * values[i+1][0] - values[i][0]
+            delta_t = rewards[i] + gamma_*values[i+1][0] - values[i][0]
                 
             # Generalized Advantage Estimation
-            gae = gae * gamma_ * self.lam + delta_t
+            gae = gae*gamma_*lambda_ + delta_t
             gae_t[i][0] = gae
 
 
@@ -148,8 +145,7 @@ class AgentA2CContinuous():
 
     def _compute_loss_gae(self):
 
-        returns, gae = self._compute_gae_return()
-        
+        returns, gae = self._compute_gae_return()     
 
         log_probs   = self._calc_log_prob(self.policy_buffer.actions_mu_b, self.policy_buffer.actions_var_b, self.policy_buffer.actions_b)
 

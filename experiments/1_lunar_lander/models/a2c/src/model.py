@@ -23,9 +23,7 @@ class Model(torch.nn.Module):
             nn.ReLU(),    
             nn.Linear(hidden_count//2, 1)
         ]           
-
-        
-                                   
+                            
         torch.nn.init.xavier_uniform_(self.layers_features[0].weight)
         
         torch.nn.init.xavier_uniform_(self.layers_actor[0].weight)
@@ -34,7 +32,6 @@ class Model(torch.nn.Module):
         torch.nn.init.xavier_uniform_(self.layers_critic[0].weight)
         torch.nn.init.xavier_uniform_(self.layers_critic[2].weight)
 
-        
         
         self.model_features = nn.Sequential(*self.layers_features)
         self.model_features.to(self.device)

@@ -92,10 +92,13 @@ class AgentA2C():
         return action_t.item()
   
     
-    def _train(self):
-        self.policy_buffer.compute_discounted_rewards(self.gamma, True) 
-        
-        loss = self._compute_loss()
+    def _train(self):      
+        self.policy_buffer.cut_zeros()
+
+        returns_t, gae_t = self._compute_gae_returns()
+
+
+        loss = self._compute_loss(returns_t, gae_t)
 
         self.optimizer.zero_grad()        
         loss.backward()
@@ -106,10 +109,7 @@ class AgentA2C():
         
 
 
-    def _compute_loss(self):
-        
-        discounted_rewards = self.policy_buffer.discounted_rewards_b.unsqueeze(1)
-
+    def _compute_loss(self, returns, gae):
         probs     = torch.nn.functional.softmax(self.policy_buffer.logits_b, dim = 1)
         log_probs = torch.nn.functional.log_softmax(self.policy_buffer.logits_b, dim = 1)
 
@@ -117,7 +117,7 @@ class AgentA2C():
         compute critic loss, as MSE
         L = (T - V(s))^2
         '''
-        loss_value = (discounted_rewards - self.policy_buffer.values_b)**2
+        loss_value = (returns - self.policy_buffer.values_b)**2
         loss_value = loss_value.mean()
 
 
@@ -125,7 +125,7 @@ class AgentA2C():
         compute actor loss 
         L = log(pi(s, a))*(T - V(s)) = log(pi(s, a))*A 
         '''
-        advantage   = (discounted_rewards - self.policy_buffer.values_b).detach()
+        advantage   = gae #(returns - self.policy_buffer.values_b).detach()
         loss_policy = -log_probs[range(len(log_probs)), self.policy_buffer.actions_b]*advantage
         loss_policy = loss_policy.mean()
 
@@ -141,3 +141,35 @@ class AgentA2C():
 
         return loss
 
+    
+    def _compute_gae_returns(self, lambda_ = 0.95):
+        rewards = self.policy_buffer.rewards_b
+        dones   = self.policy_buffer.dones_b
+        values  = self.policy_buffer.values_b
+ 
+        batch_size = len(rewards)
+
+        returns_t = torch.zeros((batch_size, 1)).to(self.model.device)
+        gae_t     = torch.zeros((batch_size, 1)).to(self.model.device)
+
+        r   = 0.0
+        gae = 0.0
+        for i in reversed(range(batch_size-1)):
+
+            if dones[i]:
+                gamma_ = 0.0
+            else:
+                gamma_ = self.gamma
+                
+            r = gamma_*r + rewards[i]
+
+            returns_t[i][0] = r
+                
+            # Compute TD-error
+            delta_t = rewards[i] + gamma_*values[i+1][0] - values[i][0]
+                
+            # Generalized Advantage Estimation
+            gae = gae*gamma_*lambda_ + delta_t
+            gae_t[i][0] = gae
+
+        return returns_t.detach(), gae_t.detach()

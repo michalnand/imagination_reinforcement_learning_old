@@ -8,7 +8,7 @@ class Config():
         self.tau                    = 0.001
 
         self.batch_size             = 32 
-        self.learning_rate          = 0.0001
+        self.learning_rate          = 0.0002
         self.bellman_steps          = 1
                  
         self.exploration            = libs_common.decay.Const(0.05, 0.05)        
