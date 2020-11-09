@@ -5,28 +5,6 @@ class Flatten(nn.Module):
     def forward(self, input):
         return input.view(input.size(0), -1)
 
-
-class ResidualBlock(torch.nn.Module):
-    def __init__(self, channels):
-        super(ResidualBlock, self).__init__()
-
-        self.layers = [] 
-        
-        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-        self.layers.append(nn.ReLU())
-        self.layers.append(nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1))
-
-        torch.nn.init.xavier_uniform_(self.layers[0].weight)
-        torch.nn.init.xavier_uniform_(self.layers[2].weight)
-
-        self.model = nn.Sequential(*self.layers)
-        self.activation = nn.ReLU()
-
-    def forward(self, x):
-        y = self.model(x) 
-        return self.activation(y + x)
-
-
 class Model(torch.nn.Module):
 
     def __init__(self, input_shape, outputs_count, kernels_count = 64):
@@ -41,48 +19,86 @@ class Model(torch.nn.Module):
         input_height    = self.input_shape[1]
         input_width     = self.input_shape[2]   
 
-        input_kernel_size = 4
 
-        self.layers = [
-            nn.Conv2d(input_channels + outputs_count, kernels_count, kernel_size=input_kernel_size, stride=input_kernel_size, padding=1),
+        self.layers_encoder = [
+            nn.Conv2d(input_channels + outputs_count, 32, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
+            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
 
-            ResidualBlock(kernels_count),
-            ResidualBlock(kernels_count),
-
-            nn.ConvTranspose2d(kernels_count, kernels_count, kernel_size=input_kernel_size, stride=input_kernel_size, padding=0),
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
-            nn.Conv2d(kernels_count, input_channels, kernel_size=3, stride=1, padding=1),
+            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
+
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
+
+            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
         ]
 
-        for i in range(len(self.layers)):
-            if hasattr(self.layers[i], "weight"):
-                torch.nn.init.xavier_uniform_(self.layers[i].weight)
 
-        self.model = nn.Sequential(*self.layers)
-        self.model.to(self.device)        
-        print(self.model, "\n\n")
+        self.layers_decoder = [
+            nn.ConvTranspose2d(64, 64, kernel_size=3, stride=2, padding=1, output_padding=1),           
+            nn.ReLU(),
+
+            nn.ConvTranspose2d(64, 64, kernel_size=3, stride=2, padding=1, output_padding=1),           
+            nn.ReLU(),
+
+            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),           
+            nn.ReLU(),
+
+            nn.ConvTranspose2d(32, 32, kernel_size=3, stride=2, padding=1, output_padding=1),           
+            nn.ReLU(),
+
+            nn.Conv2d(32, input_channels, kernel_size=3, stride=1, padding=1)
+        ]
+
+        for i in range(len(self.layers_encoder)):
+            if hasattr(self.layers_encoder[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_encoder[i].weight)
+
+        for i in range(len(self.layers_decoder)):
+            if hasattr(self.layers_decoder[i], "weight"):
+                torch.nn.init.xavier_uniform_(self.layers_decoder[i].weight)
+
+        self.model_encoder = nn.Sequential(*self.layers_encoder)
+        self.model_encoder.to(self.device)        
+
+        self.model_decoder = nn.Sequential(*self.layers_decoder)
+        self.model_decoder.to(self.device)        
+
+        print(self.model_encoder)
+        print(self.model_decoder)
+        print("\n\n")
         
     def forward(self, state, action):
         action_ = action.unsqueeze(1).unsqueeze(1).transpose(3, 1).repeat((1, 1, self.input_shape[1], self.input_shape[2])).to(self.device)
 
-        model_x     = torch.cat([state, action_], dim = 1)
-        model_y     = self.model(model_x)
+        model_x         = torch.cat([state, action_], dim = 1)
         
-        return model_y + state.detach()
+        latent_space    = self.model_encoder(model_x)
+
+        model_y         = self.model_decoder(latent_space)
+        
+        return model_y + model_x.detach()
 
     def save(self, path):
         print("saving ", path)
-        torch.save(self.model.state_dict(), path + "trained/model_env.pt")
+
+        torch.save(self.model_encoder.state_dict(), path + "trained/model_env_encoder.pt")
+        torch.save(self.model_decoder.state_dict(), path + "trained/model_env_decoder.pt")
      
 
     def load(self, path):
         print("loading ", path, " device = ", self.device) 
 
-        self.model.load_state_dict(torch.load(path + "trained/model_env.pt", map_location = self.device))
-        self.model.eval() 
+        self.model_encoder.load_state_dict(torch.load(path + "trained/model_env_encoder.pt", map_location = self.device))
+        self.model_decoder.load_state_dict(torch.load(path + "trained/model_env_decoder.pt", map_location = self.device))
+        
+        self.model_encoder.eval()
+        self.model_decoder.eval() 
 
 
   
