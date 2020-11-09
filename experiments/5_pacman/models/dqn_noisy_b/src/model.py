@@ -50,36 +50,30 @@ class Model(torch.nn.Module):
         input_width     = self.input_shape[2]    
 
 
-        fc_inputs_count = 64*(input_width//16)*(input_height//16)
+        fc_inputs_count = 128*(input_width//16)*(input_height//16)
   
         self.layers_features = [ 
-            nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1),
+            nn.Conv2d(input_channels, 64, kernel_size=3, stride=2, padding=1),
             nn.ReLU(),
+
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+
+            ResidualBlock(128),
+            ResidualBlock(128),
             nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
 
-            nn.Conv2d(32, 32, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
-
-            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            ResidualBlock(64),
-            ResidualBlock(64),
-            nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
-
-            nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            ResidualBlock(64), 
-            ResidualBlock(64),
+            ResidualBlock(128), 
+            ResidualBlock(128),
             nn.AvgPool2d(kernel_size=2, stride=2, padding=0),
 
             Flatten()
         ] 
 
         self.layers_value = [
-            nn.Linear(fc_inputs_count, 512),
+            nn.Linear(fc_inputs_count, 256),
             nn.ReLU(),                       
-            nn.Linear(512, 1)    
+            nn.Linear(256, 1)    
         ]  
 
         self.layers_advantage = [
@@ -149,7 +143,7 @@ class Model(torch.nn.Module):
  
         state_t     = torch.tensor(state, dtype=torch.float32).detach().to(self.device).unsqueeze(0)
         features    = self.model_features(state_t)
-        features    = features.reshape((1, 64, 6, 6))
+        features    = features.reshape((1, 128, 6, 6))
 
         upsample = nn.Upsample(size=(self.input_shape[1], self.input_shape[2]), mode='bicubic')
 
