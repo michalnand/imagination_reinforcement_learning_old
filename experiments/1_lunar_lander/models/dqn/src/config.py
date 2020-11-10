@@ -6,8 +6,7 @@ class Config():
         self.gamma                  = 0.99
         self.learning_rate          = 0.0002
         self.tau                    = 0.001
-        self.priority_buffer        = True
-        self.bellman_steps          = 2
+        self.bellman_steps          = 3
 
         self.batch_size             = 32
         self.update_frequency       = 4

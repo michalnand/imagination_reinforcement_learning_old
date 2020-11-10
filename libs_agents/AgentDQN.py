@@ -25,10 +25,6 @@ class AgentDQN():
             self.soft_update        = False
             self.target_update      = 10000
 
-        if hasattr(config, "priority_buffer"):
-            self.priority_buffer        = True
-        else:        
-            self.priority_buffer        = False
 
         self.update_frequency   = config.update_frequency        
         self.bellman_steps = config.bellman_steps
@@ -37,7 +33,7 @@ class AgentDQN():
         self.state_shape    = self.env.observation_space.shape
         self.actions_count  = self.env.action_space.n
 
-        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps, self.priority_buffer)
+        self.experience_replay = ExperienceBuffer(config.experience_replay_size, self.bellman_steps)
 
         self.model          = Model.Model(self.state_shape, self.actions_count)
         self.model_target   = Model.Model(self.state_shape, self.actions_count)
@@ -136,13 +132,13 @@ class AgentDQN():
                 if done_t[j][i]:
                     gamma_ = 0.0
                 reward_sum+= reward_t[j][i]*(gamma_**i)
-
+            
             action_idx    = action_t[j]
             q_target[j][action_idx]   = reward_sum + (gamma_**self.bellman_steps)*torch.max(q_predicted_next[j])
  
         #train DQN model
-        loss_ = ((q_target.detach() - q_predicted)**2)
-        loss  = loss_.mean() 
+        loss  = ((q_target.detach() - q_predicted)**2)
+        loss  = loss.mean() 
 
         self.optimizer.zero_grad()
         loss.backward()
@@ -150,10 +146,7 @@ class AgentDQN():
             param.grad.data.clamp_(-10.0, 10.0)
         self.optimizer.step()
 
-        loss_ = loss_.mean(dim=1).detach().to("cpu").numpy()
-        if self.priority_buffer:
-            self.experience_replay.set_loss_for_priority(loss_)
-
+       
     def _sample_action(self, state_t, epsilon):
 
         batch_size = state_t.shape[0]

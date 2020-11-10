@@ -2,26 +2,10 @@ import numpy
 import torch
 
 
-class PrioritySelector:
-    def __init__(self, size):
-        self.priority_b     = numpy.ones(size)
-
-    def add(self, idx, value, k = 0.1):
-        self.priority_b[idx]    = (1.0 - k)*self.priority_b[idx] + k*value
-
-    def select(self, count, max_idx):
-
-        max_idx_ = min(self.priority_b.size, max_idx)
-        aligned  = self.priority_b[0:max_idx_]
-
-        probs    = aligned/numpy.sum(aligned)
-        indices  = numpy.random.choice(len(probs), count, p=probs)
-
-        return indices
 
 class ExperienceBuffer():
 
-    def __init__(self, size, n_steps = 1, priority = False):
+    def __init__(self, size, n_steps = 1):
         self.size   = size
        
         self.ptr      = 0 
@@ -31,11 +15,6 @@ class ExperienceBuffer():
         self.done_b   = []
 
         self.n_steps        = n_steps
-
-        if priority:
-            self.priority_selector = PrioritySelector(self.size)
-        else:
-            self.priority_selector = None
 
         
 
@@ -94,13 +73,10 @@ class ExperienceBuffer():
         state_next_t    = torch.zeros(state_shape,  dtype=torch.float32).to(device)
         done_t          = torch.zeros(done_shape,  dtype=torch.float32).to(device)
 
-        if self.priority_selector is not(None):
-            self.indices = self.priority_selector.select(batch_size, self.length() - self.n_steps)
-        else:
-            self.indices = self.find_indices_random(batch_size)
+        indices = self.find_indices_random(batch_size)
 
         for j in range(batch_size): 
-            n = self.indices[j]
+            n = indices[j]
 
             state_t[j]         = torch.from_numpy(self.state_b[n]).to(device)
             action_t[j]        = self.action_b[n]
@@ -121,7 +97,3 @@ class ExperienceBuffer():
             indices[i]  = numpy.random.randint(self.length() - 1 - self.n_steps)
         
         return indices
-
-    def set_loss_for_priority(self, loss):
-        for i in range(len(self.indices)):
-            self.priority_selector.add(self.indices[i], loss[i])
