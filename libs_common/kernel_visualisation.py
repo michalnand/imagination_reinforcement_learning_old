@@ -7,7 +7,7 @@ from PIL import Image
 class InputModel(torch.nn.Module):
     def __init__(self, in_shape):
         super(InputModel, self).__init__()
-        self.weight  = nn.Parameter(torch.rand(in_shape))
+        self.weight  = nn.Parameter(torch.rand(in_shape)*2.0 - 1.0)
 
     def forward(self):
         return self.weight
@@ -36,7 +36,7 @@ class KernelVisualisation:
 
         tiles_height, tiles_width = self._make_rectangle(kernels_count)
 
-        result_image = Image.new("L", (width*tiles_width, height*tiles_height))
+        result_image = Image.new("RGB", (width*tiles_width, height*tiles_height))
 
         print("processing layer ", layer_id, kernels_count)
 
@@ -46,8 +46,9 @@ class KernelVisualisation:
                 
                 print("   processing kernel ", kernel_idx)
 
-                x = self._solve(layer_id, kernel_idx)[0]*255
-                im = Image.fromarray(x)
+                x = self._solve(layer_id, kernel_idx)
+                x_rgb = self._to_rgb(x)
+                im = Image.fromarray(x_rgb, "RGB")
 
                 result_image.paste(im, (tw*width, th*height))
 
@@ -55,7 +56,7 @@ class KernelVisualisation:
         file_name = saving_path + "layer_" + str(layer_id) + ".png"
         result_image.save(file_name)
 
-    def _solve(self, layer_id, kernel_id, epoch_count=50, learning_rate = 0.2, decay = 0.00001, normalise = True):
+    def _solve(self, layer_id, kernel_id, epoch_count=20, learning_rate = 0.1, decay = 0.00001, normalise = True):
 
         input_model = InputModel((1, ) + self.input_shape )
         optimizer   = torch.optim.Adam(input_model.parameters(), lr=learning_rate, weight_decay=decay)
@@ -66,10 +67,8 @@ class KernelVisualisation:
 
             '''
             maximize response from choosen kernel
-            minimize resposne from remaining kernels
             ''' 
-            loss = (-2.0*y[0][kernel_id]).mean()
-            loss+= y[0].mean()  
+            loss = -y[0][kernel_id].mean()
 
             optimizer.zero_grad()
             loss.backward()
@@ -95,15 +94,16 @@ class KernelVisualisation:
         return y
 
     def _to_rgb(self, x):
-        result = numpy.zeros((3, x.shape[1], x.shape[2]))
+        tmp = numpy.zeros((3, x.shape[1], x.shape[2]))
  
-        result[0] = x[0]
-        result[1] = x[0]
-        result[2] = x[0]
+        tmp[0] = x[0]
+        tmp[1] = x[1]
+        tmp[2] = x[2]
 
-        result = numpy.rollaxis(result, 0, 2)
+        result = numpy.ascontiguousarray(tmp.transpose(1,2,0))
+        result = numpy.array(result*255, dtype=numpy.uint8)
 
-        return result*255
+        return result
 
 
     def _make_rectangle(self, kernels_count):
