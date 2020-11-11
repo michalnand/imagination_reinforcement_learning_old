@@ -9,11 +9,11 @@ import libs_agents
 from libs_common.Training import *
 from libs_common.atari_wrapper import *
 
-import models.dqn_noisy_b.src.model            as Model
-import models.dqn_noisy_b.src.config           as Config
+import models.dqn_noisy_resnet_a.src.model            as Model
+import models.dqn_noisy_resnet_a.src.config           as Config
 
 
-path = "models/dqn_noisy_b/"
+path = "models/dqn_noisy_resnet_a/"
 
 env = gym.make("MsPacmanNoFrameskip-v4")
 
