@@ -5,7 +5,7 @@ class Config():
     def __init__(self):
         self.gamma                  = 0.99
         self.update_frequency       = 4
-        self.tau                    = 0.001
+        self.target_update          = 10000
 
         self.batch_size             = 32 
         self.learning_rate          = 0.0001

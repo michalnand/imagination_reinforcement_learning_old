@@ -9,13 +9,13 @@ import libs_agents
 from libs_common.Training import *
 from libs_common.atari_wrapper import *
 
-import models.dqn_noisy_resnet.src.model            as Model
-import models.dqn_noisy_resnet.src.config           as Config
+import models.dqn_noisy_resnet_b.src.model            as Model
+import models.dqn_noisy_resnet_b.src.config           as Config
 
 
-path = "models/dqn_noisy_resnet/"
+path = "models/dqn_noisy_resnet_b/"
 
-env = gym.make("SolarisNoFrameskip-v4")
+env = gym.make("MsPacmanNoFrameskip-v4")
 
 env = AtariWrapper(env)
 env.reset()
