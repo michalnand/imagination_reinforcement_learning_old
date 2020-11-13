@@ -43,25 +43,21 @@ class Model(torch.nn.Module):
 
 
         self.layers_encoder = [
-            nn.Conv2d(input_channels + outputs_count, 32, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(input_channels + outputs_count, kernels_count, kernel_size=4, stride=4, padding=0),
             nn.ReLU(),
 
-            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
             
-            ResidualBlock(64),
-            ResidualBlock(64)
+            ResidualBlock(kernels_count),
+            ResidualBlock(kernels_count)
         ]
 
-
         self.layers_decoder = [
-            nn.ConvTranspose2d(64, 64, kernel_size=3, stride=2, padding=1, output_padding=1),           
+            nn.Conv2d(kernels_count, kernels_count, kernel_size=3, stride=1, padding=1),
             nn.ReLU(),
 
-            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),           
-            nn.ReLU(),
-
-            nn.Conv2d(32, input_channels, kernel_size=3, stride=1, padding=1)
+            nn.ConvTranspose2d(kernels_count, input_channels, kernel_size=4, stride=4, padding=0, output_padding=0)   
         ]
 
         for i in range(len(self.layers_encoder)):

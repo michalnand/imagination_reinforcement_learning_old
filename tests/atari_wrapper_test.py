@@ -11,9 +11,10 @@ import libs_common.atari_wrapper
 from PIL import Image
 
 
-#env = gym.make("PongNoFrameskip-v4")
-env = gym.make("BreakoutNoFrameskip-v4")
+
+#env = gym.make("BreakoutNoFrameskip-v4")
 #env = gym.make("MsPacmanNoFrameskip-v4")
+env = gym.make("MontezumaRevengeNoFrameskip-v4")
 env = libs_common.atari_wrapper.AtariWrapper(env)
 env.reset()
 

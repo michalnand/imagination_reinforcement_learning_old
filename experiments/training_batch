@@ -1,11 +1,12 @@
-cd 4_breakout
-python3 dqn.py
+cd atari_breakout
+python3 dqn_noisy_resnet.py
 cd ..
 
-cd 4_pacman
-python3 dqn.py
+cd atari_solaris
+python3 dqn_noisy_resnet.py
 cd ..
 
-cd 4_qbert
-python3 dqn.py
+cd atari_montezuma
+python3 dqn_noisy_resnet.py
 cd ..
+
